@@ -8,7 +8,9 @@ Overview
 
 Usage
 -----
-  
+
+This is the full specification::
+
   virtualmachine { "name":
       desc            => "My first VM",
   
