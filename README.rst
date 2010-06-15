@@ -6,8 +6,8 @@ Puppet Module to manage virtual machines using libvirt.
 Overview
 --------
 
-This module provides a type for virtual machines installation and management like ensure running and so on.
-All the operations will be made using libvirt [0]. At first, only Xen and KVM will be supported.
+This module provides three new types (`kvm`, `xen_paravirt` and `xen_fullyvirt`) for virtual machines installation and management like ensure running and so on.
+All the operations will be made using libvirt [0]. At first, only Xen fully paravirtualizated, and KVM will be supported.
 
 This module is the result of my work at GSoC 2010.
 
@@ -16,11 +16,10 @@ This module is the result of my work at GSoC 2010.
 Usage
 -----
 
-This is the full specification::
+This is the full specification for the new types. All have the same fields::
 
-  virtualmachine { "name":
-      desc            => "My first VM",
-  
+  kvm | xen_paravirt | xen_fullyvirt { "name":
+      desc => "My first VM",
   # Basic configuration
       memory          => 1024, # MB, changeable
       cpus            => 2, # Changeable
@@ -43,17 +42,18 @@ This is the full specification::
   
   # Virtualization parameters
       provider        => libvirt, # For now, only libvirt is available
-      virt_type       => qemu | xen_paravirt | xen_fullvirt,
   
   # Network configuration
       interfaces      => [ "eth0", "eth1" ], # Source host interface. Default eth0 or the existing interface
   
   # VM behaviour
       autoboot        => true | false,
-      ensure          => running | stopped,
+      ensure          => running | stopped | installed | absent,
       on_poweroff     => destroy | restart | preserv | rename-restart  # Default value: destroy 
+      on_reboot       => destroy | restart | preserv | rename-restart  # Default value: restart
+      on_crash        => destroy | restart | preserv | rename-restart  # Default value: restart
   }
-  
+
 
 TODO
 ----
