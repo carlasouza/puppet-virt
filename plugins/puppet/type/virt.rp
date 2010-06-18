@@ -1,0 +1,103 @@
+Puppet::Type.newtype(:virt) do
+	@doc = "Create a new guest"
+
+	newproperty(:desc) do
+		desc "The VM description."
+	end
+
+  newproperty(:name) do
+    desc ""
+    isnamevar
+  end
+
+  newproperty(:ensure) do
+    desc ""
+  
+    aliasvalue(:false, :stopped)
+    aliasvalue(:true, :running)
+
+    newvalue(:installed) do
+    end
+
+    newvalue(:stopped) do
+    end
+
+    newvalue(:running) do
+    end
+
+    newvalue(:absent) do
+    end
+      
+    def retrieve
+      return provider.status
+    end
+
+  end
+
+	newproperty(:memory) do
+	end
+
+	newproperty(:cpus) do
+	end
+
+	newproperty(:arch) do
+	end
+
+	newproperty(:clocksync) do
+	end
+
+	newproperty(:boot_kernel) do
+	end
+
+	newproperty(:boot_initrd) do
+	end
+
+	newproperty(:boot_options) do
+	end
+
+	newproperty(:virt_path) do
+	end
+
+	newproperty(:disk_size) do
+	end
+
+	newproperty(:os_type) do
+    newvalue(:linux)
+    newvalue(:windows)
+    newvalue(:unix)
+    newvalue(:solaris)
+    newvalue(:other)
+    
+	end
+
+	newproperty(:os_variant) do
+	end
+
+	newproperty(:provider) do
+    defaultto :libvirt
+    newvalue(:libvirt)
+	end
+
+	newproperty(:virt_type) do
+    newvalue(:kvm)
+    newvalue(:xen_fullyvirt)
+    newvalue(:xen_paravirt)
+  end
+  
+  newproperty(:interfaces) do
+	end
+
+	newproperty(:on_poweroff) do
+	end
+
+	newproperty(:on_reboot) do
+	end
+
+	newproperty(:on_crash) do
+	end
+
+	newproperty(:autoboot) do
+		newvalue(:true)
+		newvalue(:false)
+	end
+end

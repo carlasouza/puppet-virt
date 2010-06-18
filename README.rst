@@ -6,7 +6,8 @@ Puppet Module to manage virtual machines using libvirt.
 Overview
 --------
 
-This module provides three new types (`kvm`, `xen_paravirt` and `xen_fullyvirt`) for virtual machines installation and management like ensure running and so on.
+This is the full specification for the new types. All have the same fields::
+This module provides a new type (`virt`) for virtual machines installation and management like ensure running and so on.
 All the operations will be made using libvirt [0]. At first, only Xen fully paravirtualizated, and KVM will be supported.
 
 This module is the result of my work at GSoC 2010.
@@ -18,7 +19,7 @@ Usage
 
 This is the full specification for the new types. All have the same fields::
 
-  kvm | xen_paravirt | xen_fullyvirt { "name":
+  virt { "name":
       desc => "My first VM",
   # Basic configuration
       memory          => 1024, # MB, changeable
@@ -27,9 +28,9 @@ This is the full specification for the new types. All have the same fields::
       clocksync       => UTC | localtime | timezone | variable, # Clock source
   
   # Boot configuration
-      install_kernel  => "/path/to/vmlinuz",
-      install_initrd  => "/path/to/initrd.img",
-      install_options => "ks=foo noacpi" # Non changeable, controls, kickstart
+      boot_kernel  => "/path/to/vmlinuz",
+      boot_initrd  => "/path/to/initrd.img",
+      boot_options => "ks=foo noacpi" # Non changeable, controls, kickstart
           #For now, only the .img files will be supported
       virt_path       => "/path/foo.img" | "/opt/virt_images/" | "/dev/sd4" 
   
@@ -42,6 +43,7 @@ This is the full specification for the new types. All have the same fields::
   
   # Virtualization parameters
       provider        => libvirt, # For now, only libvirt is available
+      virt_type        => kvm | xen-fullyvirt | xen-paravirt  # for libvirt provider, this field is mandatory
   
   # Network configuration
       interfaces      => [ "eth0", "eth1" ], # Source host interface. Default eth0 or the existing interface
@@ -50,8 +52,8 @@ This is the full specification for the new types. All have the same fields::
       autoboot        => true | false,
       ensure          => running | stopped | installed | absent,
       on_poweroff     => destroy | restart | preserv | rename-restart  # Default value: destroy 
-      on_reboot       => destroy | restart | preserv | rename-restart  # Default value: restart
-      on_crash        => destroy | restart | preserv | rename-restart  # Default value: restart
+      on_reboot       => destroy | restart | preserv | rename-restart
+      on_crash        => destroy | restart | preserv | rename-restart
   }
 
 
