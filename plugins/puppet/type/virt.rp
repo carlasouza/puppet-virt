@@ -2,8 +2,8 @@ Puppet::Type.newtype(:virt) do
 	@doc = "Create a new guest"
 
 	newproperty(:desc) do
-		desc "The VM description."
-	end
+    desc "The VM description."
+  end
 
   newproperty(:name) do
     desc ""
@@ -34,70 +34,69 @@ Puppet::Type.newtype(:virt) do
 
   end
 
-	newproperty(:memory) do
-	end
+  newproperty(:memory) do
+  end
 
-	newproperty(:cpus) do
-	end
+  newproperty(:cpus) do
+  end
 
-	newproperty(:arch) do
-	end
+  newproperty(:arch) do
+  end
 
-	newproperty(:clocksync) do
-	end
+  newproperty(:clocksync) do
+  end
 
-	newproperty(:boot_kernel) do
-	end
+  newproperty(:boot_kernel) do
+  end
 
-	newproperty(:boot_initrd) do
-	end
+  newproperty(:boot_initrd) do
+  end
 
-	newproperty(:boot_options) do
-	end
+  newproperty(:boot_options) do
+  end
 
-	newproperty(:virt_path) do
-	end
+  newproperty(:virt_path) do
+  end
 
-	newproperty(:disk_size) do
-	end
+  newproperty(:disk_size) do
+  end
 
-	newproperty(:os_type) do
+  newproperty(:os_type) do
     newvalue(:linux)
     newvalue(:windows)
     newvalue(:unix)
     newvalue(:solaris)
     newvalue(:other)
-    
-	end
+  end
 
-	newproperty(:os_variant) do
-	end
+  newproperty(:os_variant) do
+  end
 
-	newproperty(:provider) do
+  newproperty(:provider) do
     defaultto :libvirt
     newvalue(:libvirt)
-	end
+  end
 
-	newproperty(:virt_type) do
+  newproperty(:virt_type) do
     newvalue(:kvm)
     newvalue(:xen_fullyvirt)
     newvalue(:xen_paravirt)
   end
   
   newproperty(:interfaces) do
-	end
+  end
 
-	newproperty(:on_poweroff) do
-	end
+  newproperty(:on_poweroff) do
+  end
 
-	newproperty(:on_reboot) do
-	end
+  newproperty(:on_reboot) do
+  end
 
-	newproperty(:on_crash) do
-	end
-
-	newproperty(:autoboot) do
-		newvalue(:true)
-		newvalue(:false)
-	end
+  newproperty(:on_crash) do
+  end
+  
+  newproperty(:autoboot) do
+    newvalue(:true)
+    newvalue(:false)
+  end
 end
