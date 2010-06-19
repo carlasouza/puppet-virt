@@ -28,9 +28,9 @@ This is the full specification for the new types. All have the same fields::
       clocksync       => UTC | localtime | timezone | variable, # Clock source
   
   # Boot configuration
-      boot_kernel  => "/path/to/vmlinuz",
-      boot_initrd  => "/path/to/initrd.img",
-      boot_options => "ks=foo noacpi" # Non changeable, controls, kickstart
+      boot_kernel     => "/path/to/vmlinuz",
+      boot_initrd     => "/path/to/initrd.img",
+      boot_options    => "ks=foo noacpi" # Non changeable, controls, kickstart
           #For now, only the .img files will be supported
       virt_path       => "/path/foo.img" | "/opt/virt_images/" | "/dev/sd4" 
   
@@ -43,7 +43,7 @@ This is the full specification for the new types. All have the same fields::
   
   # Virtualization parameters
       provider        => libvirt, # For now, only libvirt is available
-      virt_type        => kvm | xen-fullyvirt | xen-paravirt  # for libvirt provider, this field is mandatory
+      virt_type       => kvm | xen-fullyvirt | xen-paravirt  # for libvirt provider, this field is mandatory
   
   # Network configuration
       interfaces      => [ "eth0", "eth1" ], # Source host interface. Default eth0 or the existing interface
