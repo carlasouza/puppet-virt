@@ -1,20 +1,33 @@
 module Puppet
 	newtype(:virt) do
-		@doc = "Create a new guest"
+		@doc = "Create a new xen or kvm guest"
 	
 		newparam(:desc) do
 			desc "The VM description."
 		end
 	
 		newparam(:name) do
-			desc ""
+			desc "The virtual machine name."
+			validate do |value|
+           			unless value =~ /^\w+/
+		        		raise ArguementError, "%s is not a valid device name" % value
+		    	end
 			isnamevar
 		end
-	
+
 		newproperty(:ensure) do
-			desc ""
+			desc "One of \"running\", \"installed\", \"stopped\" or \"absent\".
+			     - running:
+			         Creates config file, and makes sure the domU is running.
+			     - installed:
+			         Creates config file, but doesn't touch the state of the domU.
+			     - stopped:
+			         Creates config file, and makes sure the domU is not running.
+			     - absent:
+			         Removes config file, and makes sure the domU is not running."
 		
 			newvalue(:installed) do
+				provider.create
 			end
 	
 			newvalue(:stopped) do
@@ -24,27 +37,31 @@ module Puppet
 			end
 	
 			newvalue(:absent) do
+				provider.destroy	
 			end
 			
 			aliasvalue(:false, :stopped)
 			aliasvalue(:true, :running)
+
+			defaultto(:installed)
 			
 			def retrieve
-				return provider.status
+				provider.status
 			end
 	
 		end
 	
 		newparam(:memory) do
-			desc ""
+			desc "The amount of memory reserved for the virtual machine.
+			      Specified in MB and is changeable."
 		end
 	
 		newparam(:cpus) do
-			desc ""
+			desc "Changeable"
 		end
 	
 		newparam(:arch) do
-			desc ""
+			desc "Not Changeable"
 		end
 	
 		newparam(:clocksync) do
@@ -64,66 +81,55 @@ module Puppet
 		end
 	
 		newparam(:virt_path) do
-			desc ""
+			desc "Path to .img file"
 		end
 	
 		newparam(:disk_size) do
-			desc ""
+			desc "Not changeable."
 		end
 	
-		newparam(:os_type) do
-			desc ""
+		newproperty(:os_type) do
+			desc "Not changable."
 	
-#			newvalue(:linux)
-#			newvalue(:windows)
-#			newvalue(:unix)
-#			newvalue(:solaris)
-#			newvalue(:other)
+			newvalue(:linux, :windows, :unix, :solaris, :other)
 		end
 	
-		newparam(:os_variant) do
+		newproperty(:os_variant) do
 			desc ""
 		end
-
-#		newparam(:provider) do
-#			desc ""
-#		end	
 
 		newproperty(:virt_type) do
-			desc ""
-	
-			newvalue(:kvm) do
-				resource[:provider] = :libvirt
-			end
-			newvalue(:xen_fullyvirt) do
-				resource[:provider] = :libvirt
-			end
-			newvalue(:xen_paravirt) do
-				resource[:provider] = :libvirt
-			end
+			desc "Mandatory field"
+			newvalue(:kvm, :xen_fullyvirt, :xen_paravirt) 
+			defaultto(:xen_paravirt)
 		end
 		
 		newparam(:interfaces) do
-			desc ""
+			desc "Network interface(s)  bridge"
 		end
 	
-		newparam(:on_poweroff) do
+		newproperty(:on_poweroff) do
 			desc ""
+			newvalue(:destroy, :restart, :preserv, :renamerestart)
+			defaultto(:destroy)
 		end
 	
-		newparam(:on_reboot) do
+		newproperty(:on_reboot) do
 			desc ""
+			newvalue(:destroy, :restart, :preserv, :renamerestart)
+			defaultto(:perserv)
 		end
 	
-		newparam(:on_crash) do
+		newproperty(:on_crash) do
 			desc ""
+			newvalue(:destroy, :restart, :preserv, :renamerestart)
+			defaultto(:restart)
 		end
 		
 		newproperty(:autoboot) do
 			desc ""
-	
-			newvalue(:true)
-			newvalue(:false)
+			newvalue(:true, :false)
+			defaultto(:true)
 		end
 	end
 end

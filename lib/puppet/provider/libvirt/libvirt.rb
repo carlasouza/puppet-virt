@@ -1,21 +1,25 @@
 require 'libvirt'
+Puppet::Type.type(:virt).provide(:libvirt) do
+	desc "Libvirt provider"
+	
+	defaultfor :operatinsystem => [:debian, :ubuntu]
 
-class Util
+	def create
+		p "created"
+	end
 
-        @conn
+	def destroy
+		p "destroied"
+	end
 
-        def connect
-                @conn = Libvirt::open("qemu:///session")
-        end
+	def status 
+		@@conn = Libvirt::open("qemu:///session")
+                all = @@conn.list_domains + @@conn.list_defined_domains
+                p all.include? @resource[:name] #debuging
+		all.include? @resource[:name]
+	end
+	
+	def virt_type
+	end
 
-        def isRunning?(name)
-        #if conn != null
-                @conn.list_domains.include? name
-        #raise error
-        end
-
-        def isDefined?(name)
-                all = @conn.list_domains + @conn.list_defined_domains
-                all.include? name
-        end
 end
