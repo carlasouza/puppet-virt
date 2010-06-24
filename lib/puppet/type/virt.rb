@@ -8,10 +8,6 @@ module Puppet
 	
 		newparam(:name) do
 			desc "The virtual machine name."
-			validate do |value|
-           			unless value =~ /^\w+/
-		        		raise ArguementError, "%s is not a valid device name" % value
-		    	end
 			isnamevar
 		end
 
