@@ -4,8 +4,11 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	
 	defaultfor :operatinsystem => [:debian, :ubuntu]
 
+	commands :install => "virt-install"
+
 	def create
-		p "created"
+		p "Created"
+		install "--connect \"qemu:///system\" -n", :name," -r ", :memory, " --disk path=",:path," --import  --force"
 	end
 
 	def destroy

@@ -48,8 +48,8 @@ module Puppet
 		end
 	
 		newparam(:memory) do
-			desc "The amount of memory reserved for the virtual machine.
-			      Specified in MB and is changeable."
+#			desc "The amount of memory reserved for the virtual machine.
+#			      Specified in MB and is changeable."
 		end
 	
 		newparam(:cpus) do
@@ -87,7 +87,7 @@ module Puppet
 		newproperty(:os_type) do
 			desc "Not changable."
 	
-			newvalue(:linux, :windows, :unix, :solaris, :other)
+			newvalues(:linux, :windows, :unix, :solaris, :other)
 		end
 	
 		newproperty(:os_variant) do
@@ -96,7 +96,7 @@ module Puppet
 
 		newproperty(:virt_type) do
 			desc "Mandatory field"
-			newvalue(:kvm, :xen_fullyvirt, :xen_paravirt) 
+			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt) 
 			defaultto(:xen_paravirt)
 		end
 		
@@ -106,25 +106,25 @@ module Puppet
 	
 		newproperty(:on_poweroff) do
 			desc ""
-			newvalue(:destroy, :restart, :preserv, :renamerestart)
+			newvalues(:destroy, :restart, :preserv, :renamerestart)
 			defaultto(:destroy)
 		end
 	
 		newproperty(:on_reboot) do
 			desc ""
-			newvalue(:destroy, :restart, :preserv, :renamerestart)
-			defaultto(:perserv)
+			newvalues(:destroy, :restart, :preserv, :renamerestart)
+			defaultto(:preserv)
 		end
 	
 		newproperty(:on_crash) do
 			desc ""
-			newvalue(:destroy, :restart, :preserv, :renamerestart)
+			newvalues(:destroy, :restart, :preserv, :renamerestart)
 			defaultto(:restart)
 		end
 		
 		newproperty(:autoboot) do
 			desc ""
-			newvalue(:true, :false)
+			newvalues(:true, :false)
 			defaultto(:true)
 		end
 	end
