@@ -38,7 +38,7 @@ module Puppet
 			aliasvalue(:true, :installed)
 			aliasvalue(:present, :installed)
 
-			defaultto(:installed)
+			defaultto(:true)
 			
 			def retrieve
 				provider.status
@@ -83,17 +83,17 @@ module Puppet
 			desc "Not changeable."
 		end
 	
-		newproperty(:os_type) do
+		newparam(:os_type) do
 			desc "Not changable."
 	
 			newvalues(:linux, :windows, :unix, :solaris, :other)
 		end
 	
-		newproperty(:os_variant) do
+		newparam(:os_variant) do
 			desc ""
 		end
 
-		newproperty(:virt_type) do
+		newparam(:virt_type) do
 			desc "Mandatory field"
 			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt) 
 #			defaultto(:xen_paravirt)
@@ -103,25 +103,25 @@ module Puppet
 			desc "Network interface(s)  bridge"
 		end
 	
-		newproperty(:on_poweroff) do
+		newparam(:on_poweroff) do
 			desc ""
 			newvalues(:destroy, :restart, :preserv, :renamerestart)
 			defaultto(:destroy)
 		end
 	
-		newproperty(:on_reboot) do
+		newparam(:on_reboot) do
 			desc ""
 			newvalues(:destroy, :restart, :preserv, :renamerestart)
 			defaultto(:preserv)
 		end
 	
-		newproperty(:on_crash) do
+		newparam(:on_crash) do
 			desc ""
 			newvalues(:destroy, :restart, :preserv, :renamerestart)
 			defaultto(:restart)
 		end
 		
-		newproperty(:autoboot) do
+		newparam(:autoboot) do
 			desc ""
 			newvalues(:true, :false)
 			defaultto(:true)
