@@ -1,9 +1,6 @@
-import "*"
-
 class virt {
 	case $operatingsystem {
 		debian: { include virt::debian }
-		
 	}
 }
 

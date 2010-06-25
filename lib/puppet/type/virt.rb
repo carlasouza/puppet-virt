@@ -6,12 +6,12 @@ module Puppet
 			desc "The VM description."
 		end
 	
-		newparam(:name) do
+		newparam(:name, :namevar => true) do
 			desc "The virtual machine name."
-			isnamevar
 		end
 
-		newproperty(:ensure) do
+
+		ensurable do
 			desc "One of \"running\", \"installed\", \"stopped\" or \"absent\".
 			     - running:
 			         Creates config file, and makes sure the domU is running.
@@ -22,7 +22,9 @@ module Puppet
 			     - absent:
 			         Removes config file, and makes sure the domU is not running."
 		
-			newvalue(:installed) do
+			defaultvalues
+
+			newvalue(:installed) do # == :present
 				provider.create
 			end
 	
@@ -32,12 +34,9 @@ module Puppet
 			newvalue(:running) do
 			end
 	
-			newvalue(:absent) do
-				provider.destroy	
-			end
-			
 			aliasvalue(:false, :stopped)
-			aliasvalue(:true, :running)
+			aliasvalue(:true, :installed)
+			aliasvalue(:present, :installed)
 
 			defaultto(:installed)
 			
@@ -48,8 +47,8 @@ module Puppet
 		end
 	
 		newparam(:memory) do
-#			desc "The amount of memory reserved for the virtual machine.
-#			      Specified in MB and is changeable."
+			desc "The amount of memory reserved for the virtual machine.
+			      Specified in MB and is changeable."
 		end
 	
 		newparam(:cpus) do
@@ -97,7 +96,7 @@ module Puppet
 		newproperty(:virt_type) do
 			desc "Mandatory field"
 			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt) 
-			defaultto(:xen_paravirt)
+#			defaultto(:xen_paravirt)
 		end
 		
 		newparam(:interfaces) do
