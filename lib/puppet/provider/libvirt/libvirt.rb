@@ -1,10 +1,11 @@
 require 'libvirt'
 Puppet::Type.type(:virt2).provide(:libvirt) do
 
-        desc "   -v, --hvm: full virtualization, 
-                -p, --paravirt: paravirtualizatoin"
 
         commands :install => "/usr/bin/virt-install"
+
+        desc "   -v, --hvm: full virtualization, 
+                -p, --paravirt: paravirtualizatoin"
 
         def create
                 p "*** Create"
@@ -21,11 +22,20 @@ Puppet::Type.type(:virt2).provide(:libvirt) do
         def exists?
                 p "** Exists?"
                 @@conn = Libvirt::open("qemu:///session")
-                all = @@conn.list_domains + @@conn.list_defined_domains
-                p @resource[:name]
-                p all.include? @resource[:name]
-                all.include? @resource[:name]
+
+                # Ugly way
+                # all = @@conn.list_domains + @@conn.list_defined_domains
+                # p @resource[:name] 
+                # p all.include? @resource[:name]
+                # all.include? @resource[:name]
+
+                # Beautifull way
+                begin
+                        @@dom = @@conn.lookup_domain_by_name(@resource[:name])
+                rescue Exception => e
+                        false # The vm with that name doesnt exist
+                end
         end
 
 end
-~              
+
