@@ -1,10 +1,9 @@
 require 'libvirt'
 Puppet::Type.type(:virt2).provide(:libvirt) do
 
-
         commands :install => "/usr/bin/virt-install"
 
-        desc "   -v, --hvm: full virtualization, 
+        desc "  -v, --hvm: full virtualization 
                 -p, --paravirt: paravirtualizatoin"
 
         def create
@@ -12,11 +11,14 @@ Puppet::Type.type(:virt2).provide(:libvirt) do
                 @memory=512 # get it from manifest
                 @path="path=/local/carla/gsoc/vm10.qcow2" #get it from manifest
 
-                install "--name", @resource[:name],"--ram",@memory, "--disk" ,@path,"--import","--noautoconsole","--force"
+                install "--name", @resource[:name],"--ram", @resource[:memory], "--disk" ,@path,"--import","--noautoconsole","--force"
         end
 
         def destroy
                 p "** Destroy"
+                @@conn = Libvirt::open("qemu:///session")
+                @@dom = @@conn.lookup_domain_by_name(@resource[:name])
+                @@dom.undefine
         end
 
         def exists?
@@ -36,6 +38,4 @@ Puppet::Type.type(:virt2).provide(:libvirt) do
                         false # The vm with that name doesnt exist
                 end
         end
-
 end
-
