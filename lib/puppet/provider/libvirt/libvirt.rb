@@ -1,5 +1,5 @@
 require 'libvirt'
-Puppet::Type.type(:virt2).provide(:libvirt) do
+Puppet::Type.type(:virt).provide(:libvirt) do
 
         commands :install => "/usr/bin/virt-install"
 
@@ -7,7 +7,7 @@ Puppet::Type.type(:virt2).provide(:libvirt) do
                 -p, --paravirt: paravirtualizatoin"
 
         def create
-                p "*** Create"
+                p "** Create"
                 @memory=512 # get it from manifest
                 @path="path=/local/carla/gsoc/vm10.qcow2" #get it from manifest
 
@@ -34,8 +34,10 @@ Puppet::Type.type(:virt2).provide(:libvirt) do
                 # Beautifull way
                 begin
                         @@dom = @@conn.lookup_domain_by_name(@resource[:name])
-                rescue Exception => e
+                rescue Libvirt::RetrieveError => e
+                        p e.to_s #debug
                         false # The vm with that name doesnt exist
                 end
         end
 end
+
