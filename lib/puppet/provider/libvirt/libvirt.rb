@@ -2,13 +2,13 @@ require 'libvirt'
 
 Puppet::Type.type(:virt).provide(:libvirt) do
 
-   commands :install => "/usr/bin/virt-install"
+	commands :install => "/usr/bin/virt-install"
 
 	desc "-v, --hvm: full virtualization 
          -p, --paravirt: paravirtualizatoin"
 
-   def create
-   	p "** Create"
+	def create
+		p "** Create"
 
 		@virt_parameter = case @resource[:virt_type]
 					when :xen_fullyvirt then "--hvm"
@@ -16,24 +16,25 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 					when :kvm then "--accelerate" #must validate hardware support
 					else "invalid value"
 		end
+
 		p @resource[:virt_type]
 		p @virt_parameter
 
-      @path="path=".concat(@resource[:virt_path])
+		@path="path=".concat(@resource[:virt_path])
 
-      install "--name", @resource[:name], "--ram", @resource[:memory], "--disk" , @path, "--import", "--noautoconsole", "--force", @virt_parameter
+		install "--name", @resource[:name], "--ram", @resource[:memory], "--disk" , @path, "--import", "--noautoconsole", "--force", @virt_parameter
 
-   end
+	end
 
-   def destroy #set absent
-      p "** Destroy"
+	def destroy #set absent
+		p "** Destroy"
 
-      @@conn = Libvirt::open("qemu:///session")
-      @@dom = @@conn.lookup_domain_by_name(@resource[:name])
+		@@conn = Libvirt::open("qemu:///session")
+		@@dom = @@conn.lookup_domain_by_name(@resource[:name])
 		@@dom.destroy
-      @@dom.undefine
+		@@dom.undefine
 
-   end
+	end
 
 	def stopvm
 		desc "" 
@@ -43,7 +44,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		# else create and stop
 		
 		@@conn = Libvirt::open("qemu:///session")
-      @@dom = @@conn.lookup_domain_by_name(@resource[:name])
+		@@dom = @@conn.lookup_domain_by_name(@resource[:name])
 		@@dom.shutdown
 	end
 
@@ -55,32 +56,31 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		# else create
 
 		@@conn = Libvirt::open("qemu:///session")
-      @@dom = @@conn.lookup_domain_by_name(@resource[:name])
+		@@dom = @@conn.lookup_domain_by_name(@resource[:name])
 		@@dom.create		
 	end
 
-   def exists?
+	def exists?
 
-      p "** Exists?"
-      @@conn = Libvirt::open("qemu:///session")
+	p "** Exists?"
+		@@conn = Libvirt::open("qemu:///session")
 
-      # Ugly way
-      # all = @@conn.list_domains + @@conn.list_defined_domains
-      # p @resource[:name] 
-      # p all.include? @resource[:name]
-      # all.include? @resource[:name]
+		# Ugly way
+		# all = @@conn.list_domains + @@conn.list_defined_domains
+		# p @resource[:name] 
+		# p all.include? @resource[:name]
+		# all.include? @resource[:name]
 
-      # Beautifull way
-      begin
+		# Beautifull way
+		begin
 			@@dom = @@conn.lookup_domain_by_name(@resource[:name])
 			p "**** Exists?  true"
 			true
-      rescue Libvirt::RetrieveError => e
-      	p e.to_s #debug
+		rescue Libvirt::RetrieveError => e
+			p e.to_s #debug
 			p "**** Exists? false"
-         false # The vm with that name doesnt exist
-      end
-
+			false # The vm with that name doesnt exist
+		end
 	end
 
 	#running | stopped | installed | absent,				
