@@ -29,16 +29,17 @@ module Puppet
 			end
 	
 			newvalue(:stopped) do
+				provider.stopvm
 			end
 	
 			newvalue(:running) do
+				provider.startvm
 			end
 	
 			aliasvalue(:false, :stopped)
-			aliasvalue(:true, :installed)
-			aliasvalue(:running, :installed)
+			aliasvalue(:true, :running)
 			aliasvalue(:installed, :running)
-			aliasvalue(:stopped, :installed)
+			aliasvalue(:installed, :stopped)
 
 			defaultto(:stopped)
 			
