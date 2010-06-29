@@ -36,9 +36,11 @@ module Puppet
 	
 			aliasvalue(:false, :stopped)
 			aliasvalue(:true, :installed)
-			aliasvalue(:present, :installed)
+			aliasvalue(:running, :installed)
+			aliasvalue(:installed, :running)
+			aliasvalue(:stopped, :installed)
 
-			defaultto(:true)
+			defaultto(:stopped)
 			
 			def retrieve
 				provider.status
