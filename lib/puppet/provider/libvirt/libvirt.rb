@@ -4,66 +4,74 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	commands :install => "/usr/bin/virt-install"
 
-	desc "-v, --hvm: full virtualization 
-         -p, --paravirt: paravirtualizatoin"
+	defaultfor :operatingsystem => [:debian, :ubuntu]
 
 	def create
-		p "** Create"
+		Puppet.debug "Creating a new virtual machine " % [@resource[:name]]
 
 		@virt_parameter = case @resource[:virt_type]
-					when :xen_fullyvirt then "--hvm"
-					when :xen_paravirt then "--paravirt"
+					when :xen_fullyvirt then "--hvm" #must validate kernel support
+					when :xen_paravirt then "--paravirt" #Must validate kernel support
 					when :kvm then "--accelerate" #must validate hardware support
-					else "invalid value"
+					else "Invalid value" #raise something here
 		end
 
-		p @resource[:virt_type]
-		p @virt_parameter
+		Puppet.debug "VM type: %s" % [@resource[:virt_type]]
 
 		@path="path=".concat(@resource[:virt_path])
 
-		install "--name", @resource[:name], "--ram", @resource[:memory], "--disk" , @path, "--import", "--noautoconsole", "--force", @virt_parameter
+#		begin
+			install "--name", @resource[:name], "--ram", @resource[:memory], "--disk" , @path, "--import", "--noautoconsole", "--force", @virt_parameter
+#		rescue Puppet::ExecutionFailure => e
+#			#Should I catch this exception here?
+#		end
 
 	end
 
-	def destroy #set absent
-		p "** Destroy"
+	def destroy #Changing ensure to absent
+		Puppet.debug "Trying to destroy the virtual machine %s" % [@resource[:name]]
 
-		@@conn = Libvirt::open("qemu:///session")
-		@@dom = @@conn.lookup_domain_by_name(@resource[:name])
-		@@dom.destroy
-		@@dom.undefine
+		@conn = Libvirt::open("qemu:///session")
+		@dom = @conn.lookup_domain_by_name(@resource[:name])
+		begin
+			@dom.destroy
+		rescue Libvirt::Error => e
+			Puppet.debug "Machine %s already Stopped" % [@resource[:name]]
+		end
+		@dom.undefine
 
 	end
 
 	def stopvm
-		desc "" 
+		Puppet.debug "Stopping VM %s" % [@resource[:name]]
+		#desc Stop the virtual machine
 
-		# if exists? and is running
+		# TODO if exists? and is running
 		#   start
 		# else create and stop
 		
-		@@conn = Libvirt::open("qemu:///session")
-		@@dom = @@conn.lookup_domain_by_name(@resource[:name])
-		@@dom.shutdown
+		@conn = Libvirt::open("qemu:///session")
+		@dom = @conn.lookup_domain_by_name(@resource[:name])
+#		@dom.shutdown #Sometimes it doesn't shutdown :(
+		@dom.destroy
 	end
 
 	def startvm
-		desc "Start the virtual machine only if it is stopped (duh)"
+		Puppet.debug "Starting VM %s" % [@resource[:name]]
+		# Start the virtual machine only if it is stopped (duh)
 
-		# if exists? and is stopped
+		# TODO if exists? and is stopped
 		#    start
 		# else create
 
-		@@conn = Libvirt::open("qemu:///session")
-		@@dom = @@conn.lookup_domain_by_name(@resource[:name])
-		@@dom.create		
+		@conn = Libvirt::open("qemu:///session")
+		@dom = @conn.lookup_domain_by_name(@resource[:name])
+		@dom.create		
 	end
 
 	def exists?
 
-	p "** Exists?"
-		@@conn = Libvirt::open("qemu:///session")
+		@conn = Libvirt::open("qemu:///session")
 
 		# Ugly way
 		# all = @@conn.list_domains + @@conn.list_defined_domains
@@ -73,12 +81,11 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 		# Beautifull way
 		begin
-			@@dom = @@conn.lookup_domain_by_name(@resource[:name])
-			p "**** Exists?  true"
+			@dom = @conn.lookup_domain_by_name(@resource[:name])
+			Puppet.debug "VM %s exists? true" % [@resource[:name]]
 			true
 		rescue Libvirt::RetrieveError => e
-			p e.to_s #debug
-			p "**** Exists? false"
+			Puppet.debug "VM %s exists? false" % [@resource[:name]]
 			false # The vm with that name doesnt exist
 		end
 	end
@@ -87,18 +94,18 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	def status
 
 		p "** Status"
-		@@conn = Libvirt::open("qemu:///session")
+		@conn = Libvirt::open("qemu:///session")
 		if exists? 
 			# 1 = running, 3 = paused|suspend|freeze, 5 = stopped 
-			if @@conn.lookup_domain_by_name(@resource[:name]).info.state != 5
-				p "**** Status: running"
+			if @conn.lookup_domain_by_name(@resource[:name]).info.state != 5
+				Puppet.debug "VM %s status: running" % [@resource[:name]]
 				return "running"
 			else
-				p "**** Status: stopped"
+				Puppet.debug "VM %s status: stopped" % [@resource[:name]]
 				return "stopped"
 			end
 		else
-			p "**** Status: absent"
+			Puppet.debug "VM %s status: absent" % [@resource[:name]]
 			return "absent"
 		end
 
