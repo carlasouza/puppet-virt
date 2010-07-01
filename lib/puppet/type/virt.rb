@@ -24,9 +24,9 @@ module Puppet
 		
 			defaultvalues
 
-			newvalue(:installed) do # == :present
-				provider.create
-			end
+#			newvalue(:installed) do
+#				provider.create
+#			end
 	
 			newvalue(:stopped) do
 				provider.stopvm
@@ -36,12 +36,10 @@ module Puppet
 				provider.startvm
 			end
 	
-			aliasvalue(:false, :stopped)
-			aliasvalue(:true, :running)
 			aliasvalue(:installed, :running)
 			aliasvalue(:installed, :stopped)
 
-			defaultto(:stopped)
+			defaultto(:running)
 			
 			def retrieve
 				provider.status

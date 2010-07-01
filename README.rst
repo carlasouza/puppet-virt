@@ -50,7 +50,7 @@ This is the full specification for the new types. All have the same fields::
   
   # VM behaviour
       autoboot        => true | false,
-      ensure          => running | stopped | installed | absent,
+      ensure          => running | stopped | installed | absent, # Default value: running
       on_poweroff     => destroy | restart | preserv | rename-restart  # Default value: destroy 
       on_reboot       => destroy | restart | preserv | rename-restart
       on_crash        => destroy | restart | preserv | rename-restart
