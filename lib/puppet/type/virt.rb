@@ -24,20 +24,18 @@ module Puppet
 		
 			defaultvalues
 
-#			newvalue(:installed) do
-#				provider.create
-#			end
 	
 			newvalue(:stopped) do
-				provider.stopvm
+				provider.stop
 			end
 	
 			newvalue(:running) do
-				provider.startvm
+				provider.start
 			end
-	
-			aliasvalue(:installed, :running)
-			aliasvalue(:installed, :stopped)
+
+			#	FIXME this value must only ensure it is installed.			
+#			newvalue(:installed) do
+#			end
 
 			defaultto(:running)
 			
