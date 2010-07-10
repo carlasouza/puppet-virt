@@ -33,6 +33,7 @@ module Puppet
 				provider.start
 			end
 
+			aliasvalue(:installed, :stopped)
 			#	FIXME this value must only ensure it is installed.			
 #			newvalue(:installed) do
 #			end
@@ -62,6 +63,9 @@ module Puppet
 			desc ""
 		end
 	
+
+	# Instalation method
+
 		newparam(:boot_kernel) do
 			desc ""
 		end
@@ -81,7 +85,10 @@ module Puppet
 		newparam(:disk_size) do
 			desc "Not changeable."
 		end
+
 	
+	# VM parameters 
+		
 		newparam(:os_type) do
 			desc "Not changable."
 	
@@ -120,10 +127,14 @@ module Puppet
 			defaultto(:restart)
 		end
 		
-		newparam(:autoboot) do
+		newproperty(:autoboot) do
 			desc ""
-			newvalues(:true, :false)
-			defaultto(:true)
+			newvalues(true, false)
+			defaultto(true)
+			def retrieve #FIXME
+				provider.autoboot
+			end
 		end
+
 	end
 end
