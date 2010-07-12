@@ -118,14 +118,16 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	end
 
 
+	def isautoboot?
+		dom.autostart
+	end
+
+
 	# FIXME not working yet
 	def autoboot
 		debug "VM trying to set autoboot: %s" % [resource[:autoboot]]
 		begin
-			debug "VM auto start? %s" % [dom.autostart]
-			if dom.autostart != resource[:autoboot]
-				dom.autostart=(resource[:autoboot])
-			end
+			dom.autostart=(resource[:autoboot])
 		rescue Exception => e
 			debug "VM %s not defined" % [resource[:name]]
 		end

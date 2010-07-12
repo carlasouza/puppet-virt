@@ -1,13 +1,29 @@
 module Puppet
 	newtype(:virt) do
 		@doc = "Create a new xen or kvm guest"
-	
-		newparam(:desc) do
-			desc "The VM description."
-		end
-	
-		newparam(:name, :namevar => true) do
-			desc "The virtual machine name."
+
+
+		# A base class for Virt parameters validation.
+		class VirtParam < Puppet::Property
+
+			def numfix(num)
+				if num =~ /^\d+$/
+					return num.to_i
+				elsif num.is_a?(Integer)
+					return num
+				else
+					return false
+				end
+			end
+
+			munge do |value|
+				if numfix(value)
+					return value
+				else
+					self.fail "%s is not a valid %s" % [value, self.class.name]
+				end
+			end
+
 		end
 
 
@@ -23,7 +39,6 @@ module Puppet
 			         Removes config file, and makes sure the domU is not running."
 		
 			defaultvalues
-
 	
 			newvalue(:stopped) do
 				provider.stop
@@ -45,26 +60,39 @@ module Puppet
 			end
 	
 		end
+		
+		newparam(:desc) do
+			desc "The VM description."
+		end
 	
-		newparam(:memory) do
+		newparam(:name, :namevar => true) do
+			desc "The virtual machine name."
+		end
+
+
+		newparam(:memory, :parent => VirtParam) do
 			desc "The amount of memory reserved for the virtual machine.
 			      Specified in MB and is changeable."
 		end
 	
-		newparam(:cpus) do
+		newparam(:cpus, :parent => VirtParam) do
 			desc "Changeable"
 		end
 	
 		newparam(:arch) do
 			desc "Not Changeable"
+
+			newvalues("i386","amd64","ia64","powerpc","hppa")
 		end
 	
 		newparam(:clocksync) do
 			desc ""
+
+			newvalues("UTC", "localtime", "timezone", "variable")
 		end
 	
 
-	# Instalation method
+		# Instalation method
 
 		newparam(:boot_kernel) do
 			desc ""
@@ -82,16 +110,16 @@ module Puppet
 			desc "Path to .img file"
 		end
 	
-		newparam(:disk_size) do
+		newparam(:disk_size, :parent => VirtParam) do
 			desc "Not changeable."
 		end
 
 	
-	# VM parameters 
+		# VM parameters 
 		
 		newparam(:os_type) do
 			desc "Not changable."
-	
+
 			newvalues(:linux, :windows, :unix, :solaris, :other)
 		end
 	
@@ -101,8 +129,9 @@ module Puppet
 
 		newparam(:virt_type) do
 			desc "Mandatory field"
+
 			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt) 
-#			defaultto(:xen_paravirt)
+			defaultto(:xen_paravirt)
 		end
 		
 		newparam(:interfaces) do
@@ -111,29 +140,34 @@ module Puppet
 	
 		newparam(:on_poweroff) do
 			desc ""
+
 			newvalues(:destroy, :restart, :preserv, :renamerestart)
 			defaultto(:destroy)
 		end
 	
 		newparam(:on_reboot) do
 			desc ""
+
 			newvalues(:destroy, :restart, :preserv, :renamerestart)
 			defaultto(:preserv)
 		end
 	
 		newparam(:on_crash) do
 			desc ""
+
 			newvalues(:destroy, :restart, :preserv, :renamerestart)
 			defaultto(:restart)
 		end
 		
-		newproperty(:autoboot) do
+		newparam(:autoboot) do
 			desc ""
+
 			newvalues(true, false)
 			defaultto(true)
-			def retrieve #FIXME
-				provider.autoboot
-			end
+
+#			def retrieve
+#				provider.isautoboot?
+#			end
 		end
 
 	end
