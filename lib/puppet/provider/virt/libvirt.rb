@@ -6,7 +6,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# The provider is choosed by virt_type, not by operating system
 #	defaultfor :operatingsystem => [:debian, :ubuntu] 
 	
-#	has_features :libvirt
 	confine :feature => :libvirt
 
 	# 
@@ -31,7 +30,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 		@path="path=".concat(resource[:virt_path])
 
-		arguments = ["--name", resource[:name], "--ram", resource[:memory], "--disk" , @path, "--import", "--noautoconsole", "--force", @virt_parameter]
+		arguments = ["--name", resource[:name], "--ram", resource[:memory], "--vcpus" , resource[:cpus] , "--disk" , @path, "--import", "--noautoconsole", "--force", @virt_parameter]
 
 		if !bootoninstall
 			arguments << "--noreboot"

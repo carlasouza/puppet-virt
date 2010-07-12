@@ -51,6 +51,7 @@ module Puppet
 			aliasvalue(:installed, :stopped)
 			#	FIXME this value must only ensure it is installed.			
 #			newvalue(:installed) do
+#				#something here
 #			end
 
 			defaultto(:running)
@@ -73,10 +74,13 @@ module Puppet
 		newparam(:memory, :parent => VirtParam) do
 			desc "The amount of memory reserved for the virtual machine.
 			      Specified in MB and is changeable."
+			isrequired
 		end
 	
 		newparam(:cpus, :parent => VirtParam) do
 			desc "Changeable"
+
+			defaultto(1)
 		end
 	
 		newparam(:arch) do
@@ -108,6 +112,8 @@ module Puppet
 	
 		newparam(:virt_path) do
 			desc "Path to .img file"
+
+			isrequired
 		end
 	
 		newparam(:disk_size, :parent => VirtParam) do
@@ -130,6 +136,7 @@ module Puppet
 		newparam(:virt_type) do
 			desc "Mandatory field"
 
+			isrequired
 			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt) 
 			defaultto(:xen_paravirt)
 		end
@@ -164,7 +171,7 @@ module Puppet
 
 			newvalues(true, false)
 			defaultto(true)
-
+			
 #			def retrieve
 #				provider.isautoboot?
 #			end
