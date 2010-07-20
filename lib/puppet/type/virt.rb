@@ -38,8 +38,6 @@ module Puppet
 			     - absent:
 			         Removes config file, and makes sure the domU is not running."
 		
-			defaultvalues
-	
 			newvalue(:stopped) do
 				provider.stop
 			end
@@ -52,7 +50,9 @@ module Puppet
 				provider.setinstalled
 			end
 
-			aliasvalue(:present, :installed)
+			newvalue(:absent) do
+				provider.destroy
+			end
 
 			defaultto(:running)
 			
@@ -70,16 +70,16 @@ module Puppet
 			desc "The virtual machine name."
 		end
 
-
 		newparam(:memory, :parent => VirtParam) do
-			desc "The amount of memory reserved for the virtual machine.
+			desc "The maximum amount of memory allocation for the guest domain.
 			      Specified in MB and is changeable."
 
 			isrequired #FIXME Bug #4049
 		end
-	
+
 		newparam(:cpus, :parent => VirtParam) do
-			desc "Changeable"
+			desc "Number of virtual CPUs active in the guest domain.
+					This value is changeable"
 
 			defaultto(1)
 		end
@@ -99,6 +99,7 @@ module Puppet
 
 		# Instalation method
 
+		# Path para o kernel para realizar o boot
 		newparam(:boot_kernel) do
 			desc ""
 		end
@@ -110,11 +111,26 @@ module Puppet
 		newparam(:boot_options) do
 			desc ""
 		end
-	
+
+
 		newparam(:virt_path) do
-			desc "Path to .img file"
+			desc "Path do disk image file. This field is mandatory.
+					Initially only import existing disk is available.
+					Image files must end with *.img, *.qcow or *.qcow2"
 
 			isrequired #FIXME Bug #4049
+
+			# Value must end with .img or .qcow or .qcow2
+			munge do |value|
+				case value
+				when String
+					if (value =~ /.(img|qcow|qcow2)$/).nil?
+						self.fail "%s is not a valid %s" % [value, self.class.name]
+					end
+				end
+				return value
+			end
+
 		end
 	
 		newparam(:disk_size, :parent => VirtParam) do
