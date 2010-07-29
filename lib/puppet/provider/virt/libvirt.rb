@@ -4,8 +4,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	commands :virtinstall => "/usr/bin/virt-install"
 
 	# The provider is choosed by virt_type, not by operating system
-#	defaultfor :operatingsystem => [:debian, :ubuntu] 
-	
 	confine :feature => :libvirt
 
 	# 
@@ -116,7 +114,9 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 		if exists? 
 			# 1 = running, 3 = paused|suspend|freeze, 5 = stopped 
-			if dom.info.state != 5
+			if resource[:ensure].to_s == "installed"
+				return "installed"
+			elsif dom.info.state != 5
 				debug "Domain %s status: running" % [resource[:name]]
 				return "running"
 			else
@@ -131,8 +131,10 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	end
 
 
-	def isautoboot?
-		dom.autostart
+	def isautoboot
+
+		return dom.autostart.to_s
+
 	end
 
 

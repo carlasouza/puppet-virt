@@ -183,15 +183,15 @@ module Puppet
 			defaultto(:restart)
 		end
 		
-		newparam(:autoboot) do
+		newproperty(:autoboot) do
 			desc ""
 
-			newvalues(true, false)
-			defaultto(true)
-			
-#			def retrieve
-#				provider.isautoboot?
-#			end
+			newvalue(true)
+			newvalue(false)
+
+			def retrieve
+				provider.isautoboot
+			end
 		end
 
 	end
