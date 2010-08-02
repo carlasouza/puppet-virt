@@ -162,25 +162,40 @@ module Puppet
 			desc "Network interface(s)  bridge"
 		end
 	
-		newparam(:on_poweroff) do
+		newproperty(:on_poweroff) do
 			desc ""
 
 			newvalues(:destroy, :restart, :preserv, :renamerestart)
 			defaultto(:destroy)
+
+			def retrieve
+				provider.getvalue("poweroff")
+			end
+
 		end
 	
-		newparam(:on_reboot) do
+		newproperty(:on_reboot) do
 			desc ""
 
 			newvalues(:destroy, :restart, :preserv, :renamerestart)
 			defaultto(:preserv)
+
+			def retrieve
+				provider.getvalue("reboot")
+			end
+
 		end
 	
-		newparam(:on_crash) do
+		newproperty(:on_crash) do
 			desc ""
 
 			newvalues(:destroy, :restart, :preserv, :renamerestart)
 			defaultto(:restart)
+
+			def retrieve
+				provider.getvalue("crash")
+			end
+
 		end
 		
 		newproperty(:autoboot) do

@@ -2,13 +2,16 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	@doc = ""
 
 	commands :virtinstall => "/usr/bin/virt-install"
+	commands :grep => "/bin/grep"
 
 	# The provider is choosed by virt_type, not by operating system
 	confine :feature => :libvirt
 
 	# 
 	def dom
+
 		Libvirt::open("qemu:///session").lookup_domain_by_name(resource[:name])
+
 	end
 
 	#
@@ -130,7 +133,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	end
 
-
+	# Is the domain autostarting?
 	def isautoboot
 
 		return dom.autostart.to_s
@@ -138,29 +141,45 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	end
 
 
-	# FIXME not working yet
-	def autoboot
+	# Set true or false to autoboot property
+	def autoboot=(value)
 
-		debug "Trying to set autoboot %s at domain." % [resource[:autoboot]]
-
+		debug "Trying to set autoboot %s at domain %s." % [resource[:autoboot], resource[:name]]
 		begin
-			dom.autostart=(resource[:autoboot])
-		rescue Exception => e
+			if value.to_s == "false"
+				dom.autostart=(false)
+			else
+				dom.autostart=(true)
+			end
+		rescue Libvirt::RetrieveError => e
 			debug "Domain %s not defined" % [resource[:name]]
 		end
 
 	end
 
 	#
-#	def on_poweroff
-#	end
+	def on_poweroff=(value)
+	end
 
 	#
-#	def on_reboot
-#	end
+	def on_reboot=(value)
+	end
 
 	#
-#	def on_crash
-#	end
+	def on_crash=(value)
+	end
+
+	# Retrieve method for "on_crash", "on_reboot" and "on_poweroff" properties
+	# key must "crash", "reboot" or "poweroff"
+	def getvalue(key)
+
+		path = "/etc/libvirt/qemu/" #Debian/ubuntu path for qemu's xml files
+		extension = ".xml"
+		arguments =  [key, path + resource[:name] + extension]
+		line = grep arguments
+	
+		return line.split('>')[1].split('<')[0]	
+
+	end
 
 end
