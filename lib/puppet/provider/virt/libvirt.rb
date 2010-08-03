@@ -136,6 +136,14 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# Is the domain autostarting?
 	def isautoboot
 
+		if !exists?
+			case resource[:ensure]
+				when :absent then return #do nothing
+				when :running then install(true)
+				else install(false)
+			end
+		end
+	
 		return dom.autostart.to_s
 
 	end
