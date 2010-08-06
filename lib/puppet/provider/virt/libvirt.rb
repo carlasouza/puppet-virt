@@ -149,7 +149,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	end
 
 	# Is the domain autostarting?
-	def isautoboot
+	def autoboot
 
 		if !exists?
 			setpresent
@@ -183,7 +183,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		extension = ".xml"
 		file = path + resource[:name] + extension
 
-		if File.exists(file)
+		if File.exists?(file)
 			arguments =  ["poweroff", file]
 			line = ""
 			debug "Line: %s" % [line]
