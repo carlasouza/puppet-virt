@@ -181,18 +181,17 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 		path = "/etc/libvirt/qemu/" #Debian/ubuntu path for qemu's xml files
 		extension = ".xml"
-		arguments =  ["poweroff", path + resource[:name] + extension]
-		line = ""
-		debug "Line: %s" % [line]
+		file = path + resource[:name] + extension
 
-		begin
-			line = grep arguments
+		if File.exists(file)
+			arguments =  ["poweroff", file]
+			line = ""
 			debug "Line: %s" % [line]
-		rescue Puppet::Error => e
-			setpresent
+			line = grep arguments
+			return line.split('>')[1].split('<')[0]	
+		else
+			return :absent
 		end
-	
-		return line.split('>')[1].split('<')[0]	
 
 	end
 
