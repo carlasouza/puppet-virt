@@ -37,7 +37,10 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			arguments << "--noreboot"
 		end
 
-		virtinstall arguments 
+		@interface="bridge=".concat(resource[:interfaces])
+		network = ["--network", @interface]
+
+		virtinstall arguments
 
 	end
 
@@ -97,6 +100,16 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	end
 
+	# Auxiliary method to make sure the domain exists before change it's properties.
+	#
+	def setpresent
+		case resource[:ensure]
+			when :absent then return #do nothing
+			when :running then install(true)
+			else install(false)
+		end
+	end
+
 	# Check if the domain exists.
 	def exists?
 
@@ -114,6 +127,8 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	# running | stopped | absent,				
 	def status
+
+		debug "Calling ensure retrieve method. Now the domain is %s" % [resource[:ensure]]
 
 		if exists? 
 			# 1 = running, 3 = paused|suspend|freeze, 5 = stopped 
@@ -137,11 +152,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	def isautoboot
 
 		if !exists?
-			case resource[:ensure]
-				when :absent then return #do nothing
-				when :running then install(true)
-				else install(false)
-			end
+			setpresent
 		end
 	
 		return dom.autostart.to_s
@@ -184,7 +195,15 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		path = "/etc/libvirt/qemu/" #Debian/ubuntu path for qemu's xml files
 		extension = ".xml"
 		arguments =  [key, path + resource[:name] + extension]
-		line = grep arguments
+		line = ""
+		debug "Line: %s" % [line]
+
+		begin
+			line = grep arguments
+			debug "Line: %s" % [line]
+		rescue Puppet::Error => e
+			setpresent
+		end
 	
 		return line.split('>')[1].split('<')[0]	
 
