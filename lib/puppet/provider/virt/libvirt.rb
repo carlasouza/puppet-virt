@@ -176,25 +176,12 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	end
 
-	#
-	def on_poweroff=(value)
-	end
 
-	#
-	def on_reboot=(value)
-	end
-
-	#
-	def on_crash=(value)
-	end
-
-	# Retrieve method for "on_crash", "on_reboot" and "on_poweroff" properties
-	# key must "crash", "reboot" or "poweroff"
-	def getvalue(key)
+	def on_poweroff
 
 		path = "/etc/libvirt/qemu/" #Debian/ubuntu path for qemu's xml files
 		extension = ".xml"
-		arguments =  [key, path + resource[:name] + extension]
+		arguments =  ["poweroff", path + resource[:name] + extension]
 		line = ""
 		debug "Line: %s" % [line]
 
@@ -207,6 +194,27 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	
 		return line.split('>')[1].split('<')[0]	
 
+	end
+
+	#
+	def on_poweroff=(value)
+		# do something here
+	end
+
+	#
+	def on_reboot
+	end
+
+	#
+	def on_reboot=(value)
+	end
+
+	#
+	def on_crash
+	end
+
+	#
+	def on_crash=(value)
 	end
 
 end

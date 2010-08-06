@@ -4,7 +4,7 @@ module Puppet
 
 
 		# A base class for Virt parameters validation.
-		class VirtParam < Puppet::Property
+		class VirtParam < Puppet::Parameter
 
 			def numfix(num)
 				if num =~ /^\d+$/
@@ -16,7 +16,7 @@ module Puppet
 				end
 			end
 
-			munge do |value|
+			validate do |value|
 				if numfix(value)
 					return value
 				else
@@ -70,6 +70,7 @@ module Puppet
 			desc "The virtual machine name."
 		end
 
+		# This will change to properties
 		newparam(:memory, :parent => VirtParam) do
 			desc "The maximum amount of memory allocation for the guest domain.
 			      Specified in MB and is changeable."
@@ -121,7 +122,7 @@ module Puppet
 			isrequired #FIXME Bug #4049
 
 			# Value must end with .img or .qcow or .qcow2
-			munge do |value|
+			validate do |value|
 				case value
 				when String
 					if (value =~ /.(img|qcow|qcow2)$/).nil?
@@ -168,10 +169,6 @@ module Puppet
 			newvalues(:destroy, :restart, :preserv, :renamerestart)
 			defaultto(:destroy)
 
-			def retrieve
-				provider.getvalue("poweroff")
-			end
-
 		end
 	
 		newproperty(:on_reboot) do
@@ -179,10 +176,6 @@ module Puppet
 
 			newvalues(:destroy, :restart, :preserv, :renamerestart)
 			defaultto(:preserv)
-
-			def retrieve
-				provider.getvalue("reboot")
-			end
 
 		end
 	
@@ -192,10 +185,6 @@ module Puppet
 			newvalues(:destroy, :restart, :preserv, :renamerestart)
 			defaultto(:restart)
 
-			def retrieve
-				provider.getvalue("crash")
-			end
-
 		end
 		
 		newproperty(:autoboot) do
@@ -204,9 +193,6 @@ module Puppet
 			newvalue(true)
 			newvalue(false)
 
-			def retrieve
-				provider.isautoboot
-			end
 		end
 
 	end
