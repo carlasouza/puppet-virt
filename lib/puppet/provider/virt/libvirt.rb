@@ -29,16 +29,13 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		debug "Boot on install: %s" % bootoninstall
 		debug "Virtualization type: %s" % [resource[:virt_type]]
 
-		@path="path=".concat(resource[:virt_path])
-
-		arguments = ["--name", resource[:name], "--ram", resource[:memory], "--vcpus" , resource[:cpus] , "--disk" , @path, "--import", "--noautoconsole", "--force", @virt_parameter]
+		arguments = ["--name", resource[:name], "--ram", resource[:memory], "--vcpus" , resource[:cpus] , "--disk" , resource[:virt_path], "--import", "--noautoconsole", "--force", @virt_parameter]
 
 		if !bootoninstall
 			arguments << "--noreboot"
 		end
 
-		@interface="bridge=".concat(resource[:interfaces])
-		network = ["--network", @interface]
+		network = ["--network", resource[:interfaces]]
 
 		virtinstall arguments
 
