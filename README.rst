@@ -27,10 +27,9 @@ This is the full specification for the new types. All have the same fields::
       clocksync       => UTC | localtime | timezone | variable, # Clock source
   
   # Boot configuration
-      boot_kernel     => "/path/to/vmlinuz",
-      boot_initrd     => "/path/to/initrd.img",
+      boot_localtion  => "/path/to/vmlinuz and initrd.img",
       boot_options    => "ks=foo noacpi" # Non changeable, controls, kickstart
-          #For now, only the .img files will be supported
+          #For now, only the existing .img, .qcow2 and .qcow  files will be supported
       virt_path       => "/path/foo.img" | "/opt/virt_images/" | "/dev/sd4" 
   
   # Storage configuration
@@ -59,6 +58,6 @@ Future Work
 ----
 
 For now, some parameters will have a few values acceptable:
-  * `virtpath` will accept only .img, .qcow and .qcow2 files;
+  * `virtpath` will accept only existing .img, .qcow and .qcow2 files;
   * `memory` and `cpus` will be, initially, not changeable;
   * input devices specification like mouse and graphic will not be supported for now.
