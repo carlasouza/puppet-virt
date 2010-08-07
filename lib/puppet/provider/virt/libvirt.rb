@@ -76,9 +76,9 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 		debug "Starting domain %s" % [resource[:name]]
 
-		if exists? && status == "stopped"
+		if exists? && status != "running"
 			dom.create # Start the domain
-		else
+		elsif status == "absent"
 			install
 		end
 
@@ -124,8 +124,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	# running | stopped | absent,				
 	def status
-
-		debug "Calling ensure retrieve method. Now the domain is %s" % [resource[:ensure]]
 
 		if exists? 
 			# 1 = running, 3 = paused|suspend|freeze, 5 = stopped 
