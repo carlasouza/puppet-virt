@@ -17,9 +17,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	#
 	def install(bootoninstall = true)
 
-		debug "Creating a new domain %s " % [resource[:name]]
-
-		@virt_parameter = case resource[:virt_type]
+		virt_parameter = case resource[:virt_type]
 					when :xen_fullyvirt then "--hvm" #must validate kernel support
 					when :xen_paravirt then "--paravirt" #Must validate kernel support
 					when :kvm then "--accelerate" #Must validate hardware support
@@ -29,15 +27,27 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		debug "Boot on install: %s" % bootoninstall
 		debug "Virtualization type: %s" % [resource[:virt_type]]
 
-		arguments = ["--name", resource[:name], "--ram", resource[:memory], "--vcpus" , resource[:cpus] , "--disk" , resource[:virt_path], "--import", "--noautoconsole", "--force", @virt_parameter]
+		arguments = ["--name", resource[:name], "--ram", resource[:memory], "--vcpus" , resource[:cpus], "--noautoconsole", "--force", virt_parameter, "--file", resource[:virt_path]]
 
 		if !bootoninstall
 			arguments << "--noreboot"
 		end
 
-		network = ["--network", resource[:interfaces]]
+#		diskparams = resource[:virt_path]
 
-		virtinstall arguments
+		if File.exists?(resource[:virt_path])
+			debug "File already exists. Importing domain"
+			arguments << "--import"
+		else
+			debug "Creating new domain."
+			#--pxe, --location
+			# --size
+		end
+
+#		disk = ["--disk", diskparams]
+#		network = ["--network", resource[:interfaces]]
+
+		virtinstall arguments 
 
 	end
 
@@ -176,9 +186,9 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 		path = "/etc/libvirt/qemu/" #Debian/ubuntu path for qemu's xml files
 		extension = ".xml"
-		file = path + resource[:name] + extension
+		xml = path + resource[:name] + extension
 
-		if File.exists?(file)
+		if File.exists?(xml)
 			arguments =  ["poweroff", file]
 			line = ""
 			debug "Line: %s" % [line]
