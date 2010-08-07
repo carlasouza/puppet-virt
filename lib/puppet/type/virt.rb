@@ -100,19 +100,28 @@ module Puppet
 
 		# Instalation method
 
-		# Path para o kernel para realizar o boot
-		newparam(:boot_kernel) do
-			desc ""
+		# Location of kernel+initrd pair
+
+		newparam(:boot_location) do
+			desc "Installation source for guest virtual machine kernel+initrd pair.  The 'url' can take one of the following forms:
+
+			DIRECTORY
+             Path to a local directory containing an installable distribution image
+
+         nfs:host:/path or nfs://host/path
+             An NFS server location containing an installable distribution image
+
+         http://host/path
+             An HTTP server location containing an installable distribution image
+
+         ftp://host/path
+             An FTP server location containing an installable distribution image"
+
 		end
-	
-		newparam(:boot_initrd) do
-			desc ""
-		end
-	
+
 		newparam(:boot_options) do
 			desc ""
 		end
-
 
 		newparam(:virt_path) do
 			desc "Path do disk image file. This field is mandatory.
