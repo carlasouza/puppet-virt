@@ -4,7 +4,7 @@ module Puppet
 
 
 		# A base class for Virt parameters validation.
-		class VirtParam < Puppet::Parameter
+		class VirtNumericParam < Puppet::Parameter
 
 			def numfix(num)
 				if num =~ /^\d+$/
@@ -71,14 +71,14 @@ module Puppet
 		end
 
 		# This will change to properties
-		newparam(:memory, :parent => VirtParam) do
+		newparam(:memory, :parent => VirtNumericParam) do
 			desc "The maximum amount of memory allocation for the guest domain.
 			      Specified in MB and is changeable."
 
 			isrequired #FIXME Bug #4049
 		end
 
-		newparam(:cpus, :parent => VirtParam) do
+		newparam(:cpus, :parent => VirtNumericParam) do
 			desc "Number of virtual CPUs active in the guest domain.
 					This value is changeable"
 
@@ -143,7 +143,7 @@ module Puppet
 
 		end
 	
-		newparam(:disk_size, :parent => VirtParam) do
+		newparam(:disk_size, :parent => VirtNumericParam) do
 			desc "Not changeable."
 		end
 

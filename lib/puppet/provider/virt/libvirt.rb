@@ -33,19 +33,19 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			arguments << "--noreboot"
 		end
 
-#		diskparams = resource[:virt_path]
-
 		if File.exists?(resource[:virt_path])
 			debug "File already exists. Importing domain"
 			arguments << "--import"
 		else
 			debug "Creating new domain."
-			#--pxe, --location
-			# --size
+
+			# Future work
+			# --pxe
+			# ["--location", resource[:boot_location]]
+			# ["--size", resource[:disk_size]]
 		end
 
-#		disk = ["--disk", diskparams]
-#		network = ["--network", resource[:interfaces]]
+#TODO		network = ["--network", resource[:interfaces]]
 
 		virtinstall arguments 
 
@@ -74,7 +74,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		if !exists?
 			install(false)
 		elsif status == "running"
-#			dom.shutdown #FIXME Sometimes it doesn't shutdown
+#			dom.shutdown #FIXME Qemu does't support shutdown gracefully 
 			dom.destroy
 		end
 
@@ -181,7 +181,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	end
 
-
+	# Not implemented by libvirt yet
 	def on_poweroff
 
 		path = "/etc/libvirt/qemu/" #Debian/ubuntu path for qemu's xml files
@@ -202,23 +202,27 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	#
 	def on_poweroff=(value)
-		# do something here
+		# Not implemented by libvirt yet
 	end
 
 	#
 	def on_reboot
+		# Not implemented by libvirt yet
 	end
 
 	#
 	def on_reboot=(value)
+		# Not implemented by libvirt yet
 	end
 
 	#
 	def on_crash
+		# Not implemented by libvirt yet
 	end
 
 	#
 	def on_crash=(value)
+		# Not implemented by libvirt yet
 	end
 
 end
