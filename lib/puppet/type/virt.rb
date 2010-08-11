@@ -141,6 +141,10 @@ module Puppet
 				return value
 			end
 
+			munge do |value| 
+				"path=" + value
+			end
+
 		end
 	
 		newparam(:disk_size, :parent => VirtNumericParam) do
@@ -188,7 +192,7 @@ module Puppet
 			desc ""
 
 			newvalues(:destroy, :restart, :preserv, :renamerestart)
-			defaultto(:preserv)
+			defaultto(:restart)
 
 		end
 	

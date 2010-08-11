@@ -3,6 +3,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	commands :virtinstall => "/usr/bin/virt-install"
 	commands :grep => "/bin/grep"
+	commands :ip => "/sbin/ip"
 
 	# The provider is choosed by virt_type, not by operating system
 	confine :feature => :libvirt
@@ -27,13 +28,13 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		debug "Boot on install: %s" % bootoninstall
 		debug "Virtualization type: %s" % [resource[:virt_type]]
 
-		arguments = ["--name", resource[:name], "--ram", resource[:memory], "--vcpus" , resource[:cpus], "--noautoconsole", "--force", virt_parameter, "--file", resource[:virt_path]]
+		arguments = ["--name", resource[:name], "--ram", resource[:memory], "--vcpus" , resource[:cpus], "--noautoconsole", "--force", virt_parameter, "--disk", resource[:virt_path]]
 
 		if !bootoninstall
 			arguments << "--noreboot"
 		end
 
-		if File.exists?(resource[:virt_path])
+		if File.exists?(resource[:virt_path].split('=')[1])
 			debug "File already exists. Importing domain"
 			arguments << "--import"
 		else
@@ -42,14 +43,26 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			# Future work
 			# --pxe
 			# ["--location", resource[:boot_location]]
-			# ["--size", resource[:disk_size]]
+			# ["size=".concat(resource[:disk_size])]
 		end
 
-#TODO		network = ["--network", resource[:interfaces]]
+		if interface?
+			network = ["--network", resource[:interfaces]]
+			arguments += network
+		end
 
 		virtinstall arguments 
 
 	end
+
+	#
+	def interface?
+		ifname = resource[:interfaces].split('=')[1]
+		ip('link', 'list',  ifname)
+		rescue Puppet::ExecutionFailure
+			warnonce("Network interface " + ifname + " does not exist")
+	end
+
 
 	# Changing ensure to absent
 	def destroy #Changing ensure to absent
