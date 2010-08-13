@@ -149,6 +149,11 @@ module Puppet
 	
 		newparam(:disk_size, :parent => VirtNumericParam) do
 			desc "Not changeable."
+
+			munge do |value|
+				"size=" + value
+			end
+
 		end
 
 	
@@ -175,8 +180,10 @@ module Puppet
 		newparam(:interfaces) do
 			desc "Network interface(s)  bridge"
 
-			munge do |value|
-				"bridge=" + value
+			validate do |value|
+				unless value.is_a?(Array) or value.is_a?(String)
+					self.devfail "Ignore must be a string or an Array"
+				end
 			end
 		end
 	

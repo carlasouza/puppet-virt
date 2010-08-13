@@ -8,7 +8,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# The provider is choosed by virt_type, not by operating system
 	confine :feature => :libvirt
 
-	# 
+	# Returns the domain by its name
 	def dom
 
 		Libvirt::open("qemu:///session").lookup_domain_by_name(resource[:name])
@@ -22,7 +22,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 					when :xen_fullyvirt then "--hvm" #must validate kernel support
 					when :xen_paravirt then "--paravirt" #Must validate kernel support
 					when :kvm then "--accelerate" #Must validate hardware support
-					else "Invalid value" # FIXME Raise something here?
 		end
 
 		debug "Boot on install: %s" % bootoninstall
@@ -39,25 +38,31 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			arguments << "--import"
 		else
 			debug "Creating new domain."
-
+			fail "Only import existing domain images is supported." 
 			# Future work
 			# --pxe
 			# ["--location", resource[:boot_location]]
-			# ["size=".concat(resource[:disk_size])]
+			# [resource[:disk_size]]
 		end
 
-		if interface?
-			network = ["--network", resource[:interfaces]]
-			arguments += network
-		end
-
-		virtinstall arguments 
+		virtinstall arguments + network
 
 	end
 
-	#
-	def interface?
-		ifname = resource[:interfaces].split('=')[1]
+	# Creates network arguments for virt-install command
+	def network
+		network = []
+		iface = resource[:interfaces]
+		iface.each do |iface|
+			if interface?(iface)	
+				network << ["--network","bridge="+iface]
+			end
+		end
+		return network
+	end
+
+	# Auxiliary method. Checks if declared interface exists.
+	def interface?(ifname)
 		ip('link', 'list',  ifname)
 		rescue Puppet::ExecutionFailure
 			warnonce("Network interface " + ifname + " does not exist")
