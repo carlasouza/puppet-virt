@@ -43,7 +43,7 @@ This is the full specification for the new types. All have the same fields::
       virt_type       => kvm | xen-fullyvirt | xen-paravirt  # for libvirt provider, this field is mandatory
   
   # Network configuration
-      interfaces      => [ "eth0", "eth1" ], # Source host interface. Default eth0 or the existing interface
+      interfaces      => [ "eth0", "eth1" ] | "disable" # Source host interface. Default eth0 or the existing interface
   
   # VM behaviour
       autoboot        => true | false,

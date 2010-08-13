@@ -178,7 +178,7 @@ module Puppet
 		end
 		
 		newparam(:interfaces) do
-			desc "Network interface(s)  bridge"
+			desc "Network interface(s)"
 
 			validate do |value|
 				unless value.is_a?(Array) or value.is_a?(String)
