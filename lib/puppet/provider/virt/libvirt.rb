@@ -38,7 +38,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			arguments << "--import"
 		else
 			debug "Creating new domain."
-			fail "Only import existing domain images is supported." 
+			fail "Only existing domain images importing is supported." 
 			# Future work
 			# --pxe
 			# ["--location", resource[:boot_location]]
@@ -213,7 +213,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		xml = path + resource[:name] + extension
 
 		if File.exists?(xml)
-			arguments =  ["poweroff", file]
+			arguments =  ["poweroff", xml]
 			line = ""
 			debug "Line: %s" % [line]
 			line = grep arguments
