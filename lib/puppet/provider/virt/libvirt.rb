@@ -1,5 +1,5 @@
 Puppet::Type.type(:virt).provide(:libvirt) do
-	@doc = ""
+	desc "Create a new Xen fullyvirtualisated or paravirtualisated, and KVM guest using libvirt."
 
 	commands :virtinstall => "/usr/bin/virt-install"
 	commands :grep => "/bin/grep"
@@ -15,7 +15,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	end
 
-	#
+	# Import the declared image file as a new domain.
 	def install(bootoninstall = true)
 
 		virt_parameter = case resource[:virt_type]
@@ -118,21 +118,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	end
 
-
-	# Creates config file if absent, but doesn't touch the domain's state.
-	# FIXME I dont like this method name
-	def setinstalled
-
-		debug "Checking if the domain %s already exists." % [resource[:name]]
-
-		if !exists?
-			install(false)
-		end
-
-	end
-
 	# Auxiliary method to make sure the domain exists before change it's properties.
-	#
 	def setpresent
 		case resource[:ensure]
 			when :absent then return #do nothing

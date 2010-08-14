@@ -6,8 +6,8 @@ Puppet Module to manage virtual machines using libvirt.
 Overview
 --------
 
-This module provides a new type (`virt`) for virtual machines installation and management like ensure running and so on.
-All the operations will be made using libvirt [0]. At first, only Xen fullyvirtualisation, Xen paravirtualisation and KVM will be supported.
+This module provides a new type, `virt`, for virtual machines installation and management like ensure running and so on.
+All the operations will be made using libvirt [0]. At first, only Xen fullyvirtualization, Xen paravirtualization and KVM will be supported.
 
 This module is the result of my work at GSoC 2010.
 
