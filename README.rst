@@ -52,11 +52,12 @@ This is the full specification for the new types. All have the same fields::
       on_poweroff     => destroy | restart | preserv | rename-restart  # Default value: destroy 
       on_reboot       => destroy | restart | preserv | rename-restart
       on_crash        => destroy | restart | preserv | rename-restart
-  }
 
   # XML configuration
       #This will allow you to create a new guest from an already defined XML configuration file.
-      xml_file        => "/etc/libvirt/qemu/name.xml", 
+      xml_file        => "/etc/libvirt/qemu/name.xml"
+
+} 
 
 Future Work
 ----
