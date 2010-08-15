@@ -95,25 +95,20 @@ Puppet::Type.type(:virt).provide(:libvirt) do
                                             xargs = "-c openvz:///system define --file "
                                             if !tmplcache.nil?
                                                    require "erb"
-                                                   xmlfilename = File.new(xmlfile, APPEND)
-                                                   xmlwrite = ERB.new("openvz.erb")
-
-                                                   ovz_name = name
-                                                   ovz_xmlfile = xmlfile
-                                                   ovz_template_cache = tmplcache
-
-                                                   xmltmpl.puts = xmlwrite.result
-                                                   xmltmpl.close
+                                                   xmlovz = File.new(xmlfile, APPEND)
+                                                   xmlwrite = ERB.new("puppet-virt/templates/openvz.erb")
+                                                   xmlovz.puts = xmlwrite.result
+                                                   xmlovz.close
                                             else
                                                   fail("OpenVZ Error: No template cache define!")
                                             end
                                     else debug "Detected hypervisor type: %s " % resource[:virt_type]
                                          xargs = "-c qemu:///session define --file "
-                                         
-                                         # Create regular xml here
-                                         # it should be as simple as
-                                         # writing xmlfile to disk.
-                                         
+                                         require "erb"
+                                         xmlqemu = File.new(xmlfile, APPEND)
+                                         xmlwrite = ERB.new("puppet-virt/templates/qemu.erb")
+                                         xmlqemu.puts = xmlwrite.result
+                                         xmlqemu.close
                          end
                          
 			 debug "Creating the domain: %s " % [resource[:name]]
