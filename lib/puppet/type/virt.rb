@@ -1,10 +1,6 @@
 module Puppet
 	newtype(:virt) do
-		@doc = "Manages virtual machines using the 'libvirt' hypervisor management library. The guest can imported using an existing image. 
-
-configured to use one or more virtual disks, network interfaces,
-		
-		Create a new xen or kvm guest"
+		@doc = "Manages virtual machines using the 'libvirt' hypervisor management library. The guests may be imported using an existing image, configured to use one or more virtual disks, network interfaces and other options which we haven't included yet. Create a new xen, kvm or openvz guest."
 
 
 		# A base class for Virt parameters validation.
@@ -34,7 +30,7 @@ configured to use one or more virtual disks, network interfaces,
 		ensurable do
 			desc "The guest's ensure field can assume one of the following values:
 	`running`:
-		Creates config file, and makes sure the domU is running.
+		Creates config file, and makes sure the domain is running.
 	`installed`:
 		Creates config file, but doesn't touch the state of the domain.
 	`stopped`:
@@ -96,7 +92,7 @@ configured to use one or more virtual disks, network interfaces,
 		end
 	
 		newparam(:clocksync) do
-			desc "The guest clock synchronization can asume three possible values, allowing fine grained control over how the guest clock is synchronized to the host. NB, not all hypervisors support all modes.
+			desc "The guest clock synchronization can assume three possible values, allowing fine grained control over how the guest clock is synchronized to the host. NB, not all hypervisors support all modes.
 	Available values:			
 	`utc`:
 		The guest clock will always be synchronized to UTC when booted
@@ -112,7 +108,7 @@ configured to use one or more virtual disks, network interfaces,
 		end
 	
 
-		# Instalation method
+		# Installation method
 
 		# Location of kernel+initrd pair
 
@@ -135,7 +131,7 @@ configured to use one or more virtual disks, network interfaces,
 		end
 
 		newparam(:virt_path) do
-			desc "Path do disk image file. This field is mandatory.
+			desc "Path to disk image file. This field is mandatory.
 NB: Initially only import existing disk is available.
 Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
@@ -182,6 +178,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 	`linux`
 		`debianetch`: Debian Etch
 		`debianlenny`: Debian Lenny
+                `debiansqueeze`: Debian Squeeze
 		`fedora5`: Fedora Core 5
 		`fedora6`:  Fedora Core 6
 		`fedora7`: Fedora 7
@@ -235,10 +232,18 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 	`xen_paravirt`:
 		This guest should be a paravirtualized guest. 
 	`kvm`:
-		When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators. The KVM accelerator is preferred over KQEMU if both are available."
+		When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators. The KVM accelerator is preferred over KQEMU if both are available.
+	`openvz`:
+		When defining an OpenVZ container, the template cache to be used must be defined using tmpl_cache and you must explicitly specify the use of openvz with this attribute (for now)."
 
 			isrequired #FIXME Bug #4049
 			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt, :openvz) 
+		end
+
+		newparam(:tmpl_cache) do
+			desc "When using OpenVZ, you must define the operating system template cache file to be used (ex. 'debian-5.0-i386-minimal', 'fedora-13-x86_64')."
+
+			newvalues(:linux, :windows, :unix, :solaris, :other)
 		end
 		
 		newparam(:interfaces) do
