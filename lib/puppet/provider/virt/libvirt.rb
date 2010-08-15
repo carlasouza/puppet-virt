@@ -101,7 +101,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
                                                   # resource[:tmpl_cache]
                                                   # resource[:xmlfile]
                                             else
-                                                  warnonce("OpenVZ Error: No template cache define!")
+                                                  fail("OpenVZ Error: No template cache define!")
                                             end
                                     else debug "Detected hypervisor type: %s " % resource[:virt_type]
                                          xargs = "-c qemu:///session define --file "
@@ -115,7 +115,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			 debug "Creating the domain: %s " % [resource[:name]]
                          virsh xargs + xmlfile
                   else
-			 warnonce("Error: XML already exists on disk " + xmlfile + " )"	
+			 fail("Error: XML already exists on disk " + xmlfile + " )"	
                   end
 	end
 
