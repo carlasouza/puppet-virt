@@ -118,7 +118,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
                          virsh xargs
                          
                   else
-			 warnonce("Error: XML already exists on disk: " + xmlfile + ")	
+			 warnonce("Error: XML already exists on disk: " + xmlfile + " )"	
                   end
 	end
 
