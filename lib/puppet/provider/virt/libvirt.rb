@@ -1,5 +1,6 @@
 Puppet::Type.type(:virt).provide(:libvirt) do
 	desc "Creates a new Xen (fully or para-virtualized), KVM, or OpenVZ guest using libvirt."
+        # Ruby-Libvirt API Reference: http://libvirt.org/ruby/api/index.html
 
 	commands :virtinstall => "/usr/bin/virt-install"
 	commands :virsh => "/usr/bin/virsh"
@@ -11,15 +12,11 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	# Returns the domain by its name
 	def dom
-
               hypervisor = case resource[:virt_type]
                        when :openvz then "openvz:///system"
                        else "qemu:///session"
               end
-
-              return Libvirt::Open(hypervisor).name(resource[:name]) # Returns the name of the Libvirt::Domain
-                                                              # Ruby Libvirt API Doc: http://libvirt.org/ruby/api/index.html
-
+              return Libvirt::Open(hypervisor).name(resource[:name]) # Returns the name of the Libvirt::Domain or fails
 	end
 
 	# Import the declared image file as a new domain.
@@ -89,31 +86,36 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	def xmlinstall(xmlfile)
 
 		 if !File.exists?(xmlfile)
+               	         debug "Creating the XML file: %s " % xmlfile
 
                          case resource[:virt_type]
                                     when :openvz then
-                                            ostmpl = resource[:tmpl_cache]
-                                            xargs = "-c openvz:///system define --file " + xmlfile
-                                            #
-                                            # create openvz xml here, dont forget to include the name
-                                            #
-                                            if !ostmpl.nil?
-                                                   #make sure to put the selected os template in the XML if defined
+                   			    debug "Detected hypervisor type: %s " % resource[:virt_type]
+                                            tmplcache = resource[:tmpl_cache]
+                                            xargs = "-c openvz:///system define --file "
+                                            if !tmplcache.nil?
+                                                  # create openvz xml here
+                                                  # make sure to insert the following 
+                                                  # variables into the XML template.
+                                                  # resource[:name]
+                                                  # resource[:tmpl_cache]
+                                                  # resource[:xmlfile]
+                                            else
+                                                  warnonce("OpenVZ Error: No template cache define!")
                                             end
-                                            #
-                                    else xargs = "-c qemu:///session define --file " + xmlfile
-                                         #
+                                    else debug "Detected hypervisor type: %s " % resource[:virt_type]
+                                         xargs = "-c qemu:///session define --file "
+                                         
                                          # Create regular xml here
                                          # it should be as simple as
                                          # writing xmlfile to disk.
-                                         #
+                                         
                          end
-			 debug "Successfully created the XML file: %s " % xmlfile
                          
 			 debug "Creating the domain: %s " % [resource[:name]]
-                         virsh xargs
+                         virsh xargs + xmlfile
                   else
-			 warnonce("Error: XML already exists on disk: " + xmlfile + " )"	
+			 warnonce("Error: XML already exists on disk " + xmlfile + " )"	
                   end
 	end
 
