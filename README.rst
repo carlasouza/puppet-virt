@@ -38,9 +38,10 @@ This is the full specification for the new types. All have the same fields::
   # OS specification
       os_type         => linux | other | solaris | unix | windows,
       os_variant      => solaris | debian | ubuntu | ...,  # The OS distribution (there's 37 types)
+      tmpl_cache      => "debian-5.0-i386-minimal" | "fedora-13-x86_64" | ...,  # This only applies to OpenVZ guests
   
   # Virtualization parameters
-      virt_type       => kvm | xen-fullyvirt | xen-paravirt  # for libvirt provider, this field is mandatory
+      virt_type       => kvm | xen-fullyvirt | xen-paravirt | openvz # for libvirt provider, this field is mandatory
   
   # Network configuration
       interfaces      => [ "eth0", "eth1" ] | "disable" # Source host interface.
@@ -53,6 +54,9 @@ This is the full specification for the new types. All have the same fields::
       on_crash        => destroy | restart | preserv | rename-restart
   }
 
+  # XML configuration
+      xml_file        => "/etc/libvirt/qemu/name.xml", #This will allow you to create a new guest from an already defined XML configuration file.
+
 
 Future Work
 ----
@@ -61,3 +65,4 @@ For now, some parameters will have a few values acceptable:
   * `virtpath` will accept only existing .img, .qcow and .qcow2 files;
   * `memory` and `cpus` will be, initially, not changeable;
   * input devices specification like mouse and graphic will not be supported for now.
+  * if `virt_type` is openvz, providing both `tmpl_cache` and `xml_file` are required.
