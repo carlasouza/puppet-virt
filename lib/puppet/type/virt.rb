@@ -92,7 +92,7 @@ configured to use one or more virtual disks, network interfaces,
 		newparam(:arch) do
 			desc "The domain's installation architecture. Not Changeable"
 
-			newvalues("i386","amd64","ia64","powerpc","hppa")
+			newvalues("i386","i686","amd64","ia64","powerpc","hppa")
 		end
 	
 		newparam(:clocksync) do
