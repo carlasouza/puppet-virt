@@ -1,5 +1,5 @@
 Puppet::Type.type(:virt).provide(:libvirt) do
-	desc "Create a new Xen fullyvirtualisated or paravirtualisated, and KVM guest using libvirt."
+	desc "Create a new Xen fullyvirtualisated or paravirtualisated, KVM or OpenVZ guest using libvirt."
 
 	commands :virtinstall => "/usr/bin/virt-install"
 	commands :grep => "/bin/grep"
@@ -11,7 +11,10 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# Returns the domain by its name
 	def dom
 
-		Libvirt::open("qemu:///session").lookup_domain_by_name(resource[:name])
+              # The function used below doesn't exist in the Ruby bindings (it does in the Python ones though) 
+              # see this link for more details: http://libvirt.org/ruby/api/index.html
+              #
+              # Libvirt::open(qemu:///session).lookup_domain_by_name(resource[:name])
 
 	end
 
@@ -74,6 +77,13 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			warnonce("Network interface " + ifname + " does not exist")
 	end
 
+	# Install guests using virsh and XML where virt-install is not yet supported.
+	def xmlinstall()
+
+
+                # put something here for an api install         
+
+	end
 
 	# Changing ensure to absent
 	def destroy #Changing ensure to absent
