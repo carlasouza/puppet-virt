@@ -56,8 +56,7 @@ This is the full specification for the new types. All have the same fields::
   # XML configuration
       #This will allow you to create a new guest from an already defined XML configuration file.
       xml_file        => "/etc/libvirt/qemu/name.xml"
-
-} 
+  } 
 
 Future Work
 ----
