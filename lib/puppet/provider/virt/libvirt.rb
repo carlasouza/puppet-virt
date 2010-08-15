@@ -94,12 +94,16 @@ Puppet::Type.type(:virt).provide(:libvirt) do
                                             tmplcache = resource[:tmpl_cache]
                                             xargs = "-c openvz:///system define --file "
                                             if !tmplcache.nil?
-                                                  # create openvz xml here
-                                                  # make sure to insert the following 
-                                                  # variables into the XML template.
-                                                  # resource[:name]
-                                                  # resource[:tmpl_cache]
-                                                  # resource[:xmlfile]
+                                                   require "erb"
+                                                   xmlfilename = File.new(xmlfile, APPEND)
+                                                   xmlwrite = ERB.new("openvz.erb")
+
+                                                   ovz_name = name
+                                                   ovz_xmlfile = xmlfile
+                                                   ovz_template_cache = tmplcache
+
+                                                   xmltmpl.puts = xmlwrite.result
+                                                   xmltmpl.close
                                             else
                                                   fail("OpenVZ Error: No template cache define!")
                                             end
