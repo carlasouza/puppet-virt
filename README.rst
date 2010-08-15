@@ -54,7 +54,8 @@ This is the full specification for the new types. All have the same fields::
       on_crash        => destroy | restart | preserv | rename-restart
 
   # XML configuration
-      #This will allow you to create a new guest from an already defined XML configuration file.
+      # This will allow you to create a new guest from an already defined XML configuration file.
+      # When creating a new OpenVZ container, this option is required along with `tmpl_cache`.
       xml_file        => "/etc/libvirt/qemu/name.xml"
   } 
 
