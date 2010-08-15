@@ -96,7 +96,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
                                             if !tmplcache.nil?
                                                    require "erb"
                                                    xmlovz = File.new(xmlfile, APPEND)
-                                                   xmlwrite = ERB.new("puppet-virt/templates/openvz.erb")
+                                                   xmlwrite = ERB.new("puppet-virt/templates/ovz_xml.erb")
                                                    xmlovz.puts = xmlwrite.result
                                                    xmlovz.close
                                             else
@@ -106,7 +106,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
                                          xargs = "-c qemu:///session define --file "
                                          require "erb"
                                          xmlqemu = File.new(xmlfile, APPEND)
-                                         xmlwrite = ERB.new("puppet-virt/templates/qemu.erb")
+                                         xmlwrite = ERB.new("puppet-virt/templates/qemu_xml.erb")
                                          xmlqemu.puts = xmlwrite.result
                                          xmlqemu.close
                          end
