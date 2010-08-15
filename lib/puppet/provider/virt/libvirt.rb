@@ -2,6 +2,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	desc "Create a new Xen (fully-virtualized or para-virtualized), KVM or OpenVZ guest using Libvirt."
 
 	commands :virtinstall => "/usr/bin/virt-install"
+	commands :virsh => "/usr/bin/virsh"
 	commands :grep => "/bin/grep"
 	commands :ip => "/sbin/ip"
 
