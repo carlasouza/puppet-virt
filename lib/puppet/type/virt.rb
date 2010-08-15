@@ -238,7 +238,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 		When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators. The KVM accelerator is preferred over KQEMU if both are available."
 
 			isrequired #FIXME Bug #4049
-			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt) 
+			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt, :openvz) 
 		end
 		
 		newparam(:interfaces) do
