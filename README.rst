@@ -7,7 +7,7 @@ Overview
 --------
 
 This module provides a new type, `virt`, for virtual machines installation and management like ensure running and so on.
-All the operations will be made using libvirt [0]. At first, only Xen fullyvirtualization, Xen paravirtualization and KVM will be supported.
+All the operations will be made using libvirt [0]. At first, only Xen fullyvirtualization, Xen paravirtualization, KVM and OpenVZ will be supported.
 
 This module is the result of my work at GSoC 2010.
 
@@ -29,7 +29,7 @@ This is the full specification for the new types. All have the same fields::
   # Boot configuration
       boot_localtion  => "/path/to/vmlinuz and initrd.img",
       boot_options    => "ks=foo noacpi" # Non changeable, controls, kickstart
-          #For now, only the existing .img, .qcow2 and .qcow  files will be supported
+      #For now, only the existing .img, .qcow2 and .qcow  files will be supported
       virt_path       => "/path/foo.img" | "/opt/virt_images/" | "/dev/sd4" 
   
   # Storage configuration
@@ -55,8 +55,8 @@ This is the full specification for the new types. All have the same fields::
   }
 
   # XML configuration
-      xml_file        => "/etc/libvirt/qemu/name.xml", #This will allow you to create a new guest from an already defined XML configuration file.
-
+      #This will allow you to create a new guest from an already defined XML configuration file.
+      xml_file        => "/etc/libvirt/qemu/name.xml", 
 
 Future Work
 ----
