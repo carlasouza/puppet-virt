@@ -241,9 +241,17 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 		end
 
 		newparam(:tmpl_cache) do
-			desc "When using OpenVZ, you must define the operating system template cache file to be used (ex. 'debian-5.0-i386-minimal', 'fedora-13-x86_64')."
+			desc "When using OpenVZ this defines the os template cache file to be used (ex. 'debian-5.0-i386-minimal', 'fedora-13-x86_64')."
 
-			newvalues(:linux, :windows, :unix, :solaris, :other)
+		end
+
+		newparam(:xml_path) do
+			desc "This is the path to a predefined xml config file, to be used with the import function."
+
+			munge do |value| 
+				"path=" + value
+			end
+
 		end
 		
 		newparam(:interfaces) do
