@@ -1,20 +1,23 @@
 Puppet::Type.type(:virt).provide(:libvirt) do
-	desc "Create a new Xen fullyvirtualisated or paravirtualisated, KVM or OpenVZ guest using libvirt."
+	desc "Create a new Xen (fully-virtualized or para-virtualized), KVM or OpenVZ guest using Libvirt."
 
 	commands :virtinstall => "/usr/bin/virt-install"
 	commands :grep => "/bin/grep"
 	commands :ip => "/sbin/ip"
 
-	# The provider is choosed by virt_type, not by operating system
+	# The provider is chosen by virt_type, not by operating system
 	confine :feature => :libvirt
 
 	# Returns the domain by its name
 	def dom
 
-              # The function used below doesn't exist in the Ruby bindings (it does in the Python ones though) 
-              # see this link for more details: http://libvirt.org/ruby/api/index.html
-              #
-              # Libvirt::open(qemu:///session).lookup_domain_by_name(resource[:name])
+              hypervisor = case resource[:virt_type]
+                       when :openvz then "openvz:///session"
+                       else "qemu:///session"
+              end
+
+              Libvirt::Open(hypervisor).name(resource[:name]) # Returns the name of the Libvirt::Domain
+                                                              # Ruby Libvirt API Doc: http://libvirt.org/ruby/api/index.html
 
 	end
 
