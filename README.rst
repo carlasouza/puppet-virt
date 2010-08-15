@@ -44,7 +44,7 @@ This is the full specification for the new types. All have the same fields::
       virt_type       => kvm | xen-fullyvirt | xen-paravirt | openvz # for libvirt provider, this field is mandatory
 
       * If you specify openvz as a type you'd like to create, the following fields 
-        are the only requirements: `name`, `memory`, `vcpu`, `tmpl_cache`, and `xml_file`*
+        are the only requirements: `name`, `memory`, `vcpu`, `tmpl_cache`, and `xml_file` *
   
   # Network configuration
       interfaces      => [ "eth0", "eth1" ] | "disable" # Source host interface.
@@ -61,7 +61,7 @@ This is the full specification for the new types. All have the same fields::
       xml_file        => "/etc/libvirt/qemu/name.xml"
 
       * When creating a new openvz container this option is required - note
-        please that the xml file must be named after the VEID i.e. (/etc/libvirt/qemu/101.xml)*
+        please that the xml file must be named after the VEID i.e. (/etc/libvirt/qemu/101.xml) *
   } 
 
 Future Work
