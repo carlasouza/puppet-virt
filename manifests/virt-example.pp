@@ -10,6 +10,7 @@ class xen-fullvirt-guest {
 class ovz-guest {
 	virt { "101":
 		memory => 1024,
+                vcpu => 4,
                 xml_file => "/etc/libvirt/qemu/systems/101.xml",
 		tmpl_cache => "debian-5.0-x86",
 		ensure => installed,
