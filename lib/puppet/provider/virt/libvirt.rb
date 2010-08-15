@@ -25,10 +25,8 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# Import the declared image file as a new domain.
 	def install(bootoninstall = true)
 
-                case resource[:virt_type]
-                       when :openvz then if resource[:xml_file]
-                                                    self.xmlinstall
-                                         end
+                if resource[:xml_file]
+                           xmlinstall(resource[:xml_file])
                 end
 
 		virt_parameter = case resource[:virt_type]
@@ -88,9 +86,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	end
 
 	# Install guests using virsh with xml when virt-install is still not yet supported.
-	def xmlinstall()
-
-                 xmlfile = resource[:xml_file]
+	def xmlinstall(xmlfile)
 
 		 if !File.exists?(xmlfile)
 
@@ -116,7 +112,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
                          
 			 debug "Creating the domain: %s " % [resource[:name]]
                          virsh xargs
-                         
                   else
 			 warnonce("Error: XML already exists on disk: " + xmlfile + " )"	
                   end
