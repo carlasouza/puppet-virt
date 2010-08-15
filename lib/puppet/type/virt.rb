@@ -237,7 +237,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 		When defining an OpenVZ container, the template cache to be used must be defined using tmpl_cache and you must explicitly specify the use of openvz with this attribute (for now)."
 
 			isrequired #FIXME Bug #4049
-			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt, :openvz) 
+			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt, :qemu, :openvz) 
 		end
 
 		newparam(:tmpl_cache) do
