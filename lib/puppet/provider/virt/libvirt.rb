@@ -83,6 +83,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	end
 
 	# Install guests using virsh with xml when virt-install is still not yet supported.
+        # Libvirt XML <domain> specification: http://libvirt.org/formatdomain.html
 	def xmlinstall(xmlfile)
 
 		 if !File.exists?(xmlfile)
