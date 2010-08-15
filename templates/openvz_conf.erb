@@ -16,7 +16,7 @@
       <target dir='/'/>
     </filesystem>
     <interface type='bridge'>
-      <source bridge='<%= resource[:bridge] %>'/>
+      <source bridge='<%= resource[:bridge_dev] %>'/>
       <target dev='veth<%= resource[:name] %>.0'/>
     </interface>
   </devices>
