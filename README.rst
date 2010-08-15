@@ -41,6 +41,8 @@ This is the full specification for the new types. All have the same fields::
       tmpl_cache      => "debian-5.0-i386-minimal" | "fedora-13-x86_64" | ...,  # This only applies to OpenVZ guests
   
   # Virtualization parameters
+  # If you specify openvz as a type you'd like to create, the following fields 
+  # are the only requirements: `name`, `memory`, `vcpu`, `tmpl_cache`, and `xml_file`.
       virt_type       => kvm | xen-fullyvirt | xen-paravirt | openvz # for libvirt provider, this field is mandatory
   
   # Network configuration
@@ -55,8 +57,10 @@ This is the full specification for the new types. All have the same fields::
 
   # XML configuration
       # This will allow you to create a new guest from an already defined XML configuration file.
-      # When creating a new OpenVZ container, this option is required along with `tmpl_cache`.
       xml_file        => "/etc/libvirt/qemu/name.xml"
+
+      # When creating a new openvz container this option is required - note
+      # please that the xml file must be named after the VEID i.e. (/etc/libvirt/qemu/101.xml) 
   } 
 
 Future Work
