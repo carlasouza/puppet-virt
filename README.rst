@@ -29,6 +29,7 @@ This is the full specification for the new types. All have the same fields::
   # Boot configuration
       boot_localtion  => "/path/to/vmlinuz and initrd.img",
       boot_options    => "ks=foo noacpi" # Non changeable, controls, kickstart
+
       #For now, only the existing .img, .qcow2 and .qcow  files will be supported
       virt_path       => "/path/foo.img" | "/opt/virt_images/" | "/dev/sd4" 
   
@@ -36,12 +37,12 @@ This is the full specification for the new types. All have the same fields::
       disk_size       => 100000, # MB, not changeable
   
   # OS specification
-      os_type         => linux | other | solaris | unix | windows,
+      os_type         => linux | other | solaris | unix | windows | hvm,
       os_variant      => solaris | debian | ubuntu | ...,  # The OS distribution (there's 37 types)
       tmpl_cache      => "debian-5.0-i386-minimal" | "fedora-13-x86_64" | ...,  # This only applies to OpenVZ guests
   
   # Virtualization parameters
-      virt_type       => kvm | xen-fullyvirt | xen-paravirt | openvz # for libvirt provider, this field is mandatory
+      virt_type       => kvm | xen-fullyvirt | xen-paravirt | openvz | qemu  # for libvirt provider, this field is mandatory
 
       * If you specify openvz as a type you'd like to create, the following fields 
         are the minimum requirements: `name`, `memory`, `vcpu`, `tmpl_cache`, and `xml_file` *
