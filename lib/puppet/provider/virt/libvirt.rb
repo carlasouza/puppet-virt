@@ -1,11 +1,11 @@
 Puppet::Type.type(:virt).provide(:libvirt) do
-	desc "Create a new Xen fullyvirtualisated or paravirtualisated, and KVM guest using libvirt."
+	desc "Creates a new Xen (fullyvirtualizated or paravirtualizated), and KVM guest using libvirt."
 
 	commands :virtinstall => "/usr/bin/virt-install"
 	commands :grep => "/bin/grep"
 	commands :ip => "/sbin/ip"
 
-	# The provider is choosed by virt_type, not by operating system
+	# The provider is chosen by virt_type, not by operating system
 	confine :feature => :libvirt
 
 	# Returns the domain by its name
