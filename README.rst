@@ -19,7 +19,7 @@ Usage
 This is the full specification for the new types. All have the same fields::
 
   virt { "name":
-      desc 	      => "My first VM",
+      desc 	          => "My first VM",
   # Basic configuration
       memory          => 1024, # MB, changeable
       cpus            => 2, # Changeable
@@ -60,4 +60,5 @@ Future Work
 For now, some parameters will have a few values acceptable:
   * `virtpath` will accept only existing .img, .qcow and .qcow2 files;
   * `memory` and `cpus` will be, initially, not changeable;
-  * input devices specification like mouse and graphic will not be supported for now.
+  * Input devices specification like mouse and graphic will not be supported for now.
+  * The parameters `on_poweroff`; `on_reboot` and `on_crash` are not changeable. They will be used only to create a new domain (not for import existing domain's image, because libvirt does not support modify those values)
