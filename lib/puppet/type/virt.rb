@@ -1,8 +1,8 @@
 module Puppet
 	newtype(:virt) do
-		@doc = "Manages virtual machines using the 'libvirt' hypervisor management library. The guest can imported using an existing image."
+		@doc = "Manages virtual machines using the 'libvirt' hypervisor management library. The guest can be imported using an existing image file .img, .qcow or .qcow2."
 
-		# A base class for Virt parameters validation.
+		# A base class for numeric Virt parameters validation.
 		class VirtNumericParam < Puppet::Parameter
 
 			def numfix(num)
@@ -62,30 +62,29 @@ module Puppet
 		end
 		
 		newparam(:desc) do
-			desc "The VM description."
+			desc "The guest's description."
 		end
 	
 		newparam(:name, :namevar => true) do
-			desc "The virtual machine name."
+			desc "The guest's name."
 		end
 
 		# This will change to properties
 		newparam(:memory, :parent => VirtNumericParam) do
 			desc "The maximum amount of memory allocation for the guest domain.
-			      Specified in MB and is changeable."
+			      Specified in MB."
 
 			isrequired #FIXME Bug #4049
 		end
 
 		newparam(:cpus, :parent => VirtNumericParam) do
-			desc "Number of virtual CPUs active in the guest domain.
-					This value is changeable"
+			desc "Number of virtual CPUs active in the guest domain."
 
 			defaultto(1)
 		end
 	
 		newparam(:graphic) do
-			desc "Setup a virtual console in the guest to me imported. If no graphics option is specified, will default to enable.
+			desc "Setup a virtual console in the guest to be imported. If no graphics option is specified, will default to enable.
 	Available values:
 	`enable`:
 		Setup a virtual console in the guest and export it as a VNC server in the host. The VNC server will run on the first free port number at 5900 or above.
@@ -125,7 +124,6 @@ module Puppet
 		# Installation method
 
 		# Location of kernel+initrd pair
-
 		newparam(:boot_location) do
 			desc "Installation source for guest virtual machine kernel+initrd pair.  The `url` can take one of the following forms:
 
@@ -145,8 +143,7 @@ module Puppet
 		end
 
 		newparam(:virt_path) do
-			desc "Path to disk image file. This field is mandatory.
-NB: Initially only import existing disk is available.
+			desc "Path to disk image file. This field is mandatory. NB: Initially only import existing disk is available.
 Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
 			isrequired #FIXME Bug #4049
@@ -245,7 +242,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 	`xen_paravirt`:
 		This guest should be a paravirtualized guest. 
 	`kvm`:
-		When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators. The KVM accelerator is preferred over KQEMU if both are available."
+		When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators."
 
 			isrequired #FIXME Bug #4049
 			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt) 
@@ -261,7 +258,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
 			validate do |value|
 				unless value.is_a?(Array) or value.is_a?(String)
-					self.devfail "interfaces field must be a string or an Array"
+					self.devfail "interfaces field must be a String or an Array"
 				end
 			end
 		end

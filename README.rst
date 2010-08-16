@@ -34,7 +34,7 @@ This is the full specification for the new types. All have the same fields::
       virt_path       => "/path/foo.img" | "/opt/virt_images/" | "/dev/sd4" 
   
   # Storage configuration
-      disk_size       => 100000, # MB, not changeable
+      disk_size       => 10, # GB, not changeable
   
   # OS specification
       os_type         => linux | other | solaris | unix | windows,
