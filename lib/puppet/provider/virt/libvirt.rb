@@ -2,6 +2,10 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	desc "Creates a new Xen (fully or para-virtualized), KVM, or OpenVZ guest using libvirt."
         # Ruby-Libvirt API Reference: http://libvirt.org/ruby/api/index.html
 
+        def initialize(args)
+          args.keys.each { |name| instance_variable_set "@" + name.to_s, args[name] }
+        end
+
 	commands :virtinstall => "/usr/bin/virt-install"
 	commands :virsh => "/usr/bin/virsh"
 	commands :grep => "/bin/grep"
