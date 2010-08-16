@@ -3,7 +3,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
         # Ruby-Libvirt API Reference: http://libvirt.org/ruby/api/index.html
 
         def initialize(args)
-          args.keys.each { |name| instance_variable_set "@" + name.to_s, args[name] }
+          args.keys.each { instance_variable_set "@" + name.to_s, args[name] }
         end
 
 	commands :virtinstall => "/usr/bin/virt-install"
@@ -16,18 +16,18 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	# Returns the domain by its name
 	def dom
-              hypervisor = case resource[:virt_type]
+              hypervisor = case @resource[:virt_type]
                        when :openvz then "openvz:///system"
                        else "qemu:///session"
               end
-              return Libvirt::Open(hypervisor).name(resource[:name]) # Returns the name of the Libvirt::Domain or fails
+              return Libvirt::Open(hypervisor).name(@resource[:name]) # Returns the name of the Libvirt::Domain or fails
 	end
 
 	# Import the declared image file as a new domain.
 	def install(bootoninstall = true)
 
                 if resource[:xml_file]
-                           xmlinstall(resource[:xml_file])
+                           xmlinstall(@resource[:xml_file])
                 end
 
 		virt_parameter = case resource[:virt_type]
@@ -37,15 +37,15 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		end
 
 		debug "Boot on install: %s" % bootoninstall
-		debug "Virtualization type: %s" % [resource[:virt_type]]
+		debug "Virtualization type: %s" % [@resource[:virt_type]]
 
-		arguments = ["--name", resource[:name], "--ram", resource[:memory], "--vcpus" , resource[:cpus], "--noautoconsole", "--force", virt_parameter, "--disk", resource[:virt_path]]
+		arguments = ["--name", @resource[:name], "--ram", @resource[:memory], "--vcpus" , @resource[:cpus], "--noautoconsole", "--force", virt_parameter, "--disk", @resource[:virt_path]]
 
 		if !bootoninstall
 			arguments << "--noreboot"
 		end
 
-		if File.exists?(resource[:virt_path].split('=')[1])
+		if File.exists?(@resource[:virt_path].split('=')[1])
 			debug "File already exists. Importing domain"
 			arguments << "--import"
 		else
@@ -53,8 +53,8 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			fail "Only existing domain images importing is supported." 
 			# Future work
 			# --pxe
-			# ["--location", resource[:boot_location]]
-			# [resource[:disk_size]]
+			# ["--location", @resource[:boot_location]]
+			# [@resource[:disk_size]]
 		end
 
 		virtinstall arguments + network
@@ -64,7 +64,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# Creates network arguments for virt-install command
 	def network
 		network = []
-		iface = resource[:interfaces]
+		iface = @resource[:interfaces]
 		if iface.nil? 
 			network = ["--network", "network=default"]
 		elsif iface == "disable"
@@ -93,10 +93,10 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		 if !File.exists?(xmlfile)
                	         debug "Creating the XML file: %s " % xmlfile
 
-                         case resource[:virt_type]
+                         case @resource[:virt_type]
                                     when :openvz then
-                   			    debug "Detected hypervisor type: %s " % resource[:virt_type]
-                                            tmplcache = resource[:tmpl_cache]
+                   			    debug "Detected hypervisor type: %s " % @resource[:virt_type]
+                                            tmplcache = @resource[:tmpl_cache]
                                             xargs = "-c openvz:///system define --file "
                                             if !tmplcache.nil?
                                                    require "erb"
@@ -107,7 +107,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
                                             else
                                                   fail("OpenVZ Error: No template cache define!")
                                             end
-                                    else debug "Detected hypervisor type: %s " % resource[:virt_type]
+                                    else debug "Detected hypervisor type: %s " % @resource[:virt_type]
                                          xargs = "-c qemu:///session define --file "
                                          require "erb"
                                          xmlqemu = File.new(xmlfile, APPEND)
@@ -116,7 +116,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
                                          xmlqemu.close
                          end
                          
-			 debug "Creating the domain: %s " % [resource[:name]]
+			 debug "Creating the domain: %s " % [@resource[:name]]
                          virsh xargs + xmlfile
                   else
 			 fail("Error: XML already exists on disk " + xmlfile + " )"	
@@ -126,12 +126,12 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# Changing ensure to absent
 	def destroy #Changing ensure to absent
 
-		debug "Trying to destroy domain %s" % [resource[:name]]
+		debug "Trying to destroy domain %s" % [@resource[:name]]
 
 		begin
 			dom.destroy
 		rescue Libvirt::Error => e
-			debug "Domain %s already Stopped" % [resource[:name]]
+			debug "Domain %s already Stopped" % [@resource[:name]]
 		end
 		dom.undefine
 
@@ -141,12 +141,12 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# Creates config file if absent, and makes sure the domain is not running.
 	def stop
 
-		debug "Stopping domain %s" % [resource[:name]]
+		debug "Stopping domain %s" % [@resource[:name]]
 
 		if !exists?
 			install(false)
 		elsif status == "running"
-		        case resource[:virt_type]
+		        case @resource[:virt_type]
                                    when :qemu then dom.destroy
                                    else dom.shutdown
                         end
@@ -158,7 +158,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# Creates config file if absent, and makes sure the domain is running.
 	def start
 
-		debug "Starting domain %s" % [resource[:name]]
+		debug "Starting domain %s" % [@resource[:name]]
 
 		if exists? && status != "running"
 			dom.create # Start the domain
@@ -170,7 +170,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	# Auxiliary method to make sure the domain exists before change it's properties.
 	def setpresent
-		case resource[:ensure]
+		case @resource[:ensure]
 			when :absent then return #do nothing
 			when :running then install(true)
 			else install(false)
@@ -181,10 +181,10 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	def exists?
 		begin
 			dom
-			debug "Domain %s exists? true" % [resource[:name]]
+			debug "Domain %s exists? true" % [@resource[:name]]
 			true
 		rescue Libvirt::RetrieveError => e
-			debug "Domain %s exists? false" % [resource[:name]]
+			debug "Domain %s exists? false" % [@resource[:name]]
 			false # The vm with that name doesnt exist
 		end
 	end
@@ -197,14 +197,14 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			if resource[:ensure].to_s == "installed"
 				return "installed"
 			elsif dom.info.state != 5
-				debug "Domain %s status: running" % [resource[:name]]
+				debug "Domain %s status: running" % [@resource[:name]]
 				return "running"
 			else
-				debug "Domain %s status: stopped" % [resource[:name]]
+				debug "Domain %s status: stopped" % [@resource[:name]]
 				return "stopped"
 			end
 		else
-			debug "Domain %s status: absent" % [resource[:name]]
+			debug "Domain %s status: absent" % [@resource[:name]]
 			return "absent"
 		end
 
@@ -225,7 +225,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# Set true or false to autoboot property
 	def autoboot=(value)
 
-		debug "Trying to set autoboot %s at domain %s." % [resource[:autoboot], resource[:name]]
+		debug "Trying to set autoboot %s at domain %s." % [@resource[:autoboot], @resource[:name]]
 		begin
 			if value.to_s == "false"
 				dom.autostart=(false)
@@ -233,7 +233,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 				dom.autostart=(true)
 			end
 		rescue Libvirt::RetrieveError => e
-			debug "Domain %s not defined" % [resource[:name]]
+			debug "Domain %s not defined" % [@resource[:name]]
 		end
 
 	end
@@ -243,7 +243,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 		path = "/etc/libvirt/qemu/" #Debian/ubuntu path for qemu's xml files
 		extension = ".xml"
-		xml = path + resource[:name] + extension
+		xml = path + @resource[:name] + extension
 
 		if File.exists?(xml)
 			arguments =  ["poweroff", xml]
