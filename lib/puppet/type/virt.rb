@@ -84,10 +84,25 @@ module Puppet
 			defaultto(1)
 		end
 	
+		newparam(:graphic) do
+			desc "Setup a virtual console in the guest to me imported. If no graphics option is specified, will default to enable.
+	Available values:
+	`enable`:
+		Setup a virtual console in the guest and export it as a VNC server in the host. The VNC server will run on the first free port number at 5900 or above.
+	`vnc:VNCPORT`:
+		Request a permanent, statically assigned port number for the guest VNC console. Use of this option is discouraged as other guests may automatically choose to run on this port causing a clash.
+	`disable`:
+		No graphical console will be allocated for the guest."
+
+			newvalues(:enable,:disable,/^vnc:[0-9]+$/)
+			defaultto(:enable)
+
+		end
+
 		newparam(:arch) do
 			desc "The domain's installation architecture. Not Changeable"
 
-			newvalues("i386","amd64","ia64","powerpc","hppa")
+			newvalues("i386","i686","amd64","ia64","powerpc","hppa")
 		end
 	
 		newparam(:clocksync) do

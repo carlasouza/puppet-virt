@@ -23,7 +23,8 @@ This is the full specification for the new types. All have the same fields::
   # Basic configuration
       memory          => 1024, # MB, changeable
       cpus            => 2, # Changeable
-      arch            => x86_64 | i386,
+      arch            => "i386" | "i686" | "amd64" | "ia64" | "powerpc" | "hppa"
+      graphics        => enable | disable | vnc:VNCPORT
       clocksync       => UTC | localtime | timezone | variable, # Clock source
   
   # Boot configuration

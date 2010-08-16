@@ -45,12 +45,13 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			# [resource[:disk_size]]
 		end
 
-		virtinstall arguments + network
+		virtinstall arguments + network + graphic
 
 	end
 
 	# Creates network arguments for virt-install command
 	def network
+
 		network = []
 		iface = resource[:interfaces]
 		if iface.nil? 
@@ -65,15 +66,30 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			end
 		end
 		return network
+
 	end
 
 	# Auxiliary method. Checks if declared interface exists.
 	def interface?(ifname)
+
 		ip('link', 'list',  ifname)
 		rescue Puppet::ExecutionFailure
 			warnonce("Network interface " + ifname + " does not exist")
+
 	end
 
+	# Setup the virt-install graphic configuration arguments
+	def graphic
+
+		opt = resource[:graphics]
+		case opt
+			when :enable || nil then args = ["--vnc"]
+			when :disable then args = ["--nographics"]
+			else args = ["--vncport=" + opt.split(':')[1]]
+		end
+		args
+
+	end
 
 	# Changing ensure to absent
 	def destroy #Changing ensure to absent
