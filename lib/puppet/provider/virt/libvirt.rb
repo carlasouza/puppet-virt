@@ -10,13 +10,13 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# The provider is chosen by virt_type, not by operating system
 	confine :feature => :libvirt
 
-	# Returns the domain by its name
+	# Returns the name of the Libvirt::Domain or fails
 	def dom
               hypervisor = case @resource[:virt_type]
                        when :openvz then "openvz:///system"
                        else "qemu:///session"
               end
-              return Libvirt::Open(hypervisor).name(@resource[:name]) # Returns the name of the Libvirt::Domain or fails
+              Libvirt::Open(hypervisor).name(@resource[:name]) 
 	end
 
 	# Import the declared image file as a new domain.
@@ -72,7 +72,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 				end
 			end
 		end
-		return network
+		network
 	end
 
 	# Auxiliary method. Checks if declared interface exists.
