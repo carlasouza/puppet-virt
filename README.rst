@@ -7,7 +7,7 @@ Overview
 --------
 
 This module provides a new type, `virt`, for virtual machines installation and management like ensure running and so on.
-All the operations will be made using libvirt [0]. At first, only Xen fullyvirtualization, Xen paravirtualization and KVM will be supported.
+All the operations will be made using libvirt [0]. At first, only Xen fullyvirtualization, Xen paravirtualization, KVM and OpenVZ will be supported.
 
 This module is the result of my work at GSoC 2010.
 
@@ -30,18 +30,23 @@ This is the full specification for the new types. All have the same fields::
   # Boot configuration
       boot_localtion  => "/path/to/vmlinuz and initrd.img",
       boot_options    => "ks=foo noacpi" # Non changeable, controls, kickstart
-          #For now, only the existing .img, .qcow2 and .qcow  files will be supported
+
+      #For now, only the existing .img, .qcow2 and .qcow  files will be supported
       virt_path       => "/path/foo.img" | "/opt/virt_images/" | "/dev/sd4" 
   
   # Storage configuration
       disk_size       => 10, # GB, not changeable
   
   # OS specification
-      os_type         => linux | other | solaris | unix | windows,
+      os_type         => linux | other | solaris | unix | windows | hvm,
       os_variant      => solaris | debian | ubuntu | ...,  # The OS distribution (there's 37 types)
+      tmpl_cache      => "debian-5.0-i386-minimal" | "fedora-13-x86_64" | ...,  # This only applies to OpenVZ guests
   
   # Virtualization parameters
-      virt_type       => kvm | xen-fullyvirt | xen-paravirt  # for libvirt provider, this field is mandatory
+      virt_type       => kvm | xen-fullyvirt | xen-paravirt | openvz | qemu  # for libvirt provider, this field is mandatory
+
+      * If you specify openvz as a type you'd like to create, the following fields 
+        are the minimum requirements: `name`, `memory`, `vcpu`, `tmpl_cache`, and `xml_file` *
   
   # Network configuration
       interfaces      => [ "eth0", "eth1" ] | "disable" # Source host interface.
@@ -52,8 +57,14 @@ This is the full specification for the new types. All have the same fields::
       on_poweroff     => destroy | restart | preserv | rename-restart  # Default value: destroy 
       on_reboot       => destroy | restart | preserv | rename-restart
       on_crash        => destroy | restart | preserv | rename-restart
-  }
 
+  # XML configuration
+      # This will allow you to create a new guest from an already defined XML configuration file.
+      xml_file        => "/etc/libvirt/qemu/name.xml"
+
+      * When creating a new openvz container this option is required - note
+        please that the xml file must be named after the VEID i.e. (/etc/libvirt/qemu/101.xml) *
+  } 
 
 Future Work
 ----
@@ -63,3 +74,4 @@ For now, some parameters will have a few values acceptable:
   * `memory` and `cpus` will be, initially, not changeable;
   * Input devices specification like mouse and graphic will not be supported for now.
   * The parameters `on_poweroff`; `on_reboot` and `on_crash` are not changeable. They will be used only to create a new domain (not for import existing domain's image, because libvirt does not support modify those values)
+  * if `virt_type` is openvz, providing both `tmpl_cache` and `xml_file` are required.

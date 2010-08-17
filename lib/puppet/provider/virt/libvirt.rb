@@ -1,27 +1,35 @@
 Puppet::Type.type(:virt).provide(:libvirt) do
-	desc "Creates a new Xen (fullyvirtualizated or paravirtualizated), and KVM guest using libvirt."
+	desc "Creates a new Xen (fully or para-virtualized), KVM, or OpenVZ guest using libvirt."
+        # Ruby-Libvirt API Reference: http://libvirt.org/ruby/api/index.html
 
 	commands :virtinstall => "/usr/bin/virt-install"
+	commands :virsh => "/usr/bin/virsh"
 	commands :grep => "/bin/grep"
 	commands :ip => "/sbin/ip"
 
 	# The provider is chosen by virt_type, not by operating system
 	confine :feature => :libvirt
 
-	# Returns the domain by its name
+	# Returns the name of the Libvirt::Domain or fails
 	def dom
-
-		Libvirt::open("qemu:///session").lookup_domain_by_name(resource[:name])
-
+              hypervisor = case resource[:virt_type]
+                       when :openvz then "openvz:///system"
+                       else "qemu:///session"
+              end
+              Libvirt::Open(hypervisor).lookup_domain_by_name(resource[:name]) 
 	end
 
 	# Import the declared image file as a new domain.
 	def install(bootoninstall = true)
 
+                if resource[:xml_file]
+                           xmlinstall(resource[:xml_file])
+                end
+
 		virt_parameter = case resource[:virt_type]
 					when :xen_fullyvirt then "--hvm" #must validate kernel support
 					when :xen_paravirt then "--paravirt" #Must validate kernel support
-					when :kvm then "--accelerate" #Must validate hardware support
+					when :kvm then "--accelerate" #Must validate hardware support                         
 		end
 
 		debug "Boot on install: %s" % bootoninstall
@@ -66,7 +74,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			end
 		end
 		return network
-
 	end
 
 	# Auxiliary method. Checks if declared interface exists.
@@ -89,6 +96,41 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		end
 		args
 
+	# Install guests using virsh with xml when virt-install is still not yet supported.
+        # Libvirt XML <domain> specification: http://libvirt.org/formatdomain.html
+	def xmlinstall(xmlfile)
+
+		if !File.exists?(xmlfile)
+			debug "Creating the XML file: %s " % xmlfile
+
+			case resource[:virt_type]
+				when :openvz then
+					debug "Detected hypervisor type: %s " % resource[:virt_type]
+					tmplcache = resource[:tmpl_cache]
+					xargs = "-c openvz:///system define --file "
+					if !tmplcache.nil?
+						require "erb"
+						xmlovz = File.new(xmlfile, APPEND)
+						xmlwrite = ERB.new("puppet-virt/templates/ovz_xml.erb")
+						xmlovz.puts = xmlwrite.result
+						xmlovz.close
+					else
+						fail("OpenVZ Error: No template cache define!")
+					end
+				else debug "Detected hypervisor type: %s " % resource[:virt_type]
+					xargs = "-c qemu:///session define --file "
+					require "erb"
+					xmlqemu = File.new(xmlfile, APPEND)
+					xmlwrite = ERB.new("puppet-virt/templates/qemu_xml.erb")
+					xmlqemu.puts = xmlwrite.result
+					xmlqemu.close
+				end
+	
+			debug "Creating the domain: %s " % [resource[:name]]
+			virsh xargs + xmlfile
+		else
+			fail("Error: XML already exists on disk " + xmlfile + " )"	
+		end
 	end
 
 	# Changing ensure to absent
@@ -114,8 +156,10 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		if !exists?
 			install(false)
 		elsif status == "running"
-#			dom.shutdown #FIXME Qemu does't support shutdown gracefully 
-			dom.destroy
+			case resource[:virt_type]
+         	when :qemu then dom.destroy
+				else dom.shutdown
+			end
 		end
 
 	end
@@ -145,7 +189,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	# Check if the domain exists.
 	def exists?
-
 		begin
 			dom
 			debug "Domain %s exists? true" % [resource[:name]]
@@ -154,9 +197,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			debug "Domain %s exists? false" % [resource[:name]]
 			false # The vm with that name doesnt exist
 		end
-
 	end
-
 
 	# running | stopped | absent,				
 	def status

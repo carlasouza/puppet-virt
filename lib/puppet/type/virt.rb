@@ -1,6 +1,6 @@
 module Puppet
 	newtype(:virt) do
-		@doc = "Manages virtual machines using the 'libvirt' hypervisor management library. The guest can be imported using an existing image file .img, .qcow or .qcow2."
+		@doc = "Manages virtual machines using the 'libvirt' hypervisor management library. The guests may be imported using an existing image, configured to use one or more virtual disks, network interfaces and other options which we haven't included yet. Create a new xen, kvm or openvz guest."
 
 		# A base class for numeric Virt parameters validation.
 		class VirtNumericParam < Puppet::Parameter
@@ -189,6 +189,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 	`linux`
 		`debianetch`: Debian Etch
 		`debianlenny`: Debian Lenny
+		`debiansqueeze`: Debian Squeeze
 		`fedora5`: Fedora Core 5
 		`fedora6`:  Fedora Core 6
 		`fedora7`: Fedora 7
@@ -242,10 +243,26 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 	`xen_paravirt`:
 		This guest should be a paravirtualized guest. 
 	`kvm`:
-		When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators."
+		When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators.
+	`openvz`:
+		When defining an OpenVZ container, the template cache to be used must be defined using tmpl_cache and you must explicitly specify the use of openvz with this attribute (for now)."
 
 			isrequired #FIXME Bug #4049
-			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt) 
+			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt, :qemu, :openvz) 
+		end
+
+		newparam(:tmpl_cache) do
+			desc "When using OpenVZ this defines the os template cache file to be used (ex. 'debian-5.0-i386-minimal', 'fedora-13-x86_64')."
+
+		end
+
+		newparam(:xml_path) do
+			desc "This is the path to a predefined xml config file, to be used with the import function."
+
+			munge do |value| 
+				"path=" + value
+			end
+
 		end
 		
 		newparam(:interfaces) do
