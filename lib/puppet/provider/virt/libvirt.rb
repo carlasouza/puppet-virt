@@ -16,7 +16,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
                        when :openvz then "openvz:///system"
                        else "qemu:///session"
               end
-              Libvirt::Open(hypervisor).name(resource[:name]) 
+              Libvirt::Open(hypervisor).lookup_domain_by_name(resource[:name]) 
 	end
 
 	# Import the declared image file as a new domain.
