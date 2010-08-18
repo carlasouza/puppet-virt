@@ -12,24 +12,24 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	# Returns the name of the Libvirt::Domain or fails
 	def dom
-              hypervisor = case resource[:virt_type]
-                       when :openvz then "openvz:///system"
-                       else "qemu:///session"
-              end
-              Libvirt::open(hypervisor).lookup_domain_by_name(resource[:name]) 
+		hypervisor = case resource[:virt_type]
+			when :openvz then "openvz:///system"
+			else "qemu:///session"
+		end
+		Libvirt::open(hypervisor).lookup_domain_by_name(resource[:name]) 
 	end
 
 	# Import the declared image file as a new domain.
 	def install(bootoninstall = true)
 
-                if resource[:xml_file]
-                           xmlinstall(resource[:xml_file])
-                end
+		if resource[:xml_file]
+			xmlinstall(resource[:xml_file])
+		end
 
 		virt_parameter = case resource[:virt_type]
-					when :xen_fullyvirt then "--hvm" #must validate kernel support
-					when :xen_paravirt then "--paravirt" #Must validate kernel support
-					when :kvm then "--accelerate" #Must validate hardware support                         
+			when :xen_fullyvirt then "--hvm" #must validate kernel support
+			when :xen_paravirt then "--paravirt" #Must validate kernel support
+			when :kvm then "--accelerate" #Must validate hardware support
 		end
 
 		debug "Boot on install: %s" % bootoninstall

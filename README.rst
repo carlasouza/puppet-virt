@@ -19,7 +19,7 @@ Usage
 This is the full specification for the new types. All have the same fields::
 
   virt { "name":
-      desc 	          => "My first VM",
+      desc            => "My first VM",
   # Basic configuration
       memory          => 1024, # MB, changeable
       cpus            => 2, # Changeable
