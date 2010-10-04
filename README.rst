@@ -7,7 +7,7 @@ Overview
 --------
 
 This module provides a new type, `virt`, for virtual machines installation and management like ensure running and so on.
-All the operations will be made using libvirt [0]. At first, only Xen fullyvirtualization, Xen paravirtualization, KVM and OpenVZ will be supported.
+All the operations will be made using libvirt [0]. At first, only Xen fullyvirtualization, Xen paravirtualization, KVM and OpenVZ are supported.
 
 This module is the result of my work at GSoC 2010.
 
