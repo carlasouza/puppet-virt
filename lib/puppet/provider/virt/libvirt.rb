@@ -129,7 +129,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			debug "Creating the domain: %s " % [resource[:name]]
 			virsh xargs + xmlfile
 		else
-			fail("Error: XML already exists on disk " + xmlfile + " )"	
+			fail("Error: XML already exists on disk " + xmlfile + "." )	
 		end
 	end
 
