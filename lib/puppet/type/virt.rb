@@ -2,6 +2,12 @@ module Puppet
 	newtype(:virt) do
 		@doc = "Manages virtual machines using the 'libvirt' hypervisor management library. The guests may be imported using an existing image, configured to use one or more virtual disks, network interfaces and other options which we haven't included yet. Create a new xen, kvm or openvz guest."
 
+		feature :buildable, "The provider can build a new guest from scratch",
+			:methods => [:build]
+		
+		feature :importable, "The provider can import and existing guest image",
+			:methods => [:import]
+
 		# A base class for numeric Virt parameters validation.
 		class VirtNumericParam < Puppet::Parameter
 
