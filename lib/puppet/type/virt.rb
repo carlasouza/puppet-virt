@@ -8,7 +8,7 @@ module Puppet
 		feature :importable, "The provider can import and existing guest image",
 			:methods => [:import]
 
-		feature :livemigrable, "The provider supports live migration",
+		feature :livemigratable, "The provider supports live migration",
 			:methods => [:migrate]
 
 		# A base class for numeric Virt parameters validation.
