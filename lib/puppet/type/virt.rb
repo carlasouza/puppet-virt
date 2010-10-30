@@ -174,6 +174,14 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
 		end
 
+		newparam(:pxe) do
+			desc "Use the PXE boot protocol to load the initial ramdisk and kernel for starting the guest installation process."
+			newvalue(:true)
+			newvalue(:false)
+
+			defaultto(:false)
+
+		end
 	
 		# VM parameters 
 		
@@ -278,6 +286,12 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 					self.devfail "interfaces field must be a String or an Array"
 				end
 			end
+		end
+
+		newparam(:macaddrs) do
+			desc "Fixed MAC address for the guest; 
+If this parameter is omitted, or the value \"RANDOM\" is specified a suitable address will be randomly generated.
+For Xen virtual machines it is required that the first 3 pairs in the MAC address be the sequence '00:16:3e', while for QEMU or KVM virtual machines it must be '54:52:00'."
 		end
 	
 		newproperty(:on_poweroff) do
