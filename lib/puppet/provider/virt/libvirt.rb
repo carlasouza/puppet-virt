@@ -48,9 +48,10 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			debug "Creating new domain."
 			fail "Only existing domain images importing is supported." 
 			# Future work
-			# --pxe
+			# ["--pxe"] 
 			# ["--location", resource[:boot_location]]
-			# [resource[:disk_size]]
+			# ["-x", resource[:boot_options]]
+			# ["--disk", "size=" + resource[:disk_size]]
 		end
 
 		virtinstall arguments + network + graphic
