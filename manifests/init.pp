@@ -8,7 +8,8 @@ class virt {
 
 class virt::debian {
         case $virtual {
-                xen | kvm: {
+                /^(xen|kvm)/: {
+#                xen | kvm: {
 	             package {
 		        [ "linux-image-xen-686", "xen-hypervisor", "xen-tools", "xen-utils", 
 		        "kvm", "qemu", "libvirt-bin", "virtinst", "libvirt-bin" ]:
@@ -27,10 +28,10 @@ class virt::debian {
 
 class virt::ubuntu {
         case $virtual {
-                xen | kvm: {
+                /^(xen|kvm)/: {
 	             package {
 		        [ "ubuntu-virt-server", "python-vm-builder", "kvm", "qemu", "qemu-kvm",
-		        "ubuntu-xen-server", "libvirt-ruby" ]:
+		        "ubuntu-xen-server", "libvirt-ruby"  ]:
 		        ensure => latest;
 	             }
     	        }
@@ -45,7 +46,7 @@ class virt::ubuntu {
 
 class virt::fedora {
         case $virtual {
-                xen | kvm: {
+                /^(xen|kvm)/: {
 	             package {
 		        [ "kvm", "qemu", "libvirt", "python-virtinst", "kernel-xen", "xen",
 		        "ruby-libvirt" ]:
