@@ -9,7 +9,6 @@ class virt {
 class virt::debian {
         case $virtual {
                 /^(xen|kvm)/: {
-#                xen | kvm: {
 	             package {
 		        [ "linux-image-xen-686", "xen-hypervisor", "xen-tools", "xen-utils", 
 		        "kvm", "qemu", "libvirt-bin", "virtinst", "libvirt-bin" ]:
