@@ -46,19 +46,19 @@ module Puppet
 	`absent`:
 		Removes config file, and makes sure the domain is not running."
 		
-			newvalue(:stopped) do
+			newvalues(:stopped) do
 				provider.stop
 			end
 	
-			newvalue(:running) do
+			newvalues(:running) do
 				provider.start
 			end
 
-			newvalue(:installed) do
+			newvalues(:installed) do
 				provider.setinstalled
 			end
 
-			newvalue(:absent) do
+			newvalues(:absent) do
 				provider.destroy
 			end
 
@@ -185,8 +185,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
 		newparam(:pxe) do
 			desc "Use the PXE boot protocol to load the initial ramdisk and kernel for starting the guest installation process."
-			newvalue(:true)
-			newvalue(:false)
+			newvalues(:true, :false)
 
 			defaultto(:false)
 
@@ -273,7 +272,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
 		end
 
-		newparam(:xml_path) do
+		newparam(:xml_file) do
 			desc "This is the path to a predefined xml config file, to be used with the import function."
 
 			munge do |value| 
@@ -357,8 +356,7 @@ For Xen virtual machines it is required that the first 3 pairs in the MAC addres
 		newproperty(:autoboot) do
 			desc "Determines if the guest should start when the host starts."
 
-			newvalue(true)
-			newvalue(false)
+			newvalues(:true, :false)
 
 		end
 

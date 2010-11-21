@@ -89,7 +89,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# Setup the virt-install graphic configuration arguments
 	def graphic
 
-		opt = resource[:graphics]
+		opt = resource[:graphic]
 		case opt
 			when :enable || nil then args = ["--vnc"]
 			when :disable then args = ["--nographics"]
