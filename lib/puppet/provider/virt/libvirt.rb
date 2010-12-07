@@ -22,11 +22,20 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	end
 
 	# Import the declared image file as a new domain.
-	def install(bootoninstall = true)
+	def install(bootoninstall)
+		debug "Installing new vm"
+		debug "Boot on install: %s" % bootoninstall
 
 		if resource[:xml_file]
 			xmlinstall(resource[:xml_file])
+		else
+			debug "Virtualization type: %s" % [resource[:virt_type]]
+			virtinstall generalargs(bootoninstall) + network + graphic + bootargs
 		end
+	end
+
+	def generalargs(bootoninstall = true)
+		debug "Building general arguments"
 
 		virt_parameter = case resource[:virt_type]
 			when :xen_fullyvirt then "--hvm" #must validate kernel support
@@ -34,35 +43,66 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			when :kvm then "--accelerate" #Must validate hardware support
 		end
 
-		debug "Boot on install: %s" % bootoninstall
-		debug "Virtualization type: %s" % [resource[:virt_type]]
-
-		arguments = ["--name", resource[:name], "--ram", resource[:memory], "--vcpus" , resource[:cpus], "--noautoconsole", "--force", virt_parameter, "--disk", resource[:virt_path]]
+		arguments = ["--name", resource[:name], "--ram", resource[:memory], "--vcpus" , resource[:cpus], "--noautoconsole", "--force", virt_parameter]
 
 		if !bootoninstall
 			arguments << "--noreboot"
 		end
+		
+		arguments << diskargs
 
 		if File.exists?(resource[:virt_path].split('=')[1])
+			if resource[:pxe]
+				warnonce("Ignoring PXE boot")
+			end		
 			debug "File already exists. Importing domain"
 			arguments << "--import"
 		else
 			debug "Creating new domain."
-			fail "Only existing domain images importing is supported." 
+			# Only works with hvm virtualization
+			if resource[:pxe]
+				debug "Using PXE"
+				arguments << "--pxe"
+			end
+			fail "Only existing domain images importing and PXE are supported." 
 			# Future work
-			# ["--pxe"] #use pxe?
 			# ["--location", resource[:boot_location]] #initrd+kernel location
-			# ["-x", resource[:boot_options]] # kickstart
-			# ["--disk", "size=" + resource[:disk_size]]
 		end
 
-		virtinstall arguments + network + graphic
+		arguments
+	end
 
+	def diskargs
+		args = []
+		parameters = ""
+
+		if resource[:virt_path]
+			parameters = resource[:virt_path]
+		end
+		if resource[:disk_size]
+			parameters.concat(" " + resource[:disk_size])
+		end
+		if !parameters.nil?
+			args = ["--disk", parameters]
+		end
+		args
+	end
+
+	# Additional boot arguments
+	def bootargs
+		debug "Bootargs"
+
+		bootargs = []
+		if !resource[:kickstart].nil? #kickstart support
+			bootargs = ["-x", resource[:kickstart]]
+		end
+		bootargs
 	end
 
 	# Creates network arguments for virt-install command
 	def network
 
+		debug "Network paramentrs"
 		network = []
 		iface = resource[:interfaces]
 		if iface.nil? 
