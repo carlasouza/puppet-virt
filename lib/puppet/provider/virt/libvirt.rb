@@ -80,7 +80,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			parameters = resource[:virt_path]
 		end
 		if resource[:disk_size]
-			parameters.concat(" " + resource[:disk_size])
+			parameters.concat("," + resource[:disk_size])
 		end
 		if !parameters.nil?
 			args = ["--disk", parameters]
