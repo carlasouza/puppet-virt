@@ -57,16 +57,16 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			end		
 			debug "File already exists. Importing domain"
 			arguments << "--import"
-		else
-			debug "Creating new domain."
+		elsif resource[:pxe]
+			debug "Creating new domain. Using PXE"
 			# Only works with hvm virtualization
-			if resource[:pxe]
-				debug "Using PXE"
-				arguments << "--pxe"
-			end
+			arguments << "--pxe" 
+		else
 			fail "Only existing domain images importing and PXE boot are supported."
+
 			# Future work
 			# ["--location", resource[:boot_location]] #initrd+kernel location
+
 		end
 
 		arguments
