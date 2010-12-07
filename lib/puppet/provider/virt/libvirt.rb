@@ -10,6 +10,8 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# The provider is chosen by virt_type, not by operating system
 	confine :feature => :libvirt
 
+	#defaultfor @resource[:virt_type] => [:xen_fullyvirt, :xen_paravirt, :kvm, :openvz]
+
 	# Returns the name of the Libvirt::Domain or fails
 	def dom
 		hypervisor = case resource[:virt_type]

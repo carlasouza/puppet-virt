@@ -83,7 +83,7 @@ module Puppet
 			defaultto(1)
 		end
 	
-		newparam(:graphic) do
+		newparam(:graphics) do
 			desc "Setup a virtual console in the guest to be imported. If no graphics option is specified, will default to enable.
 	Available values:
 	`enable`:
@@ -176,8 +176,8 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
 		newparam(:pxe) do
 			desc "Use the PXE boot protocol to load the initial ramdisk and kernel for starting the guest installation process."
-			newvalue(:true)
-			newvalue(:false)
+			newvalues(:true)
+			newvalues(:false)
 
 			defaultto(:false)
 
@@ -264,7 +264,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
 		end
 
-		newparam(:xml_path) do
+		newparam(:xml_file) do
 			desc "This is the path to a predefined xml config file, to be used with the import function."
 
 			munge do |value| 
