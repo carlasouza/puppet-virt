@@ -27,7 +27,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		debug "Boot on install: %s" % bootoninstall
 
 		if resource[:xml_file]
-			xmlinstall(resource[:xml_file])
+			xmlinstall
 		else
 			debug "Virtualization type: %s" % [resource[:virt_type]]
 			virtinstall generalargs(bootoninstall) + network + graphic + bootargs
@@ -64,7 +64,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 				debug "Using PXE"
 				arguments << "--pxe"
 			end
-			fail "Only existing domain images importing and PXE boot are supported." 
+			fail "Only existing domain images importing and PXE boot are supported."
 			# Future work
 			# ["--location", resource[:boot_location]] #initrd+kernel location
 		end
@@ -143,10 +143,10 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	# Install guests using virsh with xml when virt-install is still not yet supported.
         # Libvirt XML <domain> specification: http://libvirt.org/formatdomain.html
-	def xmlinstall(xmlfile)
+	def xmlinstall
 
-		if !File.exists?(xmlfile)
-			debug "Creating the XML file: %s " % xmlfile
+		if !File.exists?(resource[:xml_file])
+			debug "Creating the XML file: %s " % resource[:xml_file]
 
 			case resource[:virt_type]
 				when :openvz then
@@ -155,7 +155,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 					xargs = "-c openvz:///system define --file "
 					if !tmplcache.nil?
 						require "erb"
-						xmlovz = File.new(xmlfile, APPEND)
+						xmlovz = File.new(resource[:xml_file], APPEND)
 						xmlwrite = ERB.new("puppet-virt/templates/ovz_xml.erb")
 						xmlovz.puts = xmlwrite.result
 						xmlovz.close
@@ -165,16 +165,16 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 				else debug "Detected hypervisor type: %s " % resource[:virt_type]
 					xargs = "-c qemu:///session define --file "
 					require "erb"
-					xmlqemu = File.new(xmlfile, APPEND)
+					xmlqemu = File.new(resource[:xml_file], APPEND)
 					xmlwrite = ERB.new("puppet-virt/templates/qemu_xml.erb")
 					xmlqemu.puts = xmlwrite.result
 					xmlqemu.close
 				end
 	
 			debug "Creating the domain: %s " % [resource[:name]]
-			virsh xargs + xmlfile
+			virsh xargs + resource[:xml_file]
 		else
-			fail("Error: XML already exists on disk " + xmlfile + "." )	
+			fail("Error: XML already exists on disk " + resource[:xml_file] + "." )	
 		end
 	end
 
