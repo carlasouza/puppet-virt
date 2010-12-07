@@ -138,8 +138,9 @@ module Puppet
 
 		end
 
+		#Kickstart file location on the network
 		newparam(:kickstart) do
-			desc ""
+			desc "Kickstart file location. "
 			
 			munge do |value|
 				"ks=" + value
@@ -174,6 +175,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
 		end
 	
+		# Disk size (only used for creating new guests
 		newparam(:disk_size, :parent => VirtNumericParam) do
 			desc "Size (in GB) to use if creating new guest storage. Not changeable."
 
@@ -183,13 +185,13 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
 		end
 
+		# Will it install using PXE?
 		newparam(:pxe) do
-			desc "Use the PXE boot protocol to load the initial ramdisk and kernel for starting the guest installation process."
+			desc "Use the PXE boot protocol to load the initial ramdisk and kernel for starting the guest installation process. PXE is only available for Xen fullyvirtualizated guests"
 			newvalues(:true)
 			newvalues(:false)
 
 			defaultto(:false)
-
 		end
 	
 		# VM parameters 
