@@ -46,7 +46,7 @@ module Puppet
 			end
 
 			newvalue(:installed) do
-				provider.setinstalled
+				provider.setpresent
 			end
 
 			newvalue(:absent) do
@@ -136,6 +136,15 @@ module Puppet
 	`ftp://host/path`
 		An FTP server location containing an installable distribution image"
 
+		end
+
+		newparam(:kickstart) do
+			desc ""
+			
+			munge do |value|
+				"ks=" + value
+			end	
+		
 		end
 
 		newparam(:boot_options) do
