@@ -53,7 +53,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 		if File.exists?(resource[:virt_path].split('=')[1])
 			if resource[:pxe]
-				warnonce("Ignoring PXE boot")
+				warnonce("Ignoring PXE boot. Domain image already exists")
 			end		
 			debug "File already exists. Importing domain"
 			arguments << "--import"
@@ -64,7 +64,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 				debug "Using PXE"
 				arguments << "--pxe"
 			end
-			fail "Only existing domain images importing and PXE are supported." 
+			fail "Only existing domain images importing and PXE boot are supported." 
 			# Future work
 			# ["--location", resource[:boot_location]] #initrd+kernel location
 		end
