@@ -29,8 +29,9 @@ This is the full specification for the new types. All have the same fields::
   
   # Boot configuration
       boot_localtion  => "/path/to/vmlinuz and initrd.img",
-      boot_options    => "ks=foo noacpi" # Non changeable, controls, kickstart
-
+      boot_options    => "noacpi" # Non changeable, controls, kickstart
+      kickstart       => "http://path/to/ks.cfg" #Used only for installation
+      pxe             => true | false
       #For now, only the existing .img, .qcow2 and .qcow  files will be supported
       virt_path       => "/path/foo.img" | "/opt/virt_images/" | "/dev/sd4" 
   
@@ -45,7 +46,7 @@ This is the full specification for the new types. All have the same fields::
   # Virtualization parameters
       virt_type       => kvm | xen-fullyvirt | xen-paravirt | openvz | qemu  # for libvirt provider, this field is mandatory
 
-      * If you specify openvz as a type you'd like to create, the following fields 
+      * If you specify Openvz as a type you'd like to create, the following fields 
         are the minimum requirements: `name`, `memory`, `vcpu`, `tmpl_cache`, and `xml_file` *
   
   # Network configuration
@@ -72,6 +73,6 @@ Future Work
 For now, some parameters will have a few values acceptable:
   * `virtpath` will accept only existing .img, .qcow and .qcow2 files;
   * `memory` and `cpus` will be, initially, not changeable;
-  * Input devices specification like mouse and graphic will not be supported for now.
+  * Input devices specification like mouse will not be supported for now.
   * The parameters `on_poweroff`; `on_reboot` and `on_crash` are not changeable. They will be used only to create a new domain (not for import existing domain's image, because libvirt does not support modify those values)
   * if `virt_type` is openvz, providing both `tmpl_cache` and `xml_file` are required.
