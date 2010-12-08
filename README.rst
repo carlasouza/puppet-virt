@@ -33,10 +33,10 @@ This is the full specification for the new types. All have the same fields::
       kickstart       => "http://path/to/ks.cfg" #Used only for installation
       pxe             => true | false
       #For now, only the existing .img, .qcow2 and .qcow  files will be supported
-      virt_path       => "/path/foo.img" | "/opt/virt_images/" | "/dev/sd4" 
   
   # Storage configuration
       disk_size       => 10, # GB, not changeable
+      virt_path       => "/path/foo.img" | "/opt/virt_images/" | "/dev/sd4" 
   
   # OS specification
       os_type         => linux | other | solaris | unix | windows | hvm,
