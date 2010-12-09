@@ -116,9 +116,14 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 				end
 			end
 		end
-	
-		if resource[:macaddrs]
-			network << ["-m", resource[:macaddrs]]
+		
+		macs = resource[:macaddrs]
+		if macs
+			resource[:macaddrs].each do |macaddr|
+				#FIXME -m is decrepted
+				network << "-m"
+				network << macaddr
+			end
 		end
 
 		return network
