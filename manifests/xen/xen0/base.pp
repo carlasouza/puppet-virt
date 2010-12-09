@@ -21,7 +21,7 @@ class virt::xen::xen0::base {
   }
   # only ensure xendomains running if we have more
   # than one domain running
-  if $virtual_guests_count > 0 {
+  if $virtual_guests_count and $virtual_guests_count > 0 {
     Service['xendomains']{
       ensure => running,
     }
