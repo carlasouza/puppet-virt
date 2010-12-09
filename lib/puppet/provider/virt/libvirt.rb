@@ -116,6 +116,11 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 				end
 			end
 		end
+	
+		if resource[:macaddrs]
+			network << ["-m", resource[:macaddrs]]
+		end
+
 		return network
 	end
 
