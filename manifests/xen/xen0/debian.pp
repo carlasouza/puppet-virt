@@ -20,7 +20,7 @@ class virt::xen::xen0::debian inherits virt::xen::xen0::base {
 
   File['xendomains_defaults']{
         path => '/etc/defaults/xendomains',
-        source => "puppet:///modules/virt/xen/${operatingsystem}/defaults/xendomains",
+        source => "puppet:///modules/virt/xen/${operatingsystem}/default/xendomains",
   }
 
   config_file {
