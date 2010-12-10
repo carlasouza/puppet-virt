@@ -11,4 +11,8 @@ class virt::libvirt::debian inherits virt::libvirt::base {
   package{'libvirt-bin':
     ensure => present,
   }
+  Service['libvirtd']{
+    name => 'libvirt-bin',
+    require +> Package['libvirt-bin'],
+  }
 }
