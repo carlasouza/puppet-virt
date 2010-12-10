@@ -11,11 +11,15 @@ class virt::xen::xen0::debian inherits virt::xen::xen0::base {
   }
 
   Package['xen']{
-    name => 'xen-hypervisor',
+    name => 'xen-utils-common',
   }
 
   Package['xen-libs']{
-    name => 'xen-utils',
+    name => 'xen-utils-3.2-1',
+  }
+
+  Service['xend']{
+    hasstatus => false,
   }
 
   File['xendomains_defaults']{
