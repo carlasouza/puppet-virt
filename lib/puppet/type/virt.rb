@@ -25,6 +25,9 @@ module Puppet
 
 		end
 
+		def self.instances()
+			[]
+		end
 
 		ensurable do
 			desc "The guest's ensure field can assume one of the following values:
