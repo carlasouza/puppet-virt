@@ -56,6 +56,17 @@ XENDOMAINS_MIGRATE=""
 XENDOMAINS_SAVE=
 
 ## Type: string
+## Default: "none"
+#
+# If you're restoring domain and the restore fails you can specify the
+# type of action to be done. Possible values are:
+#  "none"   - do nothing, standard behaviour
+#  "rename" - rename /savePath/invalidRestoreImage to /savePath/.invalidRestoreImage
+#  "delete" - delete /savePath/invalidRestoreImage
+#
+XENDOMAINS_RESTOREFAILTYPE="none"
+
+## Type: string
 ## Default: "--halt --wait"
 #
 # If neither MIGRATE nor SAVE were enabled or if they failed, you can
