@@ -1,5 +1,5 @@
 Puppet::Type.type(:virt).provide(:libvirt) do
-	desc "Creates a new Xen (fully or para-virtualized), KVM, or OpenVZ guest using libvirt."
+	desc "Creates a new Xen (fully or para-virtualized) or KVM guest using libvirt."
         # Ruby-Libvirt API Reference: http://libvirt.org/ruby/api/index.html
 
 	commands :virtinstall => "/usr/bin/virt-install"
@@ -10,7 +10,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# The provider is chosen by virt_type, not by operating system
 	confine :feature => :libvirt
 
-	#defaultfor @resource[:virt_type] => [:xen_fullyvirt, :xen_paravirt, :kvm, :openvz]
+	#defaultfor @resource[:virt_type] => [:xen_fullyvirt, :xen_paravirt, :kvm]
 
 	# Returns the name of the Libvirt::Domain or fails
 	def dom
