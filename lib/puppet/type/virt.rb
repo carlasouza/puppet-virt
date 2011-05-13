@@ -72,6 +72,20 @@ module Puppet
 			desc "The guest's name."
 		end
 
+		newparam(:ctid, :parent => VirtNumericParam) do
+			desc "OpenVZ CT ID. It must be an integer greater then 100. CT ID <= 100 are reserved for OpenVZ internal purposes."
+
+			validate do |value|
+				if value > 100
+					return value
+				else
+					self.fail "%s is not a valid %s" % [value, self.class.name]
+				end
+			end
+
+			
+		end
+
 		# This will change to properties
 		newparam(:memory, :parent => VirtNumericParam) do
 			desc "The maximum amount of memory allocation for the guest domain.
