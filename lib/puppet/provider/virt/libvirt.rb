@@ -7,7 +7,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	commands :grep => "/bin/grep"
 	commands :ip => "/sbin/ip"
 
-	# The provider is chosen by virt_type, not by operating system
+	# The provider is chosen by virt_type
 	confine :feature => :libvirt
 
 	#defaultfor @resource[:virt_type] => [:xen_fullyvirt, :xen_paravirt, :kvm]
@@ -202,6 +202,9 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	end
 
+	#TODO
+	def purge 
+	end
 
 	# Creates config file if absent, and makes sure the domain is not running.
 	def stop
