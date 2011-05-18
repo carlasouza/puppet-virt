@@ -7,13 +7,20 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	commands :vzlist => "/usr/sbin/vzlist"
 	commands :mkfs   => "/sbin/mkfs"
 
-#	confine :true => modulo openvz up
-	#defaultfor resource[:virt_type] => [:openvz]
+	if [ "Ubuntu", "Debian" ].any? { |os|  Facter.value(:operatingsystem) == os }
+		vzcache = "/var/lib/vz/template/cache"
+	else
+		vzcache = ""
+	end
 
+	# TODO if openvz module is up
+	#confine :true => 
+	
+	#Must return all host's guests
+	# FIXME ensure it works
 	def self.instances
 		guests = []
-		vzlist = which('vzlist') or return []
-		execpipe "#{vzlist} -a" do |process| #FIXME ensure it works
+		execpipe "#{vzlist} -a" do |process|
 			process.collect do |line|
 				next unless options = parse(line)
 				guests << new(options)
