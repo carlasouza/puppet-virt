@@ -8,9 +8,9 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	commands :mkfs   => "/sbin/mkfs"
 
 	if [ "Ubuntu", "Debian" ].any? { |os|  Facter.value(:operatingsystem) == os }
-		vzcache = "/var/lib/vz/template/cache"
+		vzcache_dir = "/var/lib/vz/template/cache"
 	else
-		vzcache = ""
+		vzcache_dir = ""
 	end
 
 	# TODO if openvz module is up
@@ -39,6 +39,13 @@ Puppet::Type.type(:virt).provide(:openvz) do
 			 end
 
 		return resource[:os_variant] + "-" + arch
+	end
+
+	def gettemplate(url, vzcache_dir)
+		require 'open-uri'
+		writeOut = open(vzcache_dir, "wb")
+		writeOut.write(open(url).read)
+		writeOut.close
 	end
 
 	def install
@@ -85,6 +92,13 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		end
 	end
 
+	def setpresent
+		case resource[:ensure]
+			when :absent then return
+			else install
+		end
+	end
+
 	def destroy
 		#dev = "/dev/#{@resource[:vgname]}/#{@resource[:lvname]}"
 		#lvremove '--force', "#{@resource[:vgname]}/#{@resource[:name]}"
@@ -105,6 +119,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
       end
    end
 
+	#TODO know wherever use --force parameter
    def start
 		if status == "stopped"
 			vzctl 'start', resource[:ctid]
@@ -124,6 +139,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	# running | stopped | absent
    def status
 		stat = vzctl('status', resource[:ctid]).split(" ")
+		debug self.methods
       if exists?
          if resource[:ensure].to_s == "installed"
             return "installed"
@@ -140,16 +156,19 @@ Puppet::Type.type(:virt).provide(:openvz) do
       end
    end
 
-#	VE_ARGS = [ "onboot", "root", "userpasswd", "disabled", "name", "description", "setmode", "ipadd", "ipdel", "hostname", "nameserver", "searchdomain", "netid_add", "netif_del", "mac", "nost_ifname", "host_mac", "bridge", "mac_filter", "numproc", "numtcpsock", "numothersock", "vmguardpages", "kmemsize", "tcpsndbuf", "tcprcvbuf", "othersockbuf", "dgramrcvbuf", "oomguarpages", "lockedpages", "privvmpages", "shmpages", "numfile", "numflock", "numpty", "numsiginfo", "dcachesize", "numiptent", "physpages", "cpuunits", "cpulimit", "cpus", "meminfo", "iptables", "netdev_add", "netdev_del", "diskspace", "discinodes", "quotatime", "quotaugidlimit", "noatime", "capability", "devnodes", "devices", "features", "applyconfig", "applyconfig_map", "ioprio" ]
-#
-#	VE_ARGS.each do |arg|
-#		define_method(arg.to_s.downcase) do
-#			state_values[arg]
-#		end
-#	
-#		define_method("#{arg}=".downcase) do |value|
-#			vzctl('set', resource[:name], "--#{arg}", value, "--save")
-#			state_values[arg] = value
-#		end
-#	end
+	# 'root' removed from list because it is unrecomended to change it's value using vzctl command
+	# Everything here are properties.
+	VE_ARGS = [ "onboot", "userpasswd", "disabled", "name", "description", "setmode", "ipadd", "ipdel", "hostname", "nameserver", "searchdomain", "netid_add", "netif_del", "mac", "nost_ifname", "host_mac", "bridge", "mac_filter", "numproc", "numtcpsock", "numothersock", "vmguardpages", "kmemsize", "tcpsndbuf", "tcprcvbuf", "othersockbuf", "dgramrcvbuf", "oomguarpages", "lockedpages", "privvmpages", "shmpages", "numfile", "numflock", "numpty", "numsiginfo", "dcachesize", "numiptent", "physpages", "cpuunits", "cpulimit", "cpus", "meminfo", "iptables", "netdev_add", "netdev_del", "diskspace", "discinodes", "quotatime", "quotaugidlimit", "noatime", "capability", "devnodes", "devices", "features", "applyconfig", "applyconfig_map", "ioprio" ]
+
+	# TODO: methods to merge names: onboot(autoboot), description(desc), ipaddr(ipadd), netifadd(interfaces), mac(macaddrs), meminfo(memory), diskspace(disk_size) 
+	VE_ARGS.each do |arg|
+		define_method(arg.to_s.downcase) do
+			state_values[arg]
+		end
+	
+		define_method("#{arg}=".downcase) do |value|
+			vzctl('set', resource[:name], "--#{arg}", "#{value}", "--save")
+			state_values[arg] = value
+		end
+	end
 end
