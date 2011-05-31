@@ -166,11 +166,11 @@ Puppet::Type.type(:virt).provide(:openvz) do
 
 	SET_PARAMS.each do |arg|
 		define_method(arg.to_s.downcase) do
-		get_value(arg)
-	end
+			get_value(arg)
+		end
 	
-	define_method("#{arg}=".downcase) do |value|
-		vzctl('set', ctid, "--#{arg}", value, "--save")
+		define_method("#{arg}=".downcase) do |value|
+			vzctl('set', ctid, "--#{arg}", value, "--save")
 		end
 	end
 	
