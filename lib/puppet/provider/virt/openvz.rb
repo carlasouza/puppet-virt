@@ -15,22 +15,10 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	#		:vzconf => ""
 	#	end
 	
-	class VzConfigProperty < Puppet::Property
-		def retrieve
-			#get from vzconf / ctid.conf file
-		end
-	
-		def sync
-		#map parameter -> conf parameter name
-		end
-	end
-	
-	
 	# TODO if openvz module is up
 	# confine :true => 
 	
 	# Must return all host's guests
-	# FIXME ensure it works
 	def self.instances
 		guests = []
 		execpipe "#{vzlist} -a" do |process|
@@ -39,7 +27,6 @@ Puppet::Type.type(:virt).provide(:openvz) do
 				guests << new(options)
 			end
 		end
-		p guests
 		guests
 	end
 	
@@ -102,7 +89,6 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		end
 	
 		if hn = resource[:name]
-			args << '--hostname' << hn
 			args << '--name' << hn
 		end
 		vzctl args
@@ -176,6 +162,8 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	
 	SET_PARAMS = ["name", "capability", "applyconfig", "applyconfig_map", "iptables", "features", "searchdomain", "hostname", "onboot", "disabled", "noatime", "setmode", "userpasswd", "nameserver", "ipadd", "ipdel", "cpuunits", "cpulimit", "quotatime", "quotaugidlimit", "ioprio", "cpus", "netif_add", "netif_del", "diskspace", "diskinodes", "devices", "devnodes"]
 	
+	UBC_PARAMS = ["vmguarpages", "physpages", "oomguarpages", "lockedpages", "privvmpages", "shmpages", "numproc", "numtcpsock", "numothersock", "numfile", "numflock", "numpty", "numsiginfo", "dcachesize", "numiptent", "avnumproc", "kmemsize", "tcpsndbuf", "tcprcvbuf", "othersockbuf", "dgramrcvbuf"]
+
 	SET_PARAMS.each do |arg|
 		define_method(arg.to_s.downcase) do
 		get_value(arg)
