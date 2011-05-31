@@ -99,10 +99,11 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	end
 	
 	def setpresent
-		case resource[:ensure]
-			when :absent then return #do nothing
-			else install
-		end
+#		case resource[:ensure]
+#			when :absent then return #do nothing
+#			else install
+#		end
+		install
 	end
 	
 	def destroy
@@ -117,15 +118,17 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	end
 	
 	def stop
-		if status == :running
-			vzctl 'stop', ctid
+		if !exists
+			install
 		end
+		vzctl 'stop', ctid
 	end
 	
 	def start
-		if status != :running
-			vzctl 'start', ctid
+		if !exists
+			install
 		end
+		vzctl 'start', ctid
 	end
 	
 	def exists?

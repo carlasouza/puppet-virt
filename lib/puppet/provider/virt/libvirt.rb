@@ -236,11 +236,12 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	
 	# Auxiliary method to make sure the domain exists before change it's properties.
 	def setpresent
-		case resource[:ensure]
-			when :absent then return #do nothing
-			when :running then install(true)
-			else install(false)
-		end
+#		case resource[:ensure]
+#			when :absent then return #do nothing
+#			when :running then install(true)
+#			else install(false)
+#		end
+		install(false)
 	end
 	
 	# Check if the domain exists.
@@ -279,9 +280,9 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# Is the domain autostarting?
 	def autoboot
 	
-		if !exists?
-			setpresent
-		end
+#		if !exists?
+#			setpresent
+#		end
 	
 		return dom.autostart.to_s
 	
