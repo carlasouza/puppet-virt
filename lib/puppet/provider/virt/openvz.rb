@@ -77,7 +77,11 @@ Puppet::Type.type(:virt).provide(:openvz) do
 				id = tmp+1
 			end
 		end
-		return id
+		if id
+			return id
+		else
+			fail "CTID not specified"
+		end
 
 	end
 
@@ -102,25 +106,26 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		end
 		vzctl args
 
-		args = [ 'set', ctid, '--save' ]
-		if nss = resource.should(:nameserver)
-			[nss].flatten.each do |ns|
-				args << '--nameserver' << ns
-			end
-		end
-		if ips = resource.should(:ipaddr)
-			[ips].flatten.each do |ip|
-				args << '--ipadd' << ip
-			end
-		end
-		if sds = resource[:searchdomain]
-			[sds].flatten.each do |sd|
-				args << '--searchdomain' << sd
-			end
-		end
-		vzctl args
-		if resource.should(:status) == :running
-			vzctl 'start', resource[:id]
+#		args = [ 'set', ctid, '--save' ]
+#		if nss = resource.should(:nameserver)
+#			[nss].flatten.each do |ns|
+#				args << '--nameserver' << ns
+#			end
+#		end
+#		if ips = resource.should(:ipaddr)
+#			[ips].flatten.each do |ip|
+#				args << '--ipadd' << ip
+#			end
+#		end
+#		if sds = resource[:searchdomain]
+#			[sds].flatten.each do |sd|
+#				args << '--searchdomain' << sd
+#			end
+#		end
+#		vzctl args
+#
+		if resource[:ensure] == :running
+			vzctl 'start', ctid
 		end
 	end
 
@@ -178,17 +183,18 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		stat = vzctl('status', ctid).split(" ")
       if exists?
          if resource[:ensure].to_s == "installed"
-            return "installed"
+            return ":installed"
          elsif stat[4] == "running"
-            return "running"
+            return ":running"
 			elsif stat[4] == "down"
-            return "stopped"
+            return ":stopped"
 			else 
-				return "absent"
+				return ":absent"
          end
       else
          debug "Domain %s status: absent" % [resource[:name]]
-         return "absent"
+			debug resource.should(:ensure)
+         return ":absent"
       end
    end
 	

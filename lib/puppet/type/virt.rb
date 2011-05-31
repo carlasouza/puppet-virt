@@ -323,10 +323,10 @@ module Puppet
 				newvalues(:kvm, :xen_fullyvirt, :xen_paravirt, :qemu, :openvz) 
 				
 				munge do |value| 
-					if value == openvz
-						provider = openvz
+					if value == "openvz"
+						@resource[:provider] = value
 					else
-						provider = libvirt
+						@resource[:provider] = libvirt
 					end
 				end
 
@@ -348,7 +348,7 @@ module Puppet
 			end
 			
 			newparam(:interfaces) do
-				desc " Connect the guest network to the host using the specified network as a bridge. The value can take one of 2 formats:
+				desc "Connect the guest network to the host using the specified network as a bridge. The value can take one of 2 formats:
 		`disable`:
 			The guest will have no network.
 		`[ \"ethX\", ... ] | \"ethX\" `
@@ -381,7 +381,6 @@ module Puppet
 		The domain will be terminated, and then restarted with a new name."
 
 			newvalues(:destroy, :restart, :preserv, :renamerestart)
-#			defaultto(:destroy)
 
 		end
 	
@@ -398,7 +397,6 @@ module Puppet
 		The domain will be terminated, and then restarted with a new name."
 
 			newvalues(:destroy, :restart, :preserv, :renamerestart)
-#			defaultto(:restart)
 
 		end
 	
@@ -415,16 +413,16 @@ module Puppet
 		The domain will be terminated, and then restarted with a new name."
 
 			newvalues(:destroy, :restart, :preserv, :renamerestart)
-#			defaultto(:restart)
 
 		end
 		
-		newproperty(:autoboot) do
+		newproperty(:onboot) do
 			desc "Determines if the guest should start when the host starts."
 
-			newvalue(true)
-			newvalue(false)
+			newvalue(:yes)
+			newvalue(:no)
 
+#			defaultto(:yes) #XXX change the libvirt values to yes/no
 		end
 
 	end
