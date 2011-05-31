@@ -425,5 +425,21 @@ Available values:
 #				defaultto(:yes) #XXX change the libvirt values to yes/no
 		end
 
+		newproperty(:disabled) do
+			desc "Disable container start for OpenVZ guests.
+To force the start of a disabled container, use vzctl start with --force option."
+
+			newvalue(:yes)
+			newvalue(:no)
+		end
+
+		newproperty(:noatime) do
+			desc "Sets noatime flag (do not update inode access times) on file system for OpenVZ guests."
+
+			newvalue(:yes)
+			newvalue(:no)
+		end
+
+
 	end
 end
