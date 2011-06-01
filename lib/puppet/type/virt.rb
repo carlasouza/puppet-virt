@@ -32,6 +32,17 @@ module Puppet
 			[]
 		end
 
+		def munge_boolean(value)
+			case value
+				when true, "true", :true
+					:true
+				when false, "false", :false
+					:false
+			else
+				fail("munge_boolean only takes booleans")
+			end
+		end
+
 		ensurable do
 			desc "The guest's ensure field can assume one of the following values:
 	`running`:
@@ -98,10 +109,15 @@ module Puppet
 
 		newproperty(:ipaddr, :array_matching => :all) do
 			desc "IP address(es) of the VE."
+
 			validate do |ip|
 				unless ip =~ /^\d+\.\d+\.\d+\.\d+$/
 					raise ArgumentError, "\"#{ip}\" is not a valid IP address."
 				end
+			end
+
+			def insync?(current)
+				current.sort == @should.sort
 			end
 		end
 
@@ -111,6 +127,10 @@ module Puppet
 				unless val =~ /^\d+\.\d+\.\d+\.\d+( +\d+\.\d+\.\d+\.\d+)*$/
 					raise ArgumentError, "\"#{val}\" is not a valid space-separated list of IP addresses."
 				end
+			end
+
+			def insync?(current)
+				current.sort == @should.sort
 			end
 		end
 
@@ -202,10 +222,6 @@ module Puppet
 			newvalues("UTC", "localtime", "timezone", "variable")
 		end
 	
-		newparam(:private) do
-			desc "Path to the private directory. Not passed to vzctl, if not specified."
-		end
-
 
 		# Installation method
 
@@ -276,6 +292,10 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 			desc "Use the PXE boot protocol to load the initial ramdisk and kernel for starting the guest installation process. PXE is only available for Xen fullyvirtualizated guests"
 			newvalues(:true)
 			newvalues(:false)
+
+			munge do |value|
+				@resource.munge_boolean(value)
+			end
 
 			defaultto(:false)
 		end
@@ -452,32 +472,47 @@ Available values:
 
 		end
 	
-		newproperty(:onboot) do
+		newproperty(:autoboot) do
 			desc "Determines if the guest should start when the host starts."
 
-			newvalue(:yes)
-			newvalue(:no)
+			newvalue(:true)
+			newvalue(:false)
 
-#				defaultto(:yes) #XXX change the libvirt values to yes/no
+			munge do |value|
+				@resource.munge_boolean(value)
+			end
+
 		end
 
-		#XXX	:required_features => :disabled
 		newproperty(:disabled, :required_features => :disabled) do
 			desc "Disable container start for OpenVZ guests.
 To force the start of a disabled container, use vzctl start with --force option."
 
-			newvalue(:yes)
-			newvalue(:no)
+			newvalue(:true)
+			newvalue(:false)
+
+			munge do |value|
+				return value == :true ? :yes : :no
+			end
+
+		end
+
+		newparam(:private) do
+			desc "You can use this parameter to set the path to directory in which all the files and directories specific to this very container are stored (default is VE_PRIVATE specified in vz.conf(5) file). Argument can contain string $VEID, which will be substituted with the numeric CT ID."
 		end
 
 		#XXX	:required_features => 
 		newproperty(:noatime) do
 			desc "Sets noatime flag (do not update inode access times) on file system for OpenVZ guests."
 
-			newvalue(:yes)
-			newvalue(:no)
-		end
+			newvalue(:true)
+			newvalue(:false)
 
+			munge do |value|
+				return value == :true ? :yes : :no
+			end
+
+		end
 
 	end
 end

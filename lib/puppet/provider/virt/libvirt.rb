@@ -279,13 +279,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	
 	# Is the domain autostarting?
 	def autoboot
-	
-#		if !exists?
-#			setpresent
-#		end
-	
 		return dom.autostart.to_s
-	
 	end
 	
 	
