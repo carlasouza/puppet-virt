@@ -193,11 +193,13 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	#	end
 
 	def autoboot
-		return get_value("onboot") == "yes" ? true : false
+		p get_value("onboot") == "yes" ? true : false
+		return get_value("onboot") == "yes" ? :true : :false
 	end
 
 	def autoboot=(value)
-		result = value == 'true' ? 'yes' : 'no'
+		result = value == :true ? 'yes' : 'no'
+		p result
 		vzctl 'set', ctid, '--onboot', result, '--save'
 	end
 
