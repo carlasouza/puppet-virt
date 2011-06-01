@@ -2,8 +2,11 @@ module Puppet
 	newtype(:virt) do
 		@doc = "Manages virtual machines using the 'libvirt' hypervisor management library. The guests may be imported using an existing image, configured to use one or more virtual disks, network interfaces and other options which we haven't included yet. Create a new xen, kvm or openvz guest."
 
+		feature :disabled,
+			"Disable container start guests."
+
 		# A base class for numeric Virt parameters validation.
-		class VirtNumericParam < Puppet::Parameter
+		class VirtNumericParam < Puppet::Property
 
 			def numfix(num)
 				if num =~ /^\d+$/
@@ -84,13 +87,13 @@ module Puppet
 		newparam(:ctid, :parent => VirtNumericParam) do
 			desc "OpenVZ CT ID. It must be an integer greater then 100. CT ID <= 100 are reserved for OpenVZ internal purposes."
 
-#				validate do |value|
-#					if value.to_i > 100
-#						return value
-#					else
-#						self.fail "%s is not a valid %s" % [value, self.class.name]
-#					end
-#				end
+				validate do |value|
+					if value.to_i > 100
+						return value
+					else
+						self.fail "%s is not a valid %s" % [value, self.class.name]
+					end
+				end
 		end
 
 		newproperty(:ipaddr, :array_matching => :all) do
@@ -111,22 +114,55 @@ module Puppet
 			end
 		end
 
-		newparam(:searchdomain) do
+		newproperty(:searchdomain) do
 			desc "DNS search domain name(s)."
 		end
 
 		# This will change to properties
-		newparam(:memory, :parent => VirtNumericParam) do
+		newproperty(:memory, :parent => VirtNumericParam) do
 			desc "The maximum amount of memory allocation for the guest domain.
 					Specified in MB."
 
 			isrequired #FIXME Bug #4049
 		end
 
-		newparam(:cpus, :parent => VirtNumericParam) do
+		newproperty(:cpus, :parent => VirtNumericParam) do
 			desc "Number of virtual CPUs active in the guest domain."
 
 			defaultto(1)
+		end
+
+		#XXX	:required_features => 
+		newproperty(:cpuunits, :parent => VirtNumericParam) do
+			desc "CPU weight for a container. Argument is positive non-zero number, passed to and used in the kernel fair scheduler.
+			The larger the number is, the more CPU time this container gets.
+			Maximum value is 500000, minimal is 8. Number is relative to weights of all the other running containers.
+			If cpuunits are not specified, default value of 1000 is used."
+		end
+	
+		#XXX	:required_features => 
+		newproperty(:cpulimit, :parent => VirtNumericParam) do
+			desc "Limit of CPU usage for the container, in per cent. Note if the computer has 2 CPUs, it has total of 200% CPU time. Default CPU limit is 0 (no CPU limit)."
+		end
+	
+		#XXX	:required_features => 
+		newproperty(:quotatime, :parent => VirtNumericParam) do
+			desc "Sets soft overusage time limit for disk quota (also known as grace period)."
+		end
+	
+		#XXX	:required_features => 
+		newproperty(:quotaugidlimit, :parent => VirtNumericParam) do
+			desc "Sets maximum number of user/group IDs in a container for which disk quota inside the container will be accounted. If this value is set to 0, user and group quotas inside the container will not be accounted.
+			Note that if you have previously set value of this parameter to 0, changing it while the container is running will not take effect."
+		end
+	
+#		newproperty(:ioprio, :parent => VirtNumericParam, :required_features => :manages_password_age) do
+		#XXX	:required_features => 
+		newproperty(:ioprio, :parent => VirtNumericParam) do
+			desc "Assigns  I/O priority to container.
+			Priority range is 0-7.
+			The greater priority is, the more time for I/O activity container has.
+			By default each container has priority of 4."
 		end
 	
 		newparam(:graphics) do
@@ -425,7 +461,8 @@ Available values:
 #				defaultto(:yes) #XXX change the libvirt values to yes/no
 		end
 
-		newproperty(:disabled) do
+		#XXX	:required_features => :disabled
+		newproperty(:disabled, :required_features => :disabled) do
 			desc "Disable container start for OpenVZ guests.
 To force the start of a disabled container, use vzctl start with --force option."
 
@@ -433,6 +470,7 @@ To force the start of a disabled container, use vzctl start with --force option.
 			newvalue(:no)
 		end
 
+		#XXX	:required_features => 
 		newproperty(:noatime) do
 			desc "Sets noatime flag (do not update inode access times) on file system for OpenVZ guests."
 
