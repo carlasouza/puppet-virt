@@ -158,8 +158,6 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		end
 	end
 	
-	#	VE_ARGS = [ ":onboot", ":userpasswd", ":disabled", ":name", ":description", ":setmode", ":ipadd", ":ipdel", ":hostname", ":nameserver", ":searchdomain", ":netid_add", ":netif_del", ":mac", ":nost_ifname", ":host_mac", ":bridge", ":mac_filter", ":numproc", ":numtcpsock", ":numothersock", ":vmguardpages", ":kmemsize", ":tcpsndbuf", ":tcprcvbuf", ":othersockbuf", ":dgramrcvbuf", ":oomguarpages", ":lockedpages", ":privvmpages", ":shmpages", ":numfile", ":numflock", ":numpty", ":numsiginfo", ":dcachesize", ":numiptent", ":physpages", ":cpuunits", ":cpulimit", ":cpus", ":meminfo", ":iptables", ":netdev_add", ":netdev_del", ":diskspace", ":discinodes", ":quotatime", ":quotaugidlimit", ":noatime", ":capability", ":devnodes", ":devices", ":features", ":applyconfig", ":applyconfig_map", ":ioprio" ]
-	
 	SET_PARAMS = ["name", "capability", "applyconfig", "applyconfig_map", "iptables", "features", "searchdomain", "hostname", "disabled", "noatime", "setmode", "userpasswd", "cpuunits", "cpulimit", "quotatime", "quotaugidlimit", "ioprio", "cpus", "netif_add", "netif_del", "diskspace", "diskinodes", "devices", "devnodes"]
 	
 	UBC_PARAMS = ["vmguarpages", "physpages", "oomguarpages", "lockedpages", "privvmpages", "shmpages", "numproc", "numtcpsock", "numothersock", "numfile", "numflock", "numpty", "numsiginfo", "dcachesize", "numiptent", "avnumproc", "kmemsize", "tcpsndbuf", "tcprcvbuf", "othersockbuf", "dgramrcvbuf"]
@@ -180,8 +178,8 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		conf = @@vzconf + ctid + '.conf'
 		value = open(conf).grep(/^#{arg.upcase}/)
 		result = value.size == 0 ? '' : value[0].split('"')[1]
-		p "Actual value: " << result
-		p "Should value: " << String(resource.should(arg))
+		debug "Actual value: " << result
+		debug "Should value: " << String(resource.should(arg))
 		return result
 	end
 	
@@ -193,13 +191,11 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	#	end
 
 	def autoboot
-		p get_value("onboot") == "yes" ? true : false
 		return get_value("onboot") == "yes" ? :true : :false
 	end
 
 	def autoboot=(value)
 		result = value == :true ? 'yes' : 'no'
-		p result
 		vzctl 'set', ctid, '--onboot', result, '--save'
 	end
 
@@ -208,13 +204,8 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	end
 
 	def ipaddr=(value)
-		id = ctid
-		vzctl 'set', id, '--ipdel', 'all', '--save'
-		args = ['set', id]
-		[value].flatten.each do |ip|
-			args << '--ipadd' << ip
-		end
-		vzctl args, '--save'
+		vzctl('set', ctid, '--ipdel', 'all', '--save')
+		apply("ipadd", value) unless value.empty?
 	end
 
 	def nameserver
@@ -222,12 +213,17 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	end
 
 	def nameserver=(value)
-		id = ctid
-		args = ['set', id]
+		apply("nameserver", value)
+	end
+
+	private
+	def apply(paramname, value)
+		args = ['set', ctid]
 		[value].flatten.each do |ip|
-			args << '--nameserver' << ip
+			args << '--'+paramname << ip
 		end
 		vzctl args, '--save'
 	end
+
 
 end
