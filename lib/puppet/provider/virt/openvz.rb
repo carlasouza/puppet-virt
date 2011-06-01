@@ -6,6 +6,8 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	commands :vzctl  => "/usr/sbin/vzctl"
 	commands :vzlist => "/usr/sbin/vzlist"
 	commands :mkfs   => "/sbin/mkfs"
+
+	has_feature :disabled
 	
 	#	if [ "Ubuntu", "Debian" ].any? { |os|  Facter.value(:operatingsystem) == os }
 	#		:vzcache => "/var/lib/vz/template/cache"
@@ -92,7 +94,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 			args << '--hostname' << hn
 		end
 
-		args << '--name' << hn
+		args << '--name' << resource[:name]
 		vzctl args
 	
 		if resource[:ensure] == :running
@@ -120,14 +122,14 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	end
 	
 	def stop
-		if !exists
+		if !exists?
 			install
 		end
 		vzctl 'stop', ctid
 	end
 	
 	def start
-		if !exists
+		if !exists?
 			install
 		end
 		vzctl 'start', ctid
@@ -184,7 +186,10 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		debug "Getting parameter #{arg} value"
 		conf = "/etc/vz/conf/" << ctid << ".conf"
 		value = open(conf).grep(/^#{arg.upcase}/)
-		value[0].split('"')[1]
+		result = value.size == 0 ? '' : value[0].split('"')[1]
+		p "Actual value: " << result
+		p "Should value: " << String(resource.should(arg))
+		return result
 	end
 	
 	#	class IPProperty < Puppet::Property
