@@ -658,12 +658,16 @@ To force the start of a disabled guest, use vzctl start with --force option."
 		
 		# Device access management
 
-		newproperty(:devices, :required_features => :devices_management) do
+		newproperty(:devices, :array_matching => :all, :required_features => :devices_management) do
 			desc "Give the container an access (r - read only, w - write only, rw - read/write, none - no access) to:
-	1) a device designated by the special file /dev/device. Device file is created in a container by vzctl.
-	2) a block or character device designated by its major and minor numbers. Device file have to be created manually.
+	1) a device designated by the special file /dev/device. Device file is created in a container by vzctl. 
+		Use format: device:r|w|rw|none
+	2) a block or character device designated by its major and minor numbers. Device file have to be created manually. 
+		Use format: b|c:major:minor|all:[r|w|rw|none]"
+			def insync?(current)
+				current.sort == @should.sort
+			end
 
-	device:r|w|rw|none b|c:major:minor|all:[r|w|rw|none] "
 		end
 
 	end

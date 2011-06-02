@@ -237,5 +237,20 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		apply("netif_add", value)
 	end
 
+	def devices
+		devs = get_value("devices").split
+		nodes = get_value("devnodes").split
+		devs + nodes
+	end
+
+	def devices=(value)
+		args = ['set', ctid]
+		[value].flatten.each do |value|
+			paramname = value.start_with?("b:", "c:") ? "devices" : "devnodes"
+			args << '--'+paramname << value
+		end
+		vzctl args, '--save'
+	end
+
 	
 end
