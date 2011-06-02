@@ -128,6 +128,11 @@ module Puppet
 				end
 		end
 
+		newproperty(:user) do
+			desc "Sets password for the given user in the guest, creating the user if it does not exists. 
+	In case guest is not running, it is automatically mounted, then all the appropriate file changes are applied, then it is unmounted."
+		end
+
 		newproperty(:ipaddr, :array_matching => :all) do
 			desc "IP address(es) of the VE."
 

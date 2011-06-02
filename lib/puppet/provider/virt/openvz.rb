@@ -43,7 +43,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		return resource[:os_variant] + "-" + arch
 	end
 	
-	# Private method to download OpenVZ template
+	# Private method to download OpenVZ template if don't already exists
 	def download 
 		template = ostemplate
 		file = @@vzcache + template + '.tar.gz'
@@ -61,9 +61,9 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	def ctid
 		if tmp = vzlist('--no-header', '-a','-N',resource[:name]).split(" ")[0]
 			id = tmp
-		elsif !resource[:ctid]
-			out = vzlist('-a', '-o','ctid')
-			tmp = Integer(out.split.last)
+		elsif !id = resource[:ctid]
+			out = vzlist('--no-header', '-a', '-o','ctid')
+			tmp = out.empty? ? 100 : Integer(out.split.last)
 			id = tmp <= 100 ? 101 : tmp + 1
 		end
 		if id
@@ -79,7 +79,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		#mkfs '-t', resource[:fstype], "/dev/#{resource[:vgname]}/#{resource[:lvname]}"
 		
 		if resource[:os_variant].nil?
-			fail "OS variant is required"
+			fail "Paramenter 'os_variant' is required."
 		end
 
 		download
@@ -96,9 +96,6 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		args << '--name' << resource[:name]
 		vzctl args
 	
-		if resource[:ensure] == :running
-			vzctl('start', ctid)
-		end
 	end
 	
 	def setpresent
@@ -163,8 +160,17 @@ Puppet::Type.type(:virt).provide(:openvz) do
 			return :absent
 		end
 	end
-	
-	SET_PARAMS = ["name", "capability", "applyconfig", "applyconfig_map", "iptables", "features", "searchdomain", "hostname", "disabled", "noatime", "setmode", "userpasswd", "cpuunits", "cpulimit", "quotatime", "quotaugidlimit", "ioprio", "cpus", "diskspace", "diskinodes", "devices", "devnodes"]
+
+	# It is not possible to compare the current user password with the password declared
+	def user
+		false
+	end
+
+	def user=(value)
+		vzctl('set', ctid, '--userpasswd', value)
+	end
+
+	SET_PARAMS = ["name", "capability", "applyconfig", "applyconfig_map", "iptables", "features", "searchdomain", "hostname", "disabled", "noatime", "setmode", "cpuunits", "cpulimit", "quotatime", "quotaugidlimit", "ioprio", "cpus", "diskspace", "diskinodes", "devices", "devnodes"]
 	UBC_PARAMS = ["vmguarpages", "physpages", "oomguarpages", "lockedpages", "privvmpages", "shmpages", "numproc", "numtcpsock", "numothersock", "numfile", "numflock", "numpty", "numsiginfo", "dcachesize", "numiptent", "kmemsize", "tcpsndbuf", "tcprcvbuf", "othersockbuf", "dgramrcvbuf"]
 	
 	(SET_PARAMS+UBC_PARAMS).each do |arg|
