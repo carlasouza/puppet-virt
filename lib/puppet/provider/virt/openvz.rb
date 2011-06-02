@@ -184,7 +184,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		debug "Getting parameter #{arg} value"
 		conf = @@vzconf + ctid + '.conf'
 		value = open(conf).grep(/^#{arg.upcase}/)
-		result = value.size == 0 ? '' : value[0].split('"')[1]
+		result = value.size == 0 ? '' : value[0].split('"')[1].downcase
 		debug "Actual value: " << result
 		debug "Should value: " << String(resource.should(arg))
 		return result
@@ -248,6 +248,12 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		apply("features", value)
 	end
 
+	def capability
+		get_value("capability").split
+	end
 
+	def capability=(value)
+		apply("capability", value)
+	end
 
 end

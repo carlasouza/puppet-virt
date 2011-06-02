@@ -531,8 +531,22 @@ To force the start of a disabled container, use vzctl start with --force option.
 					raise ArgumentError, "Feature \"#{feature}\" only accepts \"on\" or \"off\" modes."
 				end
 			end
+		end
 
-
+		newproperty(:capability, :array_matching => :all) do
+			desc "Sets a capability for a container. Note that setting capability when the container is running does not take immediate effect; restart the container in order for the changes to take effect. Note a container has default set of capabilities, thus any operation on capabilities is 'logical and' with the default capability mask.
+	You can use the following values for capname: chown, dac_override, dac_read_search, fowner, fsetid, kill, setgid, setuid, setpcap, linux_immutable, net_bind_service, net_broadcast, net_admin, net_raw, ipc_lock, ipc_owner, sys_module, sys_rawio, sys_chroot, sys_ptrace, sys_pacct, sys_admin, sys_boot, sys_nice, sys_resource, sys_time, sys_tty_config, mknod, lease, setveid, ve_admin.
+	WARNING: setting some of those capabilities may have far reaching security implications, so do not do it unless you know what you are doing. Also note that setting setpcap:on for a container will most probably lead to inability to start it."
+	
+			validate do |value|
+				capability, mode = value.split(':')
+				if !["chown", " dac_override", " dac_read_search", " fowner", " fsetid", " kill", " setgid", " setuid", " setpcap", " linux_immutable", " net_bind_service", " net_broadcast", " net_admin", " net_raw", " ipc_lock", " ipc_owner", " sys_module", " sys_rawio", " sys_chroot", " sys_ptrace", " sys_pacct", " sys_admin", " sys_boot", " sys_nice", " sys_resource", " sys_time", " sys_tty_config", " mknod", " lease", " setveid", " ve_admin"].include?(capability)
+					raise ArgumentError, "\"#{capability}\" is not a valid capability."
+				end
+				if !["on", "off"].include?(mode)
+					raise ArgumentError, "Feature \"#{capability}\" only accepts \"on\" or \"off\" modes."
+				end
+			end	
 		end
 
 	end
