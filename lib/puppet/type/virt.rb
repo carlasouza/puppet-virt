@@ -14,11 +14,17 @@ module Puppet
 		feature :resource_management,
 			"A set of limits and guarantees controlled per guest. More information at http://wiki.openvz.org/UBC_parameter_properties"
 	
-		feature :capability_manegement,
+		feature :capability_management,
 			"A set of capabilities management for a guest."
 
 		feature :pxe,
 			"Supports guests creation using pxe."
+
+		feature :features_management,
+			"Enable or disable a specific guest feature."
+
+		feature :devices_management,
+			"Give the guest an access to a device "
 
 		# A base class for numeric Virt parameters validation.
 		class VirtNumericParam < Puppet::Property
@@ -284,6 +290,8 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
 		end
 	
+		####
+		# Disk properties
 		# Disk size (only used for creating new guests
 		newparam(:disk_size, :parent => VirtNumericParam) do
 			desc "Size (in GB) to use if creating new guest storage. Not changeable."
@@ -291,7 +299,6 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 			munge do |value|
 				"size=" + value
 			end
-
 		end
 
 		newproperty(:quotatime, :parent => VirtNumericParam, :required_features => :disk_quota) do
@@ -301,6 +308,14 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 		newproperty(:quotaugidlimit, :parent => VirtNumericParam, :required_features => :disk_quota) do
 			desc "Sets maximum number of user/group IDs in a guest for which disk quota inside the guest will be accounted. If this value is set to 0, user and group quotas inside the guest will not be accounted.
 			Note that if you have previously set value of this parameter to 0, changing it while the guest is running will not take effect."
+		end
+
+		newproperty(:diskinodes, :required_features => :disk_quota) do
+			desc "Sets soft and hard disk quotas, in i-nodes. First parameter is soft quota, second is hard quota."
+		end
+
+		newproperty(:diskspace, :required_features => :disk_quota) do
+			desc "Sets soft and hard disk quotas, in blocks. First parameter is soft quota, second is hard quota. One block is currently equal to 1Kb. Also suffixes G, M, K can be specified"
 		end
 	
 		# Will it install using PXE?
@@ -316,11 +331,6 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 			defaultto(:false)
 		end
 	
-		# VM parameters 
-		newparam(:ostemplate) do
-			desc "Template name."
-		end
-
 		newparam(:os_type) do
 			desc "Optimize the guest configuration for a type of operating system (ex. 'linux', 'windows'). Not changable."
 
@@ -429,8 +439,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
 		Bridge is an optional parameter which can be used in custom network start scripts to automatically add the interface to a bridge. All parameters except ifname are optional and are automatically generated if not specified.
 
-	If the specified interfaces does not exist, it will be ignored and raises a warning.
-	"
+	If the specified interfaces does not exist, it will be ignored and raises a warning."
 			validate do |value|
 				unless value.is_a?(Array) or value.is_a?(String)
 					self.devfail "interfaces field must be a String or an Array"
@@ -521,8 +530,7 @@ To force the start of a disabled guest, use vzctl start with --force option."
 			desc "You can use this parameter to set the path to directory in which all the files and directories specific to this very guest are stored (default is VE_PRIVATE specified in vz.conf(5) file). Argument can contain string $VEID, which will be substituted with the numeric CT ID."
 		end
 
-		#XXX	:required_features => 
-		newproperty(:noatime) do
+		newproperty(:noatime, :required_features => :resource_management) do
 			desc "Sets noatime flag (do not update inode access times) on file system for OpenVZ guests."
 
 			newvalue(:true)
@@ -534,7 +542,7 @@ To force the start of a disabled guest, use vzctl start with --force option."
 
 		end
 
-		newproperty(:features, :array_matching => :all) do
+		newproperty(:features, :array_matching => :all, :required_features => :features_management) do
 			desc "Enable or disable a specific guest feature.  Known features are: sysfs, nfs, sit, ipip. Available for OpenVZ hypervisor."
 
 			validate do |value|
@@ -548,7 +556,7 @@ To force the start of a disabled guest, use vzctl start with --force option."
 			end
 		end
 
-		newproperty(:capability, :array_matching => :all, :required_features => :capability_manegement) do
+		newproperty(:capability, :array_matching => :all, :required_features => :capability_management) do
 			desc "Sets a capability for a guest. Note that setting capability when the guest is running does not take immediate effect; restart the guest in order for the changes to take effect. Note a guest has default set of capabilities, thus any operation on capabilities is 'logical and' with the default capability mask.
 	You can use the following values for capname: chown, dac_override, dac_read_search, fowner, fsetid, kill, setgid, setuid, setpcap, linux_immutable, net_bind_service, net_broadcast, net_admin, net_raw, ipc_lock, ipc_owner, sys_module, sys_rawio, sys_chroot, sys_ptrace, sys_pacct, sys_admin, sys_boot, sys_nice, sys_resource, sys_time, sys_tty_config, mknod, lease, setveid, ve_admin.
 	WARNING: setting some of those capabilities may have far reaching security implications, so do not do it unless you know what you are doing. Also note that setting setpcap:on for a guest will most probably lead to inability to start it."
@@ -564,8 +572,12 @@ To force the start of a disabled guest, use vzctl start with --force option."
 			end	
 		end
 
+		### 
+		# UBC parameters (in form of barrier:limit)
+		# Requires one or two arguments. In case of one argument, vzctl sets barrier and limit to the same value. In case of two colon-separated arguments, the first is a barrier, and the second is a limit. Each argument is either a number, a number with a suffix, or the special value 'unlimited'."
+	
 		newproperty(:vmguarpages, :required_features => :resource_management) do
-			desc "This parameter controls how much memory is available to the Virtual Environment (i.e. how much memory its applications can allocate by malloc(3) or other standard Linux memory allocation mechanisms)."
+			desc "This parameter controls how much memory is available to the Virtual Environment (i.e. how much memory its applications can allocate by malloc(3) or other standard Linux memory allocation mechanisms). "
 		end
 
 		newproperty(:physpages, :required_features => :resource_management) do
@@ -644,6 +656,15 @@ To force the start of a disabled guest, use vzctl start with --force option."
 			desc "The total size of buffers used to temporary store the incoming packets of UDP and other datagram protocols."
 		end
 		
+		# Device access management
+
+		newproperty(:devices, :required_features => :devices_management) do
+			desc "Give the container an access (r - read only, w - write only, rw - read/write, none - no access) to:
+	1) a device designated by the special file /dev/device. Device file is created in a container by vzctl.
+	2) a block or character device designated by its major and minor numbers. Device file have to be created manually.
+
+	device:r|w|rw|none b|c:major:minor|all:[r|w|rw|none] "
+		end
 
 	end
 end

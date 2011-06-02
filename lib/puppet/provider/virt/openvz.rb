@@ -1,4 +1,4 @@
-require 'facter/util/plist'
+#require 'facter/util/plist'
 Puppet::Type.type(:virt).provide(:openvz) do
 	desc "Manages OpenVZ guests."
 	# More information about OpenVZ at: openvz.org
@@ -7,7 +7,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	commands :vzlist => "/usr/sbin/vzlist"
 	commands :mkfs   => "/sbin/mkfs"
 
-	has_features :disabled, :cpu_fair, :disk_quota, :resource_management, :capability_manegement
+	has_features :disabled, :cpu_fair, :disk_quota, :resource_management, :capability_management, :features_management, :devices_management
 
 	# TODO if openvz module is up
 	# confine :true => 

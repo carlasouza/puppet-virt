@@ -153,17 +153,15 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	def xmlinstall
 	
 		if !File.exists?(resource[:xml_file])
+			require "erb"
 			debug "Creating the XML file: %s " % resource[:xml_file]
 		
-			case resource[:virt_type]
-				debug "Detected hypervisor type: %s " % resource[:virt_type]
-				xargs = "-c qemu:///session define --file "
-				require "erb"
-				xmlqemu = File.new(resource[:xml_file], APPEND)
-				xmlwrite = ERB.new("puppet-virt/templates/qemu_xml.erb")
-				xmlqemu.puts = xmlwrite.result
-				xmlqemu.close
-			end
+			debug "Detected hypervisor type: %s " % resource[:virt_type]
+			xargs = "-c qemu:///session define --file "
+			xmlqemu = File.new(resource[:xml_file], APPEND)
+			xmlwrite = ERB.new("puppet-virt/templates/qemu_xml.erb")
+			xmlqemu.puts = xmlwrite.result
+			xmlqemu.close
 		
 			debug "Creating the domain: %s " % [resource[:name]]
 			virsh xargs + resource[:xml_file]
