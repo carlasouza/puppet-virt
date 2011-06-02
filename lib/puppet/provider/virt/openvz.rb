@@ -28,6 +28,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 				guests << new(options)
 			end
 		end
+		p guests
 		guests
 	end
 	
@@ -43,13 +44,17 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		return resource[:os_variant] + "-" + arch
 	end
 	
-	# Private method to download openvz template
-	# XXX Download the template from OpenVZ repository
-	def download full_url
-		require 'open-uri'
-		writeOut = open(@@vzcache, "wb")
-		writeOut.write(open(full_url).read)
-		writeOut.close
+	# Private method to download OpenVZ template
+	def download 
+		template = ostemplate
+		file = @@vzcache + template + '.tar.gz'
+		if !File.file? file
+			require 'open-uri'
+			debug "Downloading template '" + template + "' to directory: '" + @@vzcache + "'"
+			writeOut = open(file, "wb")
+			writeOut.write(open('http://download.openvz.org/template/precreated/' + template + '.tar.gz').read)
+			writeOut.close
+		end
 	end
 	
 	# If CTID not specified, it will assign the first possible value
@@ -77,7 +82,9 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		if resource[:os_variant].nil?
 			fail "OS variant is required"
 		end
-	
+
+		download
+
 		args = [ 'create', ctid, '--ostemplate', ostemplate ]
 		if priv = resource[:private]
 			args << '--private' << priv
@@ -183,6 +190,15 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		return result
 	end
 	
+	private
+	def apply(paramname, value)
+		args = ['set', ctid]
+		[value].flatten.each do |ip|
+			args << '--'+paramname << ip
+		end
+		vzctl args, '--save'
+	end
+
 	#	class IPProperty < Puppet::Property
 	#		def ipsplit(str)
 	#			interface, address, defrouter = str.split(':')
@@ -200,7 +216,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	end
 
 	def ipaddr
-		get_value("IP_ADDRESS").split
+		get_value("ip_address").split
 	end
 
 	def ipaddr=(value)
@@ -216,14 +232,12 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		apply("nameserver", value)
 	end
 
-	private
-	def apply(paramname, value)
-		args = ['set', ctid]
-		[value].flatten.each do |ip|
-			args << '--'+paramname << ip
-		end
-		vzctl args, '--save'
+	def iptables
+		get_value("iptables").split
 	end
 
+	def iptables=(value)
+		apply("iptables", value)
+	end
 
 end

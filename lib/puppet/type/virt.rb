@@ -134,6 +134,11 @@ module Puppet
 			end
 		end
 
+		newproperty(:iptables, :array_matching => :all) do
+			desc "Restrict access to iptables modules inside a container (by default all iptables modules that are loaded in the host system are accessible inside a container).
+	You can use the following values for name: iptable_filter, iptable_mangle, ipt_limit, ipt_multiport, ipt_tos, ipt_TOS, ipt_REJECT, ipt_TCPMSS, ipt_tcpmss, ipt_ttl, ipt_LOG, ipt_length, ip_conntrack, ip_conntrack_ftp, ip_conntrack_irc, ipt_conntrack, ipt_state, ipt_helper, iptable_nat, ip_nat_ftp, ip_nat_irc, ipt_REDIRECT, xt_mac, ipt_owner."
+		end
+
 		newproperty(:searchdomain) do
 			desc "DNS search domain name(s)."
 		end
