@@ -193,8 +193,8 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	private
 	def apply(paramname, value)
 		args = ['set', ctid]
-		[value].flatten.each do |ip|
-			args << '--'+paramname << ip
+		[value].flatten.each do |value|
+			args << '--'+paramname << value
 		end
 		vzctl args, '--save'
 	end
@@ -256,4 +256,15 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		apply("capability", value)
 	end
 
+	def interfaces
+		get_value("netif").split
+	end
+
+	def interfaces=(value)
+		if value == disabled
+			vzctl('set', ctid, '--netif_del', 'all', '--save')
+		end
+
+		apply("netif_add", value)
+	end
 end

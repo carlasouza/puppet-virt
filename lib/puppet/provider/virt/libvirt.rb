@@ -105,7 +105,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		iface = resource[:interfaces]
 		if iface.nil? 
 			network = ["--network", "network=default"]
-		elsif iface == "disable"
+		elsif iface == "disabled"
 			network = ["--nonetworks"]
 		else
 			iface.each do |iface|

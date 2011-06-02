@@ -408,14 +408,23 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
 		end
 		
-		newparam(:interfaces) do
+		newproperty(:interfaces) do
 			desc "Connect the guest network to the host using the specified network as a bridge. The value can take one of 2 formats:
-	`disable`:
+	`disabled`:
 		The guest will have no network.
 	`[ \"ethX\", ... ] | \"ethX\" `
 		The guest can receive one or an array with interface's name from host to connect to the guest interfaces.
-	If the specified interfaces does not exist, it will be ignored and raises a warning."
+	'ifname[,mac,host_ifname,host_mac,[bridge]]'
+		For OpenVZ hypervisor, the network interface must be specified using the format above, where:
+		* 'ifname' is the ethernet device name in the container;
+		* 'mac' is its MAC address;
+		* 'host_ifname' is the ethernet device name on the host;
+		* 'host_mac' is its MAC address. MAC addresses should be in the format like XX:XX:XX:XX:XX:XX.
 
+		Bridge is an optional parameter which can be used in custom network start scripts to automatically add the interface to a bridge. All parameters except ifname are optional and are automatically generated if not specified.
+
+	If the specified interfaces does not exist, it will be ignored and raises a warning.
+	"
 			validate do |value|
 				unless value.is_a?(Array) or value.is_a?(String)
 					self.devfail "interfaces field must be a String or an Array"
