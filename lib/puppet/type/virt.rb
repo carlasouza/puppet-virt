@@ -519,5 +519,21 @@ To force the start of a disabled container, use vzctl start with --force option.
 
 		end
 
+		newproperty(:features, :array_matching => :all) do
+			desc "Enable or disable a specific container feature.  Known features are: sysfs, nfs, sit, ipip. Available for OpenVZ hypervisor."
+
+			validate do |value|
+				feature, mode = value.split(':')
+				if !["sysfs", "nfs", "sit", "ipip"].include?(feature)
+					raise ArgumentError, "\"#{feature}\" is not a valid feature."
+				end
+				if !["on", "off"].include?(mode)
+					raise ArgumentError, "Feature \"#{feature}\" only accepts \"on\" or \"off\" modes."
+				end
+			end
+
+
+		end
+
 	end
 end

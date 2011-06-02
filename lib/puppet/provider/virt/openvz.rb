@@ -240,4 +240,14 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		apply("iptables", value)
 	end
 
+	def features
+		get_value("features").split
+	end
+
+	def features=(value)
+		apply("features", value)
+	end
+
+
+
 end
