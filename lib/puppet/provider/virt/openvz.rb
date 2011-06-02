@@ -7,7 +7,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	commands :vzlist => "/usr/sbin/vzlist"
 	commands :mkfs   => "/sbin/mkfs"
 
-	has_feature :disabled
+	has_features :disabled, :cpu_fair, :disk_quota, :resource_management, :capability_manegement
 
 	# TODO if openvz module is up
 	# confine :true => 
@@ -28,7 +28,6 @@ Puppet::Type.type(:virt).provide(:openvz) do
 				guests << new(options)
 			end
 		end
-		p guests
 		guests
 	end
 	
@@ -165,11 +164,10 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		end
 	end
 	
-	SET_PARAMS = ["name", "capability", "applyconfig", "applyconfig_map", "iptables", "features", "searchdomain", "hostname", "disabled", "noatime", "setmode", "userpasswd", "cpuunits", "cpulimit", "quotatime", "quotaugidlimit", "ioprio", "cpus", "netif_add", "netif_del", "diskspace", "diskinodes", "devices", "devnodes"]
+	SET_PARAMS = ["name", "capability", "applyconfig", "applyconfig_map", "iptables", "features", "searchdomain", "hostname", "disabled", "noatime", "setmode", "userpasswd", "cpuunits", "cpulimit", "quotatime", "quotaugidlimit", "ioprio", "cpus", "diskspace", "diskinodes", "devices", "devnodes"]
+	UBC_PARAMS = ["vmguarpages", "physpages", "oomguarpages", "lockedpages", "privvmpages", "shmpages", "numproc", "numtcpsock", "numothersock", "numfile", "numflock", "numpty", "numsiginfo", "dcachesize", "numiptent", "kmemsize", "tcpsndbuf", "tcprcvbuf", "othersockbuf", "dgramrcvbuf"]
 	
-	UBC_PARAMS = ["vmguarpages", "physpages", "oomguarpages", "lockedpages", "privvmpages", "shmpages", "numproc", "numtcpsock", "numothersock", "numfile", "numflock", "numpty", "numsiginfo", "dcachesize", "numiptent", "avnumproc", "kmemsize", "tcpsndbuf", "tcprcvbuf", "othersockbuf", "dgramrcvbuf"]
-
-	SET_PARAMS.each do |arg|
+	(SET_PARAMS+UBC_PARAMS).each do |arg|
 		define_method(arg.to_s.downcase) do
 			get_value(arg)
 		end
@@ -199,13 +197,6 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		vzctl args, '--save'
 	end
 
-	#	class IPProperty < Puppet::Property
-	#		def ipsplit(str)
-	#			interface, address, defrouter = str.split(':')
-	#			return interface, address, defrouter
-	#		end
-	#	end
-
 	def autoboot
 		return get_value("onboot") == "yes" ? :true : :false
 	end
@@ -213,6 +204,16 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	def autoboot=(value)
 		result = value == :true ? 'yes' : 'no'
 		vzctl 'set', ctid, '--onboot', result, '--save'
+	end
+
+	["nameserver", "iptables", "features", "capability"].each do |arg|
+		define_method(arg.to_s.downcase) do
+			get_value(arg).split
+		end
+	
+		define_method("#{arg}=".downcase) do |value|
+			apply(arg, value)
+		end
 	end
 
 	def ipaddr
@@ -224,47 +225,17 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		apply("ipadd", value) unless value.empty?
 	end
 
-	def nameserver
-		get_value("nameserver").split
-	end
-
-	def nameserver=(value)
-		apply("nameserver", value)
-	end
-
-	def iptables
-		get_value("iptables").split
-	end
-
-	def iptables=(value)
-		apply("iptables", value)
-	end
-
-	def features
-		get_value("features").split
-	end
-
-	def features=(value)
-		apply("features", value)
-	end
-
-	def capability
-		get_value("capability").split
-	end
-
-	def capability=(value)
-		apply("capability", value)
-	end
-
 	def interfaces
-		get_value("netif").split
+		get_value("netif").split(";")
 	end
 
 	def interfaces=(value)
-		if value == disabled
+		if value == "disabled"
 			vzctl('set', ctid, '--netif_del', 'all', '--save')
 		end
 
 		apply("netif_add", value)
 	end
+
+	
 end

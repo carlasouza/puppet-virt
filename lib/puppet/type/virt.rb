@@ -3,7 +3,22 @@ module Puppet
 		@doc = "Manages virtual machines using the 'libvirt' hypervisor management library. The guests may be imported using an existing image, configured to use one or more virtual disks, network interfaces and other options which we haven't included yet. Create a new xen, kvm or openvz guest."
 
 		feature :disabled,
-			"Disable container start guests."
+			"Disable guest start guests."
+
+		feature :cpu_fair,
+			"These parameters control CPU usage by guest."
+
+		feature :disk_quota,
+			"Specify disk usage quota."
+
+		feature :resource_management,
+			"A set of limits and guarantees controlled per guest. More information at http://wiki.openvz.org/UBC_parameter_properties"
+	
+		feature :capability_manegement,
+			"A set of capabilities management for a guest."
+
+		feature :pxe,
+			"Supports guests creation using pxe."
 
 		# A base class for numeric Virt parameters validation.
 		class VirtNumericParam < Puppet::Property
@@ -135,7 +150,7 @@ module Puppet
 		end
 
 		newproperty(:iptables, :array_matching => :all) do
-			desc "Restrict access to iptables modules inside a container (by default all iptables modules that are loaded in the host system are accessible inside a container).
+			desc "Restrict access to iptables modules inside a guest (by default all iptables modules that are loaded in the host system are accessible inside a guest).
 	You can use the following values for name: iptable_filter, iptable_mangle, ipt_limit, ipt_multiport, ipt_tos, ipt_TOS, ipt_REJECT, ipt_TCPMSS, ipt_tcpmss, ipt_ttl, ipt_LOG, ipt_length, ip_conntrack, ip_conntrack_ftp, ip_conntrack_irc, ipt_conntrack, ipt_state, ipt_helper, iptable_nat, ip_nat_ftp, ip_nat_irc, ipt_REDIRECT, xt_mac, ipt_owner."
 		end
 
@@ -157,37 +172,24 @@ module Puppet
 			defaultto(1)
 		end
 
-		#XXX	:required_features => 
-		newproperty(:cpuunits, :parent => VirtNumericParam) do
-			desc "CPU weight for a container. Argument is positive non-zero number, passed to and used in the kernel fair scheduler.
-			The larger the number is, the more CPU time this container gets.
-			Maximum value is 500000, minimal is 8. Number is relative to weights of all the other running containers.
+		newproperty(:cpuunits, :parent => VirtNumericParam, :required_features => :cpu_fair) do
+			desc "CPU weight for a guest. Argument is positive non-zero number, passed to and used in the kernel fair scheduler.
+			The larger the number is, the more CPU time this guest gets.
+			Maximum value is 500000, minimal is 8. Number is relative to weights of all the other running guests.
 			If cpuunits are not specified, default value of 1000 is used."
 		end
 	
-		#XXX	:required_features => 
-		newproperty(:cpulimit, :parent => VirtNumericParam) do
-			desc "Limit of CPU usage for the container, in per cent. Note if the computer has 2 CPUs, it has total of 200% CPU time. Default CPU limit is 0 (no CPU limit)."
-		end
-	
-		#XXX	:required_features => 
-		newproperty(:quotatime, :parent => VirtNumericParam) do
-			desc "Sets soft overusage time limit for disk quota (also known as grace period)."
-		end
-	
-		#XXX	:required_features => 
-		newproperty(:quotaugidlimit, :parent => VirtNumericParam) do
-			desc "Sets maximum number of user/group IDs in a container for which disk quota inside the container will be accounted. If this value is set to 0, user and group quotas inside the container will not be accounted.
-			Note that if you have previously set value of this parameter to 0, changing it while the container is running will not take effect."
+		newproperty(:cpulimit, :parent => VirtNumericParam, :required_features => :cpu_fair) do
+			desc "Limit of CPU usage for the guest, in per cent. Note if the computer has 2 CPUs, it has total of 200% CPU time. Default CPU limit is 0 (no CPU limit)."
 		end
 	
 #		newproperty(:ioprio, :parent => VirtNumericParam, :required_features => :manages_password_age) do
 		#XXX	:required_features => 
 		newproperty(:ioprio, :parent => VirtNumericParam) do
-			desc "Assigns  I/O priority to container.
+			desc "Assigns  I/O priority to guest.
 			Priority range is 0-7.
-			The greater priority is, the more time for I/O activity container has.
-			By default each container has priority of 4."
+			The greater priority is, the more time for I/O activity guest has.
+			By default each guest has priority of 4."
 		end
 	
 		newparam(:graphics) do
@@ -292,8 +294,17 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
 		end
 
+		newproperty(:quotatime, :parent => VirtNumericParam, :required_features => :disk_quota) do
+			desc "Sets soft overusage time limit for disk quota (also known as grace period)."
+		end
+	
+		newproperty(:quotaugidlimit, :parent => VirtNumericParam, :required_features => :disk_quota) do
+			desc "Sets maximum number of user/group IDs in a guest for which disk quota inside the guest will be accounted. If this value is set to 0, user and group quotas inside the guest will not be accounted.
+			Note that if you have previously set value of this parameter to 0, changing it while the guest is running will not take effect."
+		end
+	
 		# Will it install using PXE?
-		newparam(:pxe) do
+		newparam(:pxe, :required_features => :pxe) do
 			desc "Use the PXE boot protocol to load the initial ramdisk and kernel for starting the guest installation process. PXE is only available for Xen fullyvirtualizated guests"
 			newvalues(:true)
 			newvalues(:false)
@@ -378,7 +389,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 	`kvm`:
 		When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators.
 	`openvz`:
-		When defining an OpenVZ container, the template cache to be used must be defined using tmpl_cache and you must explicitly specify the use of openvz with this attribute (for now)."
+		When defining an OpenVZ guest, the template cache to be used must be defined using tmpl_cache and you must explicitly specify the use of openvz with this attribute (for now)."
 
 			isrequired #FIXME Bug #4049
 			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt, :qemu, :openvz) 
@@ -391,11 +402,6 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 				end
 			end
 
-
-		end
-
-		newparam(:tmpl_cache) do
-			desc "When using OpenVZ this defines the os template cache file to be used (ex. 'debian-5.0-i386-minimal', 'fedora-13-x86_64')."
 
 		end
 
@@ -416,7 +422,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 		The guest can receive one or an array with interface's name from host to connect to the guest interfaces.
 	'ifname[,mac,host_ifname,host_mac,[bridge]]'
 		For OpenVZ hypervisor, the network interface must be specified using the format above, where:
-		* 'ifname' is the ethernet device name in the container;
+		* 'ifname' is the ethernet device name in the guest;
 		* 'mac' is its MAC address;
 		* 'host_ifname' is the ethernet device name on the host;
 		* 'host_mac' is its MAC address. MAC addresses should be in the format like XX:XX:XX:XX:XX:XX.
@@ -499,8 +505,8 @@ Available values:
 		end
 
 		newproperty(:disabled, :required_features => :disabled) do
-			desc "Disable container start for OpenVZ guests.
-To force the start of a disabled container, use vzctl start with --force option."
+			desc "Disable guest start for OpenVZ guests.
+To force the start of a disabled guest, use vzctl start with --force option."
 
 			newvalue(:true)
 			newvalue(:false)
@@ -512,7 +518,7 @@ To force the start of a disabled container, use vzctl start with --force option.
 		end
 
 		newparam(:private) do
-			desc "You can use this parameter to set the path to directory in which all the files and directories specific to this very container are stored (default is VE_PRIVATE specified in vz.conf(5) file). Argument can contain string $VEID, which will be substituted with the numeric CT ID."
+			desc "You can use this parameter to set the path to directory in which all the files and directories specific to this very guest are stored (default is VE_PRIVATE specified in vz.conf(5) file). Argument can contain string $VEID, which will be substituted with the numeric CT ID."
 		end
 
 		#XXX	:required_features => 
@@ -529,7 +535,7 @@ To force the start of a disabled container, use vzctl start with --force option.
 		end
 
 		newproperty(:features, :array_matching => :all) do
-			desc "Enable or disable a specific container feature.  Known features are: sysfs, nfs, sit, ipip. Available for OpenVZ hypervisor."
+			desc "Enable or disable a specific guest feature.  Known features are: sysfs, nfs, sit, ipip. Available for OpenVZ hypervisor."
 
 			validate do |value|
 				feature, mode = value.split(':')
@@ -542,10 +548,10 @@ To force the start of a disabled container, use vzctl start with --force option.
 			end
 		end
 
-		newproperty(:capability, :array_matching => :all) do
-			desc "Sets a capability for a container. Note that setting capability when the container is running does not take immediate effect; restart the container in order for the changes to take effect. Note a container has default set of capabilities, thus any operation on capabilities is 'logical and' with the default capability mask.
+		newproperty(:capability, :array_matching => :all, :required_features => :capability_manegement) do
+			desc "Sets a capability for a guest. Note that setting capability when the guest is running does not take immediate effect; restart the guest in order for the changes to take effect. Note a guest has default set of capabilities, thus any operation on capabilities is 'logical and' with the default capability mask.
 	You can use the following values for capname: chown, dac_override, dac_read_search, fowner, fsetid, kill, setgid, setuid, setpcap, linux_immutable, net_bind_service, net_broadcast, net_admin, net_raw, ipc_lock, ipc_owner, sys_module, sys_rawio, sys_chroot, sys_ptrace, sys_pacct, sys_admin, sys_boot, sys_nice, sys_resource, sys_time, sys_tty_config, mknod, lease, setveid, ve_admin.
-	WARNING: setting some of those capabilities may have far reaching security implications, so do not do it unless you know what you are doing. Also note that setting setpcap:on for a container will most probably lead to inability to start it."
+	WARNING: setting some of those capabilities may have far reaching security implications, so do not do it unless you know what you are doing. Also note that setting setpcap:on for a guest will most probably lead to inability to start it."
 	
 			validate do |value|
 				capability, mode = value.split(':')
@@ -553,10 +559,91 @@ To force the start of a disabled container, use vzctl start with --force option.
 					raise ArgumentError, "\"#{capability}\" is not a valid capability."
 				end
 				if !["on", "off"].include?(mode)
-					raise ArgumentError, "Feature \"#{capability}\" only accepts \"on\" or \"off\" modes."
+					raise ArgumentError, "Capability \"#{capability}\" only accepts \"on\" or \"off\" modes."
 				end
 			end	
 		end
+
+		newproperty(:vmguarpages, :required_features => :resource_management) do
+			desc "This parameter controls how much memory is available to the Virtual Environment (i.e. how much memory its applications can allocate by malloc(3) or other standard Linux memory allocation mechanisms)."
+		end
+
+		newproperty(:physpages, :required_features => :resource_management) do
+			desc "Total number of RAM pages used by processes in this guest."
+		end
+		
+		newproperty(:oomguarpages, :required_features => :resource_management) do
+			desc "The guaranteed amount of memory for the case the memory is “over-booked” (out-of-memory kill guarantee)."
+		end
+		
+		newproperty(:lockedpages, :required_features => :resource_management) do
+			desc "Process pages not allowed to be swapped out."
+		end
+		
+		newproperty(:privvmpages, :required_features => :resource_management) do
+			desc "Allows controlling the amount of memory allocated by applications."
+		end
+		
+		newproperty(:shmpages, :required_features => :resource_management) do
+			desc "The total size of shared memory (IPC, shared anonymous mappings and tmpfs objects). The barrier should be set equal to the limit."
+		end
+		
+		newproperty(:numproc, :required_features => :resource_management) do
+			desc "Maximum number of processes and kernel-level threads allowed for this guest."
+		end
+		
+		newproperty(:numtcpsock, :required_features => :resource_management) do
+			desc "Maximum number of TCP sockets."
+		end
+		
+		newproperty(:numothersock, :required_features => :resource_management) do
+			desc "Maximum number of non-TCP sockets (local sockets, UDP and other types of sockets)."
+		end
+		
+		newproperty(:numfile, :required_features => :resource_management) do
+			desc "Maximum number of open files."
+		end
+		
+		newproperty(:numflock, :required_features => :resource_management) do
+			desc "Maximum number of file locks."
+		end
+		
+		newproperty(:numpty, :required_features => :resource_management) do
+			desc "Maximum number of pseudo-terminals."
+		end
+		
+		newproperty(:numsiginfo, :required_features => :resource_management) do
+			desc "Maximum number of siginfo structures."
+		end
+		
+		newproperty(:dcachesize, :required_features => :resource_management) do
+			desc "The total size of dentry and inode structures locked in memory."
+		end
+		
+		newproperty(:numiptent, :required_features => :resource_management) do
+			desc "The number of NETFILTER (IP packet filtering) entries."
+		end
+		
+		newproperty(:kmemsize, :required_features => :resource_management) do
+			desc "Size of unswappable memory in bytes, allocated by the operating system kernel."
+		end
+		
+		newproperty(:tcpsndbuf, :required_features => :resource_management) do
+			desc "The total size of buffers used to send data over TCP network connections."
+		end
+		
+		newproperty(:tcprcvbuf, :required_features => :resource_management) do
+			desc "The total size of buffers used to temporary store the data coming from TCP network connections."
+		end
+		
+		newproperty(:othersockbuf, :required_features => :resource_management) do
+			desc "The total size of buffers used by local (UNIX-domain) connections between processes inside the system (such as connections to a local database server) and send buffers of UDP and other datagram protocols."
+		end
+		
+		newproperty(:dgramrcvbuf, :required_features => :resource_management) do
+			desc "The total size of buffers used to temporary store the incoming packets of UDP and other datagram protocols."
+		end
+		
 
 	end
 end

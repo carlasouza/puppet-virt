@@ -10,14 +10,13 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# The provider is chosen by virt_type
 	confine :feature => :libvirt
 	
+	has_feature :pxe
+
 	#defaultfor @resource[:virt_type] => [:xen_fullyvirt, :xen_paravirt, :kvm]
 	
 	# Returns the name of the Libvirt::Domain or fails
 	def dom
-		hypervisor = case resource[:virt_type]
-			when :openvz then "openvz:///system"
-			else "qemu:///session"
-		end
+		hypervisor = "qemu:///session"
 		Libvirt::open(hypervisor).lookup_domain_by_name(resource[:name]) 
 	end
 	
@@ -157,26 +156,13 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			debug "Creating the XML file: %s " % resource[:xml_file]
 		
 			case resource[:virt_type]
-				when :openvz then
-					debug "Detected hypervisor type: %s " % resource[:virt_type]
-					tmplcache = resource[:tmpl_cache]
-					xargs = "-c openvz:///system define --file "
-					if !tmplcache.nil?
-						require "erb"
-						xmlovz = File.new(resource[:xml_file], APPEND)
-						xmlwrite = ERB.new("puppet-virt/templates/ovz_xml.erb")
-						xmlovz.puts = xmlwrite.result
-						xmlovz.close
-					else
-						fail("OpenVZ Error: No template cache define!")
-					end
-				else debug "Detected hypervisor type: %s " % resource[:virt_type]
-					xargs = "-c qemu:///session define --file "
-					require "erb"
-					xmlqemu = File.new(resource[:xml_file], APPEND)
-					xmlwrite = ERB.new("puppet-virt/templates/qemu_xml.erb")
-					xmlqemu.puts = xmlwrite.result
-					xmlqemu.close
+				debug "Detected hypervisor type: %s " % resource[:virt_type]
+				xargs = "-c qemu:///session define --file "
+				require "erb"
+				xmlqemu = File.new(resource[:xml_file], APPEND)
+				xmlwrite = ERB.new("puppet-virt/templates/qemu_xml.erb")
+				xmlqemu.puts = xmlwrite.result
+				xmlqemu.close
 			end
 		
 			debug "Creating the domain: %s " % [resource[:name]]
