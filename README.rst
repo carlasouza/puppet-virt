@@ -25,7 +25,7 @@ This is the full specification for the new type. Note that not all are supported
       id              => 101,
       user            => "user:passwd",
   # Basic configuration
-      memory          => 1024, # MB, changeable
+      memory          => 1024 (libvirt), none | pages:value | privvmpages:value (openvz),
       arch            => "i386" | "i686" | "amd64" | "ia64" | "powerpc" | "hppa"
       graphics        => enable | disable | vnc:VNCPORT
       clocksync       => UTC | localtime | timezone | variable, # Clock source
