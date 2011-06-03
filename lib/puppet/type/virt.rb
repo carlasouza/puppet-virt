@@ -119,7 +119,7 @@ module Puppet
 			desc "The guest's hostname."
 		end
 
-		newparam(:ctid, :parent => VirtNumericParam) do
+		newparam(:id, :parent => VirtNumericParam) do
 			desc "OpenVZ CT ID. It must be an integer greater then 100. CT ID <= 100 are reserved for OpenVZ internal purposes."
 
 				validate do |value|
@@ -197,9 +197,8 @@ module Puppet
 			desc "Limit of CPU usage for the guest, in per cent. Note if the computer has 2 CPUs, it has total of 200% CPU time. Default CPU limit is 0 (no CPU limit)."
 		end
 	
-#		newproperty(:ioprio, :parent => VirtNumericParam, :required_features => :manages_password_age) do
 		#XXX	:required_features => 
-		newproperty(:ioprio, :parent => VirtNumericParam) do
+		newproperty(:ioprio, :parent => VirtNumericParam, :required_features => :resource_management) do
 			desc "Assigns  I/O priority to guest.
 			Priority range is 0-7.
 			The greater priority is, the more time for I/O activity guest has.
@@ -598,8 +597,11 @@ To force the start of a disabled guest, use vzctl start with --force option."
 		### 
 		# UBC parameters (in form of barrier:limit)
 		# Requires one or two arguments. In case of one argument, vzctl sets barrier and limit to the same value. In case of two colon-separated arguments, the first is a barrier, and the second is a limit. Each argument is either a number, a number with a suffix, or the special value 'unlimited'."
+		# UBC parameters description can be found at: http://wiki.openvz.org/UBC_parameters_table
 	
 		newproperty(:resources_parameters, :array_matching => :all, :required_features => :resource_management) do
+			desc "Manages settings of the host's resources usage limit by the guest"
+
 			validate do |value|
 				feature = value.split("=")[0].downcase
 				features = ["vmguarpages", "physpages", "oomguarpages", "lockedpages", "privvmpages", "shmpages", "numproc", "numtcpsock", "numothersock", "numfile", "numflock", "numpty", "numsiginfo", "dcachesize", "numiptent", "kmemsize", "tcpsndbuf", "tcprcvbuf", "othersockbuf", "dgramrcvbuf"]
@@ -610,86 +612,6 @@ To force the start of a disabled guest, use vzctl start with --force option."
 				current.sort == @should.sort
 			end
 
-		end
-
-		newproperty(:vmguarpages, :required_features => :resource_management) do
-			desc "This parameter controls how much memory is available to the Virtual Environment (i.e. how much memory its applications can allocate by malloc(3) or other standard Linux memory allocation mechanisms). "
-		end
-
-		newproperty(:physpages, :required_features => :resource_management) do
-			desc "Total number of RAM pages used by processes in this guest."
-		end
-		
-		newproperty(:oomguarpages, :required_features => :resource_management) do
-			desc "The guaranteed amount of memory for the case the memory is “over-booked” (out-of-memory kill guarantee)."
-		end
-		
-		newproperty(:lockedpages, :required_features => :resource_management) do
-			desc "Process pages not allowed to be swapped out."
-		end
-		
-		newproperty(:privvmpages, :required_features => :resource_management) do
-			desc "Allows controlling the amount of memory allocated by applications."
-		end
-		
-		newproperty(:shmpages, :required_features => :resource_management) do
-			desc "The total size of shared memory (IPC, shared anonymous mappings and tmpfs objects). The barrier should be set equal to the limit."
-		end
-		
-		newproperty(:numproc, :required_features => :resource_management) do
-			desc "Maximum number of processes and kernel-level threads allowed for this guest."
-		end
-	
-		newproperty(:numtcpsock, :required_features => :resource_management) do
-			desc "Maximum number of TCP sockets."
-		end
-		
-		newproperty(:numothersock, :required_features => :resource_management) do
-			desc "Maximum number of non-TCP sockets (local sockets, UDP and other types of sockets)."
-		end
-		
-		newproperty(:numfile, :required_features => :resource_management) do
-			desc "Maximum number of open files."
-		end
-		
-		newproperty(:numflock, :required_features => :resource_management) do
-			desc "Maximum number of file locks."
-		end
-		
-		newproperty(:numpty, :required_features => :resource_management) do
-			desc "Maximum number of pseudo-terminals."
-		end
-		
-		newproperty(:numsiginfo, :required_features => :resource_management) do
-			desc "Maximum number of siginfo structures."
-		end
-		
-		newproperty(:dcachesize, :required_features => :resource_management) do
-			desc "The total size of dentry and inode structures locked in memory."
-		end
-		
-		newproperty(:numiptent, :required_features => :resource_management) do
-			desc "The number of NETFILTER (IP packet filtering) entries."
-		end
-		
-		newproperty(:kmemsize, :required_features => :resource_management) do
-			desc "Size of unswappable memory in bytes, allocated by the operating system kernel."
-		end
-		
-		newproperty(:tcpsndbuf, :required_features => :resource_management) do
-			desc "The total size of buffers used to send data over TCP network connections."
-		end
-		
-		newproperty(:tcprcvbuf, :required_features => :resource_management) do
-			desc "The total size of buffers used to temporary store the data coming from TCP network connections."
-		end
-		
-		newproperty(:othersockbuf, :required_features => :resource_management) do
-			desc "The total size of buffers used by local (UNIX-domain) connections between processes inside the system (such as connections to a local database server) and send buffers of UDP and other datagram protocols."
-		end
-		
-		newproperty(:dgramrcvbuf, :required_features => :resource_management) do
-			desc "The total size of buffers used to temporary store the incoming packets of UDP and other datagram protocols."
 		end
 		
 	end

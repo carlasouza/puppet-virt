@@ -61,7 +61,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	def ctid
 		if tmp = vzlist('--no-header', '-a','-N',resource[:name]).split(" ")[0]
 			id = tmp
-		elsif !id = resource[:ctid]
+		elsif !id = resource[:id]
 			out = vzlist('--no-header', '-a', '-o','ctid')
 			tmp = out.empty? ? 100 : Integer(out.split.last)
 			id = tmp <= 100 ? 101 : tmp + 1
@@ -166,7 +166,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		vzctl('set', ctid, '--userpasswd', value)
 	end
 
-	SET_PARAMS = ["name", "capability", "applyconfig", "applyconfig_map", "iptables", "features", "searchdomain", "hostname", "disabled", "noatime", "setmode", "cpuunits", "cpulimit", "quotatime", "quotaugidlimit", "ioprio", "cpus", "diskspace", "diskinodes", "devices", "devnodes"]
+	SET_PARAMS = ["name", "capability", "applyconfig", "applyconfig_map", "iptables", "features", "searchdomain", "hostname", "disabled", "setmode", "cpuunits", "cpulimit", "quotatime", "quotaugidlimit", "ioprio", "cpus", "diskspace", "diskinodes", "devices", "devnodes"]
 	
 	SET_PARAMS.each do |arg|
 		define_method(arg.to_s.downcase) do
@@ -227,6 +227,15 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	def autoboot=(value)
 		result = value == :true ? 'yes' : 'no'
 		vzctl('set', ctid, '--onboot', result, '--save')
+	end
+	
+	def noatime
+		return get_value("noatime") == "yes" ? :true : :false
+	end
+
+	def noatime=(value)
+		result = value == :true ? 'yes' : 'no'
+		vzctl('set', ctid, '--noatime', result, '--save')
 	end
 
 	["nameserver", "iptables", "features", "capability"].each do |arg|
