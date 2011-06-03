@@ -220,6 +220,14 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		vzctl(args, '--save')
 	end
 
+	def memory
+			get_value("meminfo")
+	end
+
+	def memory=(value)
+			vzctl('set', ctid, "--meminfo", value, "--save")
+	end
+
 	def autoboot
 		return get_value("onboot") == "yes" ? :true : :false
 	end
@@ -255,6 +263,15 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	def ipaddr=(value)
 		vzctl('set', ctid, '--ipdel', 'all', '--save')
 		apply("ipadd", value) unless value.empty?
+	end
+
+	def network_cards
+		get_value("netdev").split
+	end
+
+	def network_cards=(value)
+		vzctl('set', ctid, '--netdev_del', 'all', '--save')
+		apply("netdev_add", value) unless value.empty?
 	end
 
 	def interfaces

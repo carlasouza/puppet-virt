@@ -173,9 +173,8 @@ module Puppet
 		end
 
 		# This will change to properties
-		newproperty(:memory, :parent => VirtNumericParam) do
-			desc "The maximum amount of memory allocation for the guest domain.
-					Specified in MB."
+		newproperty(:memory) do
+			desc "The maximum amount of memory allocation for the guest domain."
 
 			isrequired #FIXME Bug #4049
 		end
@@ -473,6 +472,15 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 If this parameter is omitted, or the value \"RANDOM\" is specified a suitable address will be randomly generated.
 For Xen virtual machines it is required that the first 3 pairs in the MAC address be the sequence '00:16:3e', while for QEMU or KVM virtual machines it must be '54:52:00'."
 		end
+
+		newproperty(:network_cards, :array_matching => :all, :required_features => :devices_management) do
+			desc "Moves network device from the host system to a specified OpenVZ guest"
+
+			def insync?(current)
+				current.sort == @should.sort
+			end
+
+		end
 	
 		newproperty(:on_poweroff) do
 			desc "The content of this element specifies the action to take when the guest requests a poweroff.
@@ -592,7 +600,6 @@ To force the start of a disabled guest, use vzctl start with --force option."
 				end
 			end	
 		end
-
 
 		### 
 		# UBC parameters (in form of barrier:limit)
