@@ -26,6 +26,9 @@ module Puppet
 		feature :devices_management,
 			"Give the guest an access to a device "
 
+		feature :user_management,
+			"Manages guest's users"
+
 		# A base class for numeric Virt parameters validation.
 		class VirtNumericParam < Puppet::Property
 
@@ -128,7 +131,7 @@ module Puppet
 				end
 		end
 
-		newproperty(:user) do
+		newproperty(:user, :required_features => :user_management) do
 			desc "Sets password for the given user in the guest, creating the user if it does not exists. 
 	In case guest is not running, it is automatically mounted, then all the appropriate file changes are applied, then it is unmounted."
 		end
@@ -322,7 +325,21 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 		newproperty(:diskspace, :required_features => :disk_quota) do
 			desc "Sets soft and hard disk quotas, in blocks. First parameter is soft quota, second is hard quota. One block is currently equal to 1Kb. Also suffixes G, M, K can be specified"
 		end
-	
+
+		# Device access management
+
+		newproperty(:devices, :array_matching => :all, :required_features => :devices_management) do
+			desc "Give the container an access (r - read only, w - write only, rw - read/write, none - no access) to:
+	1) a device designated by the special file /dev/device. Device file is created in a container by vzctl. 
+		Use format: device:r|w|rw|none
+	2) a block or character device designated by its major and minor numbers. Device file have to be created manually. 
+		Use format: b|c:major:minor|all:[r|w|rw|none]"
+			def insync?(current)
+				current.sort == @should.sort
+			end
+
+		end
+
 		# Will it install using PXE?
 		newparam(:pxe, :required_features => :pxe) do
 			desc "Use the PXE boot protocol to load the initial ramdisk and kernel for starting the guest installation process. PXE is only available for Xen fullyvirtualizated guests"
@@ -577,10 +594,24 @@ To force the start of a disabled guest, use vzctl start with --force option."
 			end	
 		end
 
+
 		### 
 		# UBC parameters (in form of barrier:limit)
 		# Requires one or two arguments. In case of one argument, vzctl sets barrier and limit to the same value. In case of two colon-separated arguments, the first is a barrier, and the second is a limit. Each argument is either a number, a number with a suffix, or the special value 'unlimited'."
 	
+		newproperty(:resources_parameters, :array_matching => :all, :required_features => :resource_management) do
+			validate do |value|
+				feature = value.split("=")[0].downcase
+				features = ["vmguarpages", "physpages", "oomguarpages", "lockedpages", "privvmpages", "shmpages", "numproc", "numtcpsock", "numothersock", "numfile", "numflock", "numpty", "numsiginfo", "dcachesize", "numiptent", "kmemsize", "tcpsndbuf", "tcprcvbuf", "othersockbuf", "dgramrcvbuf"]
+				raise ArgumentError, "Feature #{feature} is not valid." unless features.include? feature
+			end
+			
+			def insync?(current)
+				current.sort == @should.sort
+			end
+
+		end
+
 		newproperty(:vmguarpages, :required_features => :resource_management) do
 			desc "This parameter controls how much memory is available to the Virtual Environment (i.e. how much memory its applications can allocate by malloc(3) or other standard Linux memory allocation mechanisms). "
 		end
@@ -608,7 +639,7 @@ To force the start of a disabled guest, use vzctl start with --force option."
 		newproperty(:numproc, :required_features => :resource_management) do
 			desc "Maximum number of processes and kernel-level threads allowed for this guest."
 		end
-		
+	
 		newproperty(:numtcpsock, :required_features => :resource_management) do
 			desc "Maximum number of TCP sockets."
 		end
@@ -661,19 +692,5 @@ To force the start of a disabled guest, use vzctl start with --force option."
 			desc "The total size of buffers used to temporary store the incoming packets of UDP and other datagram protocols."
 		end
 		
-		# Device access management
-
-		newproperty(:devices, :array_matching => :all, :required_features => :devices_management) do
-			desc "Give the container an access (r - read only, w - write only, rw - read/write, none - no access) to:
-	1) a device designated by the special file /dev/device. Device file is created in a container by vzctl. 
-		Use format: device:r|w|rw|none
-	2) a block or character device designated by its major and minor numbers. Device file have to be created manually. 
-		Use format: b|c:major:minor|all:[r|w|rw|none]"
-			def insync?(current)
-				current.sort == @should.sort
-			end
-
-		end
-
 	end
 end

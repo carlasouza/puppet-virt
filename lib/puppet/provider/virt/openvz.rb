@@ -7,7 +7,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	commands :vzlist => "/usr/sbin/vzlist"
 	commands :mkfs   => "/sbin/mkfs"
 
-	has_features :disabled, :cpu_fair, :disk_quota, :resource_management, :capability_management, :features_management, :devices_management
+	has_features :disabled, :cpu_fair, :disk_quota, :resource_management, :capability_management, :features_management, :devices_management, :user_management
 
 	# TODO if openvz module is up
 	# confine :true => 
@@ -99,10 +99,6 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	end
 	
 	def setpresent
-#		case resource[:ensure]
-#			when :absent then return #do nothing
-#			else install
-#		end
 		install
 	end
 	
@@ -140,7 +136,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		end
 	end
 	
-	# exist, deleted, mouted, umounted, running, down
+	# OpenVZ guests status: exist, deleted, mouted, umounted, running, down
 	# running | stopped | absent
 	def status
 		stat = vzctl('status', ctid).split(" ")
@@ -171,9 +167,8 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	end
 
 	SET_PARAMS = ["name", "capability", "applyconfig", "applyconfig_map", "iptables", "features", "searchdomain", "hostname", "disabled", "noatime", "setmode", "cpuunits", "cpulimit", "quotatime", "quotaugidlimit", "ioprio", "cpus", "diskspace", "diskinodes", "devices", "devnodes"]
-	UBC_PARAMS = ["vmguarpages", "physpages", "oomguarpages", "lockedpages", "privvmpages", "shmpages", "numproc", "numtcpsock", "numothersock", "numfile", "numflock", "numpty", "numsiginfo", "dcachesize", "numiptent", "kmemsize", "tcpsndbuf", "tcprcvbuf", "othersockbuf", "dgramrcvbuf"]
 	
-	(SET_PARAMS+UBC_PARAMS).each do |arg|
+	SET_PARAMS.each do |arg|
 		define_method(arg.to_s.downcase) do
 			get_value(arg)
 		end
@@ -200,7 +195,29 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		[value].flatten.each do |value|
 			args << '--'+paramname << value
 		end
-		vzctl args, '--save'
+		vzctl(args, '--save')
+	end
+
+	def resources_parameters
+		conf = @@vzconf + ctid + '.conf'
+
+		results = []
+		resource[:resources_parameters].flatten.each do |value|
+			tmp = open(conf).grep(/^#{value.split("=")[0].upcase}/)[0].delete! "\""
+			tmp.delete! "\n"
+			results << tmp
+		end
+		results
+
+	end
+
+	def resources_parameters=(value)
+		args = ['set', ctid]
+		[value].flatten.each do |resource|
+			paramname, value = resource.split("=")
+			args << '--'+paramname.downcase << value
+		end
+		vzctl(args, '--save')
 	end
 
 	def autoboot
@@ -209,7 +226,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 
 	def autoboot=(value)
 		result = value == :true ? 'yes' : 'no'
-		vzctl 'set', ctid, '--onboot', result, '--save'
+		vzctl('set', ctid, '--onboot', result, '--save')
 	end
 
 	["nameserver", "iptables", "features", "capability"].each do |arg|
