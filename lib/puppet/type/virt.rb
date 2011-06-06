@@ -11,23 +11,29 @@ module Puppet
 		feature :disk_quota,
 			"Specify disk usage quota."
 
-		feature :resource_management,
+		feature :manages_resources,
 			"A set of limits and guarantees controlled per guest. More information at http://wiki.openvz.org/UBC_parameter_properties"
 	
-		feature :capability_management,
+		feature :manages_capabilities,
 			"A set of capabilities management for a guest."
 
 		feature :pxe,
 			"Supports guests creation using pxe."
 
-		feature :features_management,
+		feature :manages_features,
 			"Enable or disable a specific guest feature."
 
-		feature :devices_management,
+		feature :manages_devices,
 			"Give the guest an access to a device "
 
-		feature :user_management,
+		feature :manages_users,
 			"Manages guest's users"
+
+		feature :iptables,
+			"Load iptables modules"
+
+		feature :manages_behaviour,
+			"Manages the gues't behaviour during reboot, crash and shutdown."
 
 		# A base class for numeric Virt parameters validation.
 		class VirtNumericParam < Puppet::Property
@@ -131,7 +137,7 @@ module Puppet
 				end
 		end
 
-		newproperty(:user, :required_features => :user_management) do
+		newproperty(:user, :required_features => :manages_users) do
 			desc "Sets password for the given user in the guest, creating the user if it does not exists. 
 	In case guest is not running, it is automatically mounted, then all the appropriate file changes are applied, then it is unmounted."
 		end
@@ -163,7 +169,7 @@ module Puppet
 			end
 		end
 
-		newproperty(:iptables, :array_matching => :all) do
+		newproperty(:iptables, :array_matching => :all, :required_features => :iptables) do
 			desc "Restrict access to iptables modules inside a guest (by default all iptables modules that are loaded in the host system are accessible inside a guest).
 	You can use the following values for name: iptable_filter, iptable_mangle, ipt_limit, ipt_multiport, ipt_tos, ipt_TOS, ipt_REJECT, ipt_TCPMSS, ipt_tcpmss, ipt_ttl, ipt_LOG, ipt_length, ip_conntrack, ip_conntrack_ftp, ip_conntrack_irc, ipt_conntrack, ipt_state, ipt_helper, iptable_nat, ip_nat_ftp, ip_nat_irc, ipt_REDIRECT, xt_mac, ipt_owner."
 		end
@@ -197,7 +203,7 @@ module Puppet
 		end
 	
 		#XXX	:required_features => 
-		newproperty(:ioprio, :parent => VirtNumericParam, :required_features => :resource_management) do
+		newproperty(:ioprio, :parent => VirtNumericParam, :required_features => :manages_resources) do
 			desc "Assigns  I/O priority to guest.
 			Priority range is 0-7.
 			The greater priority is, the more time for I/O activity guest has.
@@ -326,7 +332,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
 		# Device access management
 
-		newproperty(:devices, :array_matching => :all, :required_features => :devices_management) do
+		newproperty(:devices, :array_matching => :all, :required_features => :manages_devices) do
 			desc "Give the container an access (r - read only, w - write only, rw - read/write, none - no access) to:
 	1) a device designated by the special file /dev/device. Device file is created in a container by vzctl. 
 		Use format: device:r|w|rw|none
@@ -473,7 +479,7 @@ If this parameter is omitted, or the value \"RANDOM\" is specified a suitable ad
 For Xen virtual machines it is required that the first 3 pairs in the MAC address be the sequence '00:16:3e', while for QEMU or KVM virtual machines it must be '54:52:00'."
 		end
 
-		newproperty(:network_cards, :array_matching => :all, :required_features => :devices_management) do
+		newproperty(:network_cards, :array_matching => :all, :required_features => :manages_devices) do
 			desc "Moves network device from the host system to a specified OpenVZ guest"
 
 			def insync?(current)
@@ -482,7 +488,7 @@ For Xen virtual machines it is required that the first 3 pairs in the MAC addres
 
 		end
 	
-		newproperty(:on_poweroff) do
+		newproperty(:on_poweroff, :required_features => :manages_behaviour) do
 			desc "The content of this element specifies the action to take when the guest requests a poweroff.
 	Available values:
 	`destroy`:
@@ -498,7 +504,7 @@ For Xen virtual machines it is required that the first 3 pairs in the MAC addres
 
 		end
 
-		newproperty(:on_reboot) do
+		newproperty(:on_reboot, :required_features => :manages_behaviour) do
 			desc "The content of this element specifies the action to take when the guest requests a reboot.
 Available values:
 `destroy`:
@@ -514,7 +520,7 @@ Available values:
 
 		end
 
-		newproperty(:on_crash) do
+		newproperty(:on_crash, :required_features => :manages_behaviour) do
 			desc "The content of this element specifies the action to take when the guest crashes.
 Available values:
 `destroy`:
@@ -559,7 +565,7 @@ To force the start of a disabled guest, use vzctl start with --force option."
 			desc "You can use this parameter to set the path to directory in which all the files and directories specific to this very guest are stored (default is VE_PRIVATE specified in vz.conf(5) file). Argument can contain string $VEID, which will be substituted with the numeric CT ID."
 		end
 
-		newproperty(:noatime, :required_features => :resource_management) do
+		newproperty(:noatime, :required_features => :manages_resources) do
 			desc "Sets noatime flag (do not update inode access times) on file system for OpenVZ guests."
 
 			newvalue(:true)
@@ -571,7 +577,7 @@ To force the start of a disabled guest, use vzctl start with --force option."
 
 		end
 
-		newproperty(:features, :array_matching => :all, :required_features => :features_management) do
+		newproperty(:features, :array_matching => :all, :required_features => :manages_features) do
 			desc "Enable or disable a specific guest feature.  Known features are: sysfs, nfs, sit, ipip. Available for OpenVZ hypervisor."
 
 			validate do |value|
@@ -585,7 +591,7 @@ To force the start of a disabled guest, use vzctl start with --force option."
 			end
 		end
 
-		newproperty(:capability, :array_matching => :all, :required_features => :capability_management) do
+		newproperty(:capability, :array_matching => :all, :required_features => :manages_capabilities) do
 			desc "Sets a capability for a guest. Note that setting capability when the guest is running does not take immediate effect; restart the guest in order for the changes to take effect. Note a guest has default set of capabilities, thus any operation on capabilities is 'logical and' with the default capability mask.
 	You can use the following values for capname: chown, dac_override, dac_read_search, fowner, fsetid, kill, setgid, setuid, setpcap, linux_immutable, net_bind_service, net_broadcast, net_admin, net_raw, ipc_lock, ipc_owner, sys_module, sys_rawio, sys_chroot, sys_ptrace, sys_pacct, sys_admin, sys_boot, sys_nice, sys_resource, sys_time, sys_tty_config, mknod, lease, setveid, ve_admin.
 	WARNING: setting some of those capabilities may have far reaching security implications, so do not do it unless you know what you are doing. Also note that setting setpcap:on for a guest will most probably lead to inability to start it."
@@ -606,7 +612,7 @@ To force the start of a disabled guest, use vzctl start with --force option."
 		# Requires one or two arguments. In case of one argument, vzctl sets barrier and limit to the same value. In case of two colon-separated arguments, the first is a barrier, and the second is a limit. Each argument is either a number, a number with a suffix, or the special value 'unlimited'."
 		# UBC parameters description can be found at: http://wiki.openvz.org/UBC_parameters_table
 	
-		newproperty(:resources_parameters, :array_matching => :all, :required_features => :resource_management) do
+		newproperty(:resources_parameters, :array_matching => :all, :required_features => :manages_resources) do
 			desc "Manages settings of the host's resources usage limit by the guest"
 
 			validate do |value|

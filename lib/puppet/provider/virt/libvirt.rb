@@ -10,7 +10,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# The provider is chosen by virt_type
 	confine :feature => :libvirt
 	
-	has_feature :pxe
+	has_features :pxe, :manages_behaviour
 
 	#defaultfor @resource[:virt_type] => [:xen_fullyvirt, :xen_paravirt, :kvm]
 	

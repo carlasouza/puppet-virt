@@ -7,7 +7,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	commands :vzlist => "/usr/sbin/vzlist"
 	commands :mkfs   => "/sbin/mkfs"
 
-	has_features :disabled, :cpu_fair, :disk_quota, :resource_management, :capability_management, :features_management, :devices_management, :user_management
+	has_features :disabled, :cpu_fair, :disk_quota, :resource_management, :manages_capabilities, :features_management, :devices_management, :user_management, :iptables
 
 	# TODO if openvz module is up
 	# confine :true => 
