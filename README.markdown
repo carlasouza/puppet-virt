@@ -13,6 +13,7 @@ Xen fullyvirtualization, Xen paravirtualization, KVM, and OpenVZ [1] hypervisors
 This module is the result of my work at GSoC 2010.
 
 [0] The Virtualization API - http://www.libvirt.org/
+
 [1] OpenVZ - http://wiki.openvz.org/
 
 **Autorequires:** If Puppet is managing Xen or KVM guests, the virt resource will autorequire `libvirt` library.
@@ -57,6 +58,7 @@ Note that some values can be specified as an array of values:
 
 
 Features \ Provider  | libvirt | openvz |
+-------------------- | ------- | ------ |
 disabled             |         |  *X*   |
 cpu_fair             |         |  *X*   |
 disk_quota           |         |  *X*   |
@@ -103,69 +105,70 @@ Optimize the guest configuration for a type of operating system (ex. 'linux', 'w
 ##### os_variant
 
 Further optimize the guest configuration for a specific operating system variant (ex. 'fedora8', 'winxp'). This parameter is optional for libvirt provider and mandatory for openvz provider.
+
 Available values for libvirt are:
-   `linux`
-      `debianetch`: Debian Etch
-      `debianlenny`: Debian Lenny
-      `debiansqueeze`: Debian Squeeze
-      `fedora5`: Fedora Core 5
-      `fedora6`:  Fedora Core 6
-      `fedora7`: Fedora 7
-      `fedora8`: Fedora 8
-      `fedora9`: Fedora 9
-      `fedora10`: Fedora 10
-      `fedora11`: Fedora 11
-      `generic24`: Generic 2.4.x kernel
-      `generic26`: Generic 2.6.x kernel
-      `virtio26`: Generic 2.6.25 or later kernel with virtio
-      `rhel2.1`: Red Hat Enterprise Linux 2.1
-      `rhel3`: Red Hat Enterprise Linux 3
-      `rhel4`: Red Hat Enterprise Linux 4
-      `rhel5`: Red Hat Enterprise Linux 5
-      `sles10`: Suse Linux Enterprise Server
-      `ubuntuhardy`: Ubuntu 8.04 LTS (Hardy Heron)
-      `ubuntuintrepid`: Ubuntu 8.10 (Intrepid Ibex)
-      `ubuntujaunty`: Ubuntu 9.04 (Jaunty Jackalope)
+* `linux`
+ * `debianetch`: Debian Etch
+ * `debianlenny`: Debian Lenny
+ * `debiansqueeze`: Debian Squeeze
+ * `fedora5`: Fedora Core 5
+ * `fedora6`:  Fedora Core 6
+ * `fedora7`: Fedora 7
+ * `fedora8`: Fedora 8
+ * `fedora9`: Fedora 9
+ * `fedora10`: Fedora 10
+ * `fedora11`: Fedora 11
+ * `generic24`: Generic 2.4.x kernel
+ * `generic26`: Generic 2.6.x kernel
+ * `virtio26`: Generic 2.6.25 or later kernel with virtio
+ * `rhel2.1`: Red Hat Enterprise Linux 2.1
+ * `rhel3`: Red Hat Enterprise Linux 3
+ * `rhel4`: Red Hat Enterprise Linux 4
+ * `rhel5`: Red Hat Enterprise Linux 5
+ * `sles10`: Suse Linux Enterprise Server
+ * `ubuntuhardy`: Ubuntu 8.04 LTS (Hardy Heron)
+ * `ubuntuintrepid`: Ubuntu 8.10 (Intrepid Ibex)
+ * `ubuntujaunty`: Ubuntu 9.04 (Jaunty Jackalope)
 
-   `other`
-      `generic`: Generic
-      `msdos`: MS-DOS
-      `netware4`: Novell Netware 4
-      `netware5`: Novell Netware 5
-      `netware6`: Novell Netware 6
+* `other`
+ * `generic`: Generic
+ * `msdos`: MS-DOS
+ * `netware4`: Novell Netware 4
+ * `netware5`: Novell Netware 5
+ * `netware6`: Novell Netware 6
 
-   `solaris`
-      `opensolaris`: Sun OpenSolaris
-      `solaris10`: Sun Solaris 10
-      `solaris9`: Sun Solaris 9
+* `solaris`
+ * `opensolaris`: Sun OpenSolaris
+ * `solaris10`: Sun Solaris 10
+ * `solaris9`: Sun Solaris 9
 
-   `unix`
-      `freebsd6`: Free BSD 6.x
-      `freebsd7`: Free BSD 7.x
-      `openbsd4`: Open BSD 4.x
+* `unix`
+ * `freebsd6`: Free BSD 6.x
+ * `freebsd7`: Free BSD 7.x
+ * `openbsd4`: Open BSD 4.x
 
-   `windows`
-      `vista`: Microsoft Windows Vista
-      `win2k`: Microsoft Windows 2000
-      `win2k3`: Microsoft Windows 2003
-      `win2k8`: Microsoft Windows 2008
-      `winxp`: Microsoft Windows XP (x86)
-      `winxp64`: Microsoft Windows XP (x86_64)
+* `windows`
+ * `vista`: Microsoft Windows Vista
+ * `win2k`: Microsoft Windows 2000
+ * `win2k3`: Microsoft Windows 2003
+ * `win2k8`: Microsoft Windows 2008
+ * `winxp`: Microsoft Windows XP (x86)
+ * `winxp64`: Microsoft Windows XP (x86_64)
 
 For OpenVZ provider, available values are:
-      `centos-4`: CentOS 4 
-      `centos-5`: CentOS 5
-      `debian-5.0`: Debian Lenny
-      `debian-6.0`: Debian Squeeze
-      `fedora-13`: Fedora 13
-      `fedora-14`: Fedora 14
-      `suse-11.3`: Suse 11.3
-      `suse-11.4`: Suse 11.4
-      `ubuntu-8.04`: Ubuntu LTS 8.04
-      `ubuntu-9.10`: Ubuntu 9.10
-      `ubuntu-10.04`: Ubuntu LTS 10.04
-      `ubuntu-10.10`: Ubuntu 10.10
-      `ubuntu-11.04`: Ubuntu 11.04
+* `centos-4`: CentOS 4 
+* `centos-5`: CentOS 5
+* `debian-5.0`: Debian Lenny
+* `debian-6.0`: Debian Squeeze
+* `fedora-13`: Fedora 13
+* `fedora-14`: Fedora 14
+* `suse-11.3`: Suse 11.3
+* `suse-11.4`: Suse 11.4
+* `ubuntu-8.04`: Ubuntu LTS 8.04
+* `ubuntu-9.10`: Ubuntu 9.10
+* `ubuntu-10.04`: Ubuntu LTS 10.04
+* `ubuntu-10.10`: Ubuntu 10.10
+* `ubuntu-11.04`: Ubuntu 11.04
 
 When using OpenVZ provider, the template for the new guest will be automaticaly downloaded according to the value specified in this parameter.
 
@@ -181,10 +184,10 @@ Available providers are:
 
 Specify the guest virtualization type. Mandatory field.
 Available values:
-   `xen_fullyvirt`: Request the use of full virtualization, if both para & full virtualization are available on the host. This parameter may not be available if connecting to a Xen hypervisor on a machine without hardware virtualization support. This parameter is implied if connecting to a QEMU based hypervisor.
-   `xen_paravirt`: This guest should be a paravirtualized guest. It requires hardware virtualization support
-   `kvm`: When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators.
-   `openvz`: When defining an OpenVZ guest, the `os_variant` paramenter must be defined.
+* `xen_fullyvirt`: Request the use of full virtualization, if both para & full virtualization are available on the host. This parameter may not be available if connecting to a Xen hypervisor on a machine without hardware virtualization support. This parameter is implied if connecting to a QEMU based hypervisor.
+* `xen_paravirt`: This guest should be a paravirtualized guest. It requires hardware virtualization support
+* `kvm`: When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators.
+* `openvz`: When defining an OpenVZ guest, the `os_variant` paramenter must be defined.
 The values `xen_fullyvirt`, `xen_paravirt` and `kvm` will use libvirt as provider. `openvz` will use the `openvz` provider.
 
 ##### xml_file
@@ -194,8 +197,11 @@ This is the path to a predefined xml config file, to be used with the import fun
 ##### user 
 
 User name and password. It is generally a good idea to keep to the degenerate 8 characters, beginning with a letter.
+
 Sets password for the given user in the guest, creating the user if it does not exists. In case guest is not running, it is automatically mounted, then all the appropriate file changes are applied, then it is unmounted.
+
 Requires features `manages_users`.
+
 For OpenVZ guests, must use the format: "user:password"
 
 ##### ipaddr 
@@ -205,14 +211,15 @@ IP address(es) of the guest. Multiple IP addresses should be specified as an arr
 ##### interfaces
 
 Connect the guest network to the host using the specified network as a bridge. The value can take one of 2 formats:
-   `disabled`: The guest will have no network.
-   `[ "ethX", ... ] | "ethX"`: The guest can receive one or an array with interface's name from host to connect to the guest interfaces.
-   `ifname[,mac,host_ifname,host_mac,[bridge]]`: For OpenVZ hypervisor, the network interface must be specified using the format above, where:
-      * 'ifname' is the ethernet device name in the guest;
-      * 'mac' is its MAC address;
-      * 'host_ifname' is the ethernet device name on the host;
-      * 'host_mac' is its MAC address. MAC addresses should be in the format like XX:XX:XX:XX:XX:XX.
-      Bridge is an optional parameter which can be used in custom network start scripts to automatically add the interface to a bridge. All parameters except ifname are optional and are automatically generated if not specified.
+* `disabled`: The guest will have no network.
+* `[ "ethX", ... ] | "ethX"`: The guest can receive one or an array with interface's name from host to connect to the guest interfaces.
+* `ifname[,mac,host_ifname,host_mac,[bridge]]`: For OpenVZ hypervisor, the network interface must be specified using the format above, where:
+ * 'ifname' is the ethernet device name in the guest;
+ * 'mac' is its MAC address;
+ * 'host_ifname' is the ethernet device name on the host;
+ * 'host_mac' is its MAC address. MAC addresses should be in the format like XX:XX:XX:XX:XX:XX.
+
+Bridge is an optional parameter which can be used in custom network start scripts to automatically add the interface to a bridge. All parameters except ifname are optional and are automatically generated if not specified.
 
 If the specified interfaces does not exist, it will be ignored and raises a warning.
 
@@ -220,6 +227,7 @@ If the specified interfaces does not exist, it will be ignored and raises a warn
 
 Fixed MAC address for the guest; 
 If this parameter is omitted, or the value \"RANDOM\" is specified a suitable address will be randomly generated.
+
 For Xen virtual machines it is required that the first 3 pairs in the MAC address be the sequence '00:16:3e', while for QEMU or KVM virtual machines it must be '54:52:00'.
 For OpenVZ virtual machine, the interface must exists previously.
 
@@ -273,29 +281,31 @@ Requires features `cpu_fair`.
 
 Setup a virtual console in the guest to be imported. If no graphics option is specified, will default to enable.
 Available values:
-   `enable`: Setup a virtual console in the guest and export it as a VNC server in the host. The VNC server will run on the first free port number at 5900 or above.
-   `vnc:VNCPORT`: Request a permanent, statically assigned port number for the guest VNC console. Use of this option is discouraged as other guests may automatically choose to run on this port causing a clash.
-   `disable`: No graphical console will be allocated for the guest.
+* `enable`: Setup a virtual console in the guest and export it as a VNC server in the host. The VNC server will run on the first free port number at 5900 or above.
+* `vnc:VNCPORT`: Request a permanent, statically assigned port number for the guest VNC console. Use of this option is discouraged as other guests may automatically choose to run on this port causing a clash.
+* `disable`: No graphical console will be allocated for the guest.
 Requires features `graphics`.
 
 ##### clocksync
 
 The guest clock synchronization can assume three possible values, allowing fine grained control over how the guest clock is synchronized to the host. NB, not all hypervisors support all modes.
 Available values:       
-   `utc`: The guest clock will always be synchronized to UTC when booted
-   `localtime`: The guest clock will be synchronized to the host's configured timezone when booted, if any.
-   `timezone`: The guest clock will be synchronized to the requested timezone using the timezone attribute.
-   `variable`: The guest clock will have an arbitrary offset applied relative to UTC. The delta relative to UTC is specified in seconds, using the adjustment attribute. The guest is free to adjust the RTC over time an expect that it will be honoured at next reboot. This is in contrast to 'utc' mode, where the RTC adjustments are lost at each reboot.
+* `utc`: The guest clock will always be synchronized to UTC when booted
+* `localtime`: The guest clock will be synchronized to the host's configured timezone when booted, if any.
+* `timezone`: The guest clock will be synchronized to the requested timezone using the timezone attribute.
+* `variable`: The guest clock will have an arbitrary offset applied relative to UTC. The delta relative to UTC is specified in seconds, using the adjustment attribute. The guest is free to adjust the RTC over time an expect that it will be honoured at next reboot. This is in contrast to 'utc' mode, where the RTC adjustments are lost at each reboot.
 NB, at time of writing, only QEMU supports the variable clock mode, or custom timezones.
+
 Requires features `clocksync`.
 
 ##### boot_location
 
 Installation source for guest virtual machine kernel+initrd pair.  The `url` can take one of the following forms:
-   `DIRECTORY`: Path to a local directory containing an installable distribution image
-   `nfs:host:/path or nfs://host/path`: An NFS server location containing an installable distribution image
-   `http://host/path`: An HTTP server location containing an installable distribution image
-   `ftp://host/path`: An FTP server location containing an installable distribution image
+* `DIRECTORY`: Path to a local directory containing an installable distribution image
+* `nfs:host:/path or nfs://host/path`: An NFS server location containing an installable distribution image
+* `http://host/path`: An HTTP server location containing an installable distribution image
+* `ftp://host/path`: An FTP server location containing an installable distribution image
+
 Requires features `boot_params`.
 
 ##### boot_options
@@ -327,6 +337,7 @@ Requires features `disk_quota`.
 ##### quotaugidlimit 
 
 Sets maximum number of user/group IDs in a guest for which disk quota inside the guest will be accounted. If this value is set to 0, user and group quotas inside the guest will not be accounted.
+
 Note that if you have previously set value of this parameter to 0, changing it while the guest is running will not take effect.
 Requires features `disk_quota`.
 
@@ -343,10 +354,10 @@ Requires features `disk_quota`.
 ##### devices 
 
 Give the container an access (r - read only, w - write only, rw - read/write, none - no access) to:
-   1) a device designated by the special file /dev/device. Device file is created in a container by vzctl. 
-      Use format: device:r|w|rw|none
-   2) a block or character device designated by its major and minor numbers. Device file have to be created manually. 
-      Use format: b|c:major:minor|all:[r|w|rw|none]
+* a device designated by the special file /dev/device. Device file is created in a container by vzctl. 
+ * Use format: device:r|w|rw|none
+* a block or character device designated by its major and minor numbers. Device file have to be created manually. 
+ * Use format: b|c:major:minor|all:[r|w|rw|none]
 Requires features `manages_devices`.
 
 ##### pxe 
@@ -356,10 +367,10 @@ Use the PXE boot protocol to load the initial ramdisk and kernel for starting th
 ##### on_crash
 
 The content of this element specifies the action to take when the guest crashes. Available values:
-`destroy`: The domain will be terminated completely and all resources released.
-`restart`: The domain will be terminated, and then restarted with the same configuration.
-`preserve`: The domain will be terminated, and its resource preserved to allow analysis.
-`rename-restart`: The domain will be terminated, and then restarted with a new name."
+* `destroy`: The domain will be terminated completely and all resources released.
+* `restart`: The domain will be terminated, and then restarted with the same configuration.
+* `preserve`: The domain will be terminated, and its resource preserved to allow analysis.
+* `rename-restart`: The domain will be terminated, and then restarted with a new name."
 Requires features `manages_behaviour`.
 
 ##### on_poweroff
@@ -391,14 +402,18 @@ Enable or disable a specific guest feature.  Known features are: `sysfs`, `nfs`,
 ##### capability 
 
 Sets a capability for a guest. Note that setting capability when the guest is running does not take immediate effect; restart the guest in order for the changes to take effect. Note a guest has default set of capabilities, thus any operation on capabilities is 'logical and' with the default capability mask.
+
 You can use the following values for capname: `chown`, `dac_override`, `dac_read_search`, `fowner`, `fsetid`, `kill`, `setgid`, `setuid`, `setpcap`, `linux_immutable`, `net_bind_service`, `net_broadcast`, `net_admin`, `net_raw`, `ipc_lock`, `ipc_owner`, `sys_module`, `sys_rawio`, `sys_chroot`, `sys_ptrace`, `sys_pacct`, `sys_admin`, `sys_boot`, `sys_nice`, `sys_resource`, `sys_time`, `sys_tty_config`, `mknod`, `lease`, `setveid`, `ve_admin`.
+
 Requires features `manages_capabilities`.
 WARNING: setting some of those capabilities may have far reaching security implications, so do not do it unless you know what you are doing. Also note that setting setpcap:on for a guest will most probably lead to inability to start it.
 
 ##### resources_parameters
 
 Requires one or two arguments. In case of one argument, vzctl sets barrier and limit to the same value. In case of two colon-separated arguments, the first is a barrier, and the second is a limit. Each argument is either a number, a number with a suffix, or the special value `unlimited`. UBC parameters description can be found at: http://wiki.openvz.org/UBC_parameters_table.
+
 Valid values are: `vmguarpages`, `physpages`, `oomguarpages`, `lockedpages`, `privvmpages`, `shmpages`, `numproc`, `numtcpsock`, `numothersock`, `numfile`, `numflock`, `numpty`, `numsiginfo`, `dcachesize`, `numiptent`, `kmemsize`, `tcpsndbuf`, `tcprcvbuf`, `othersockbuf`, `dgramrcvbuf`.
+
 Requires features `resources_management`.
 
 Future Work
