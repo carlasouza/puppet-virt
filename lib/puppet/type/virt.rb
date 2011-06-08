@@ -3,7 +3,7 @@ module Puppet
 		@doc = "Manages virtual machines using the 'libvirt' hypervisor management library. The guests may be imported using an existing image, configured to use one or more virtual disks, network interfaces and other options which we haven't included yet. Create a new xen, kvm or openvz guest."
 
 		feature :disabled,
-			"Disable guest start guests."
+			"Disable guest start."
 
 		feature :cpu_fair,
 			"These parameters control CPU usage by guest."
@@ -24,16 +24,26 @@ module Puppet
 			"Enable or disable a specific guest feature."
 
 		feature :manages_devices,
-			"Give the guest an access to a device "
+			"Give the guest an access to a device."
 
 		feature :manages_users,
-			"Manages guest's users"
+			"Manages guest's users."
 
 		feature :iptables,
-			"Load iptables modules"
+			"Load iptables modules."
 
 		feature :manages_behaviour,
-			"Manages the gues't behaviour during reboot, crash and shutdown."
+			"Manages the guest's behaviour for reboot, crash and shutdown."
+
+		feature :graphics,
+			"Setup a virtual console in the guest for VNC."
+
+		feature :clocksync,
+			"Specify the guest's clock syncronization method."
+
+		feature :boot_params,
+			"Support parameters for the guest boot."
+
 
 		# A base class for numeric Virt parameters validation.
 		class VirtNumericParam < Puppet::Property
@@ -210,7 +220,7 @@ module Puppet
 			By default each guest has priority of 4."
 		end
 	
-		newparam(:graphics) do
+		newparam(:graphics, :requires_features => :graphics) do
 			desc "Setup a virtual console in the guest to be imported. If no graphics option is specified, will default to enable.
 	Available values:
 	`enable`:
@@ -231,7 +241,7 @@ module Puppet
 			newvalues("i386","i686","amd64","ia64","powerpc","hppa")
 		end
 	
-		newparam(:clocksync) do
+		newparam(:clocksync, :requires_features => :clocksync) do
 			desc "The guest clock synchronization can assume three possible values, allowing fine grained control over how the guest clock is synchronized to the host. NB, not all hypervisors support all modes.
 	Available values:			
 	`utc`:
@@ -266,7 +276,7 @@ module Puppet
 		end
 
 		#Kickstart file location on the network
-		newparam(:kickstart) do
+		newparam(:kickstart, :requires_features => :boot_params) do
 			desc "Kickstart file location. "
 			
 			munge do |value|
@@ -275,7 +285,7 @@ module Puppet
 		
 		end
 
-		newparam(:boot_options) do
+		newparam(:boot_options, :requires_features => :boot_params) do
 			desc "Additional kernel command line arguments to pass to the installer when performing a guest install from declared location."
 		end
 
@@ -327,7 +337,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 		end
 
 		newproperty(:diskspace, :required_features => :disk_quota) do
-			desc "Sets soft and hard disk quotas, in blocks. First parameter is soft quota, second is hard quota. One block is currently equal to 1Kb. Also suffixes G, M, K can be specified"
+			desc "Sets soft and hard disk quotas, in blocks. First parameter is soft quota, second is hard quota. One block is currently equal to 1Kb. Also suffixes G, M, K can be specified."
 		end
 
 		# Device access management
@@ -425,7 +435,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 	`kvm`:
 		When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators.
 	`openvz`:
-		When defining an OpenVZ guest, the template cache to be used must be defined using tmpl_cache and you must explicitly specify the use of openvz with this attribute (for now)."
+		When defining an OpenVZ guest, the os_variant must be defined."
 
 			isrequired #FIXME Bug #4049
 			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt, :qemu, :openvz) 
@@ -473,7 +483,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 			end
 		end
 
-		newparam(:macaddrs) do
+		newproperty(:macaddrs) do
 			desc "Fixed MAC address for the guest; 
 If this parameter is omitted, or the value \"RANDOM\" is specified a suitable address will be randomly generated.
 For Xen virtual machines it is required that the first 3 pairs in the MAC address be the sequence '00:16:3e', while for QEMU or KVM virtual machines it must be '54:52:00'."
