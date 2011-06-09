@@ -1,11 +1,9 @@
 #require 'facter/util/plist'
 Puppet::Type.type(:virt).provide(:openvz) do
-	desc "Manages OpenVZ guests."
-	# More information about OpenVZ at: openvz.org
+	desc "Manages OpenVZ guests."	# More information about OpenVZ at: openvz.org
 	
 	commands :vzctl  => "/usr/sbin/vzctl"
 	commands :vzlist => "/usr/sbin/vzlist"
-	commands :mkfs   => "/sbin/mkfs"
 
 	has_features :disabled, :cpu_fair, :disk_quota, :resource_management, :manages_capabilities, :features_management, :devices_management, :user_management, :iptables
 
@@ -19,10 +17,10 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		fail "Sorry, this provider is not supported for your Operation System, yet :)"
 	end
 
-	# FIXME Must return all host's guests
+	# Returns all host's guests
 	def self.instances
 		guests = []
-		execpipe "#{vzlist} --no-header -a" do |process|
+		execpipe "#{vzlist} --no-header -a -o ctid" do |process|
 		process.collect do |line|
 		next unless options = parse(line)
 				guests << new(options)
