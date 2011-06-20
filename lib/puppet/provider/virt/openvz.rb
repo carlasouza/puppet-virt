@@ -42,14 +42,14 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	end
 	
 	# Private method to download OpenVZ template if don't already exists
-	def download 
+	def download(url='http://download.openvz.org/template/precreated/')
 		template = ostemplate
 		file = @@vzcache + template + '.tar.gz'
 		if !File.file? file
 			require 'open-uri'
 			debug "Downloading template '" + template + "' to directory: '" + @@vzcache + "'"
 			writeOut = open(file, "wb")
-			writeOut.write(open('http://download.openvz.org/template/precreated/' + template + '.tar.gz').read)
+			writeOut.write(open(url + '/' + template + '.tar.gz').read)
 			writeOut.close
 		end
 	end
@@ -79,8 +79,10 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		if resource[:os_variant].nil?
 			fail "Paramenter 'os_variant' is required."
 		end
-
-		download
+		
+		if resource[:tmpl_repo]
+			download(resource[:tmpl_repo])
+		end
 
 		args = [ 'create', ctid, '--ostemplate', ostemplate ]
 		if priv = resource[:private]

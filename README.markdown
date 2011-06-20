@@ -298,6 +298,10 @@ NB, at time of writing, only QEMU supports the variable clock mode, or custom ti
 
 Requires features `clocksync`.
 
+##### tmpl_repo
+
+The URL from where download OpenVZ precreated templates. Default value: `http://download.openvz.org/template/precreated/`
+
 ##### boot_location
 
 Installation source for guest virtual machine kernel+initrd pair.  The `url` can take one of the following forms:

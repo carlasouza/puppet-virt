@@ -260,6 +260,12 @@ module Puppet
 
 		# Installation method
 
+		# URL repository to download OpenVZ Templates
+		newparam(:tmpl_repo) do
+			desc "URL repository to download OpenVZ Templates.
+	If not defined, it will use 'http://download.openvz.org/templates/precreated/' as default repository."
+		end
+
 		# Location of kernel+initrd pair
 		newparam(:boot_location) do
 			desc "Installation source for guest virtual machine kernel+initrd pair.  The `url` can take one of the following forms:
