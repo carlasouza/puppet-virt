@@ -87,9 +87,8 @@ Puppet::Type.type(:virt).provide(:openvz) do
 			args << '--private' << priv
 		end
 	
-		if hn = resource[:hostname]
-			args << '--hostname' << hn
-		end
+		hn = resource[:hostname] ? resource[:hostname] : resource[:name]
+		args << '--hostname' << hn
 
 		args << '--name' << resource[:name]
 		vzctl args
