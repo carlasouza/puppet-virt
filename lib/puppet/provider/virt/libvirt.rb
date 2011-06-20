@@ -18,7 +18,10 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			when :openvz then "openvz:///system"
 			else "qemu:///session"
 		end
-		Libvirt::open(hypervisor).lookup_domain_by_name(resource[:name]) 
+		conn = Libvirt::open(hypervisor)
+		dom = conn.lookup_domain_by_name(resource[:name]) 
+		#conn.close
+		return dom
 	end
 
 	# Import the declared image file as a new domain.
@@ -210,9 +213,9 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 		if !exists?
 			install(false)
-		elsif status == "running"
+		elsif status == :running
 			case resource[:virt_type]
-         	when :qemu then dom.destroy
+         			when :kvm,:qemu then dom.destroy
 				else dom.shutdown
 			end
 		end
@@ -225,9 +228,9 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 		debug "Starting domain %s" % [resource[:name]]
 
-		if exists? && status != "running"
+		if exists? && status != :running
 			dom.create # Start the domain
-		elsif status == "absent"
+		elsif status == :absent
 			install
 		end
 
@@ -259,18 +262,18 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 		if exists? 
 			# 1 = running, 3 = paused|suspend|freeze, 5 = stopped 
-			if resource[:ensure].to_s == "installed"
-				return "installed"
+			if resource[:ensure].to_s == :installed
+				return :installed
 			elsif dom.info.state != 5
 				debug "Domain %s status: running" % [resource[:name]]
-				return "running"
+				return :running
 			else
 				debug "Domain %s status: stopped" % [resource[:name]]
-				return "stopped"
+				return :stopped
 			end
 		else
 			debug "Domain %s status: absent" % [resource[:name]]
-			return "absent"
+			return :absent
 		end
 
 	end
