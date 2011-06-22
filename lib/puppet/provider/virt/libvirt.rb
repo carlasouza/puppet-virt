@@ -12,16 +12,17 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	#defaultfor @resource[:virt_type] => [:xen_fullyvirt, :xen_paravirt, :kvm, :openvz]
 
-	# Returns the name of the Libvirt::Domain or fails
-	def dom
+	# Executes operation over guest
+	def exec
 		hypervisor = case resource[:virt_type]
 			when :openvz then "openvz:///system"
 			else "qemu:///session"
 		end
 		conn = Libvirt::open(hypervisor)
-		dom = conn.lookup_domain_by_name(resource[:name]) 
-		#conn.close
-		return dom
+		@guest = conn.lookup_domain_by_name(resource[:name]) 
+		ret = yield if block_given?
+		conn.close
+		return ret
 	end
 
 	# Import the declared image file as a new domain.
@@ -197,11 +198,11 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		debug "Trying to destroy domain %s" % [resource[:name]]
 
 		begin
-			dom.destroy
+			exec { @guest.destroy }
 		rescue Libvirt::Error => e
 			debug "Domain %s already Stopped" % [resource[:name]]
 		end
-		dom.undefine
+		exec { @guest.undefine } 
 
 	end
 
@@ -215,8 +216,8 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			install(false)
 		elsif status == :running
 			case resource[:virt_type]
-         			when :kvm,:qemu then dom.destroy
-				else dom.shutdown
+         			when :kvm,:qemu then exec { @guest.destroy }
+				else exec { @guest.shutdown }
 			end
 		end
 
@@ -229,7 +230,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		debug "Starting domain %s" % [resource[:name]]
 
 		if exists? && status != :running
-			dom.create # Start the domain
+			exec { @guest.create }
 		elsif status == :absent
 			install
 		end
@@ -237,6 +238,8 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	end
 
 	# Auxiliary method to make sure the domain exists before change it's properties.
+			#dom.create # Start the domain
+			#dom.create # Start the domain
 	def setpresent
 		case resource[:ensure]
 			when :absent then return #do nothing
@@ -248,7 +251,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# Check if the domain exists.
 	def exists?
 		begin
-			dom
+			exec
 			debug "Domain %s exists? true" % [resource[:name]]
 			true
 		rescue Libvirt::RetrieveError => e
@@ -264,7 +267,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			# 1 = running, 3 = paused|suspend|freeze, 5 = stopped 
 			if resource[:ensure].to_s == :installed
 				return :installed
-			elsif dom.info.state != 5
+			elsif exec { @guest.info.state } != 5
 				debug "Domain %s status: running" % [resource[:name]]
 				return :running
 			else
@@ -285,7 +288,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			setpresent
 		end
 	
-		return dom.autostart.to_s
+		return exec { @guest.autostart.to_s }
 
 	end
 
@@ -296,9 +299,9 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		debug "Trying to set autoboot %s at domain %s." % [resource[:autoboot], resource[:name]]
 		begin
 			if value.to_s == "false"
-				dom.autostart=(false)
+				exec { @guest.autostart=(false) }
 			else
-				dom.autostart=(true)
+				exec { @guest.autostart=(true) }
 			end
 		rescue Libvirt::RetrieveError => e
 			debug "Domain %s not defined" % [resource[:name]]
