@@ -23,7 +23,7 @@ Example:
     virt { server:
       ensure     => 'running',
       ctid       => 101,
-      os_variant => 'ubuntu-10.10',
+      os_template => 'ubuntu-10.10',
       virt_type  => 'openvz',
       autoboot   => 'false'
     }
@@ -102,7 +102,7 @@ Valid values are `running`, `stopped`, `installed`, `absent`.
 
 Optimize the guest configuration for a type of operating system (ex. 'linux', 'windows') for libvirt provider. It is used during the guest creation.
 
-##### os_variant
+##### os_template
 
 Further optimize the guest configuration for a specific operating system variant (ex. 'fedora8', 'winxp'). This parameter is optional for libvirt provider and mandatory for openvz provider.
 
@@ -187,7 +187,7 @@ Available values:
 * `xen_fullyvirt`: Request the use of full virtualization, if both para & full virtualization are available on the host. This parameter may not be available if connecting to a Xen hypervisor on a machine without hardware virtualization support. This parameter is implied if connecting to a QEMU based hypervisor.
 * `xen_paravirt`: This guest should be a paravirtualized guest. It requires hardware virtualization support
 * `kvm`: When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators.
-* `openvz`: When defining an OpenVZ guest, the `os_variant` paramenter must be defined.
+* `openvz`: When defining an OpenVZ guest, the `os_template` paramenter must be defined.
 The values `xen_fullyvirt`, `xen_paravirt` and `kvm` will use libvirt as provider. `openvz` will use the `openvz` provider.
 
 ##### xml_file

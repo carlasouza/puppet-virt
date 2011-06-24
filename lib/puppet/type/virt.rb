@@ -379,7 +379,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 			newvalues(:linux, :windows, :unix, :solaris, :other)
 		end
 	
-		newparam(:os_variant) do #TODO change 'os_variant' to 'os'
+		newparam(:os_template) do #TODO change 'os_template' to 'os'
 			desc "Further optimize the guest configuration for a specific operating system variant (ex. 'fedora8', 'winxp'). This parameter is optional, and does not require an `os-type` to be specified.
 	Available values:
 	`linux`
@@ -441,7 +441,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 	`kvm`:
 		When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators.
 	`openvz`:
-		When defining an OpenVZ guest, the os_variant must be defined."
+		When defining an OpenVZ guest, the os_template must be defined."
 
 			isrequired #FIXME Bug #4049
 			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt, :qemu, :openvz) 

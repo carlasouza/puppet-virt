@@ -30,7 +30,10 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	end
 	
 	def ostemplate 
-		resource[:os_variant]
+		os = resource[:os_template]
+		if File.file? @@vzcache + os + '.tar.gz'
+			return os
+		end
 		arch = resource[:arch].nil? ? Facter.value(:architecture) : resource[:arch]
 		arch = case arch.to_s
 			#when "i386","i686" then "x86"
@@ -38,7 +41,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 			else "x86"
 		end
 	
-		return resource[:os_variant] + "-" + arch
+		return resource[:os_template] + "-" + arch
 	end
 	
 	# Private method to download OpenVZ template if don't already exists
@@ -72,12 +75,8 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	end
 	
 	def install
-		#dev = "/dev/#{resource[:vgname]}/#{resource[:lvname]}"
-		#scratch dev if resource[:scratchdevice]
-		#mkfs '-t', resource[:fstype], "/dev/#{resource[:vgname]}/#{resource[:lvname]}"
-		
-		if resource[:os_variant].nil?
-			fail "Paramenter 'os_variant' is required."
+		if resource[:os_template].nil?
+			fail "Paramenter 'os_template' is required."
 		end
 		
 		if resource[:tmpl_repo]
