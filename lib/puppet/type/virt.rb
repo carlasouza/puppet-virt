@@ -468,7 +468,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 				if value == "openvz"
 					@resource[:provider] = value
 				else
-					@resource[:provider] = libvirt
+					@resource[:provider] = :libvirt
 				end
 			end
 
