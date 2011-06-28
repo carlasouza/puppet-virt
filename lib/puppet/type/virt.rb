@@ -152,6 +152,24 @@ module Puppet
 	In case guest is not running, it is automatically mounted, then all the appropriate file changes are applied, then it is unmounted."
 		end
 
+		newparam(:ve_root) do
+			desc "Sets the path to the mount point for the container root directory (default is VE_ROOT specified in vz.conf(5) file). Argument can contain literal string $VEID, which will be substituted with the numeric CT ID."
+		end
+
+		newparam(:ve_private) do
+			desc "Set the path to directory in which all the files and directories specific to this very container are stored (default is VE_PRIVATE specified in vz.conf(5) file). Argument can contain literal string $VEID, which will be substituted with the numeric CT ID."
+		end
+
+		newparam(:configfile) do
+			desc "If specified, values from example configuration file /etc/vz/conf/ve-<VALUE>.conf-sample are put into the container configuration file. If this container configuration file already exists, it will be removed."
+
+			validate do |file|
+				unless File.file? "/etc/vz/conf/ve-#{file}.conf-sample"
+					raise ArgumentError, "Config file \"#{file}\" does not exist."
+				end
+			end
+		end
+
 		newproperty(:ipaddr, :array_matching => :all) do
 			desc "IP address(es) of the VE."
 
@@ -575,10 +593,6 @@ To force the start of a disabled guest, use vzctl start with --force option."
 				return value == :true ? :yes : :no
 			end
 
-		end
-
-		newparam(:private) do
-			desc "You can use this parameter to set the path to directory in which all the files and directories specific to this very guest are stored (default is VE_PRIVATE specified in vz.conf(5) file). Argument can contain string $VEID, which will be substituted with the numeric CT ID."
 		end
 
 		newproperty(:noatime, :required_features => :manages_resources) do

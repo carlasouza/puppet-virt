@@ -84,10 +84,24 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		end
 
 		args = [ 'create', ctid, '--ostemplate', ostemplate ]
-		if priv = resource[:private]
+		if priv = resource[:ve_private]
 			args << '--private' << priv
 		end
 	
+		if root = resource[:ve_root]
+			args << '--root' << root
+		end
+
+		if config = resource[:configfile]
+			args << '--config' << config
+		end
+
+		if ips = resource[:ipaddr]
+			[ips].flatten.each do |ip|
+				args << '--ipadd' << ip
+			end
+		end
+
 		hn = resource[:hostname] ? resource[:hostname] : resource[:name]
 		args << '--hostname' << hn
 
@@ -219,11 +233,11 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	end
 
 	def memory
-			get_value("meminfo")
+		get_value("meminfo")
 	end
 
 	def memory=(value)
-			vzctl('set', ctid, "--meminfo", value, "--save")
+		vzctl('set', ctid, "--meminfo", value, "--save")
 	end
 
 	def autoboot

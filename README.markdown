@@ -153,7 +153,7 @@ Available values for libvirt are:
  * `win2k3`: Microsoft Windows 2003
  * `win2k8`: Microsoft Windows 2008
  * `winxp`: Microsoft Windows XP (x86)
- * `winxp64`: Microsoft Windows XP (x86_64)
+ * `winxp64`: Microsoft Windows XP (x86\_64)
 
 For OpenVZ provider, available values are:
 * `centos-4`: CentOS 4 
@@ -170,7 +170,9 @@ For OpenVZ provider, available values are:
 * `ubuntu-10.10`: Ubuntu 10.10
 * `ubuntu-11.04`: Ubuntu 11.04
 
-When using OpenVZ provider, the template for the new guest will be automaticaly downloaded according to the value specified in this parameter.
+Also, you can use a custom value with your custom template name. Example: `my-customized-ubuntu-10` or `fedora-mycompany`.
+
+When using OpenVZ provider, the template for the new guest will be automaticaly downloaded if don't already exists. It will download from official OpenVZ repository or from URL specified at `tmpl_repo` parameter.
 
 ##### provider
 
@@ -193,6 +195,18 @@ The values `xen_fullyvirt`, `xen_paravirt` and `kvm` will use libvirt as provide
 ##### xml_file
 
 This is the path to a predefined xml config file, to be used with the import function.
+
+##### ve_root
+
+Sets the path to the mount point for the container root directory (default is VE_ROOT specified in vz.conf(5) file). Argument can contain literal string $VEID, which will be substituted with the numeric CT ID.
+
+##### ve_private
+
+Set the path to directory in which all the files and directories specific to this very container are stored (default is VE_PRIVATE specified in vz.conf(5) file). Argument can contain literal string $VEID, which will be substituted with the numeric CT ID.
+
+##### configfile
+
+If specified, values from example configuration file /etc/vz/conf/ve-<VALUE>.conf-sample are put into the container configuration file. If this container configuration file already exists, it will be removed.
 
 ##### user 
 
