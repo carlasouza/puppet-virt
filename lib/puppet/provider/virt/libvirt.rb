@@ -26,7 +26,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	end
 
 	# Import the declared image file as a new domain.
-	def install(bootoninstall)
+	def install(bootoninstall = true)
 		debug "Installing new vm"
 		debug "Boot on install: %s" % bootoninstall
 
@@ -38,7 +38,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		end
 	end
 
-	def generalargs(bootoninstall = true)
+	def generalargs(bootoninstall)
 		debug "Building general arguments"
 
 		virt_parameter = case resource[:virt_type]
