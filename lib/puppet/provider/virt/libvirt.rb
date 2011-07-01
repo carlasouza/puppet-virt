@@ -36,14 +36,12 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			debug "Virtualization type: %s" % [resource[:virt_type]]
 			virtinstall generalargs(bootoninstall) + network + graphic + bootargs
 		
-#			resource.properties.each do |prop|
-#				if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
-#					p "AAAAAAAAAAAAA " + prop.to_s
-#					p resource[:"#{prop.to_s}"]
-#					p eval prop.to_s
-#				end
-#			end
+		end
 
+		resource.properties.each do |prop|
+			if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
+				eval "self.#{prop.to_s}=('#{prop.should}')"
+			end
 		end
 
 	end
@@ -273,12 +271,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# running | stopped | absent,				
 	def status
 
-		resource.properties.each do |prop|
-			if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
-				eval prop.to_s
-			end
-		end
-
 		if exists? 
 			# 1 = running, 3 = paused|suspend|freeze, 5 = stopped 
 			if resource[:ensure].to_s == :installed
@@ -311,9 +303,9 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	# Set true or false to autoboot property
 	def autoboot=(value)
-
-		debug "Trying to set autoboot %s at domain %s." % [resource[:autoboot], resource[:name]]
+		debug "Setting autoboot %s at domain %s." % [resource[:autoboot], resource[:name]]
 		begin
+			# FIXME
 			if value.to_s == "false"
 				exec { @guest.autostart=(false) }
 			else
@@ -352,6 +344,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	#
 	def on_reboot
 		# Not implemented by libvirt yet
+		resource[:on_reboot]
 	end
 
 	#
@@ -362,6 +355,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	#
 	def on_crash
 		# Not implemented by libvirt yet
+		resource[:on_crash]
 	end
 
 	#
