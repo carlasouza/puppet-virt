@@ -110,7 +110,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	
                 resource.properties.each do |prop| 
                         if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure' 
-                                eval "self.#{prop.to_s}=('#{prop.should}')" 
+                                eval "self.#{prop.to_s}=prop.should"
                         end 
                 end 
 	
@@ -225,6 +225,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 
 		results = []
 		resource[:resources_parameters].flatten.each do |value|
+			
 			tmp = open(conf).grep(/^#{value.split("=")[0].upcase}/)[0].delete! "\""
 			tmp.delete! "\n"
 			results << tmp
