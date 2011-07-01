@@ -40,7 +40,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 		resource.properties.each do |prop|
 			if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
-				eval "self.#{prop.to_s}=('#{prop.should}')"
+				eval "self.#{prop.to_s}=prop.should"
 			end
 		end
 
