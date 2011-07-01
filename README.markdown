@@ -55,6 +55,8 @@ Note that some values can be specified as an array of values:
 - *manages_devices*: The provider can give the guest an access to a device.
 - *manages_users*: The provider manage guest's users and passwords.
 - *manages_behaviour*: The provider manage the quest's behaviour for reboot, crash and shutdown.
+- *initial_config*: The provider can receive a config file with default values for VE creation.
+- *storage_path*: The provider can set the path to storage and mount VE files.
 
 
 Features \ Provider  | libvirt | openvz |
@@ -73,6 +75,8 @@ manages_features     |         |  *X*   |
 manages_devices      |         |  *X*   |
 manages_users        |         |  *X*   |
 manages_behaviour    |   *X*   |        |
+initial_config       |         |  *X*   |
+storage_path         |         |  *X*   |
 
 
 #### Parameters
@@ -200,13 +204,19 @@ This is the path to a predefined xml config file, to be used with the import fun
 
 Sets the path to the mount point for the container root directory (default is VE_ROOT specified in vz.conf(5) file). Argument can contain literal string $VEID, which will be substituted with the numeric CT ID.
 
+Requires features `storage_path`.
+
 ##### ve_private
 
 Set the path to directory in which all the files and directories specific to this very container are stored (default is VE_PRIVATE specified in vz.conf(5) file). Argument can contain literal string $VEID, which will be substituted with the numeric CT ID.
 
+Requires features `storage_path`.
+
 ##### configfile
 
 If specified, values from example configuration file /etc/vz/conf/ve-<VALUE>.conf-sample are put into the container configuration file. If this container configuration file already exists, it will be removed.
+
+Requires features `initial_config`.
 
 ##### user 
 

@@ -44,6 +44,11 @@ module Puppet
 		feature :boot_params,
 			"Support parameters for the guest boot."
 
+		feature :initial_config,
+			"Config file with default values for VE creation"
+
+		feature :storage_path,
+			"Sets the path to storage VE files"
 
 		# A base class for numeric Virt parameters validation.
 		class VirtNumericParam < Puppet::Property
@@ -152,15 +157,15 @@ module Puppet
 	In case guest is not running, it is automatically mounted, then all the appropriate file changes are applied, then it is unmounted."
 		end
 
-		newparam(:ve_root) do
+		newparam(:ve_root, :required_features => :storage_path) do
 			desc "Sets the path to the mount point for the container root directory (default is VE_ROOT specified in vz.conf(5) file). Argument can contain literal string $VEID, which will be substituted with the numeric CT ID."
 		end
 
-		newparam(:ve_private) do
+		newparam(:ve_private, :required_features => :storage_path) do
 			desc "Set the path to directory in which all the files and directories specific to this very container are stored (default is VE_PRIVATE specified in vz.conf(5) file). Argument can contain literal string $VEID, which will be substituted with the numeric CT ID."
 		end
 
-		newparam(:configfile) do
+		newparam(:configfile, :required_features => :initial_config) do
 			desc "If specified, values from example configuration file /etc/vz/conf/ve-<VALUE>.conf-sample are put into the container configuration file. If this container configuration file already exists, it will be removed."
 
 			validate do |file|

@@ -5,11 +5,8 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	commands :vzctl  => "/usr/sbin/vzctl"
 	commands :vzlist => "/usr/sbin/vzlist"
 
-	has_features :disabled, :cpu_fair, :disk_quota, :manages_resources, :manages_capabilities, :manages_features, :manages_devices, :manages_user, :iptables
+	has_features :disabled, :cpu_fair, :disk_quota, :manages_resources, :manages_capabilities, :manages_features, :manages_devices, :manages_user, :iptables, :initial_config, :storage_path
 
-	# TODO if openvz module is up
-	# confine :true => 
-	
 	if [ "Ubuntu", "Debian" ].any? { |os|  Facter.value(:operatingsystem) == os }
 		@@vzcache = "/var/lib/vz/template/cache/"
 		@@vzconf = "/etc/vz/conf/"
@@ -128,7 +125,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	end
 	
 	def purge
-		#	File.unlink("#{@@vzconf}/#{ctid}.conf.destroyed")
+	#	File.unlink("#{@@vzconf}/#{ctid}.conf.destroyed")
 	end
 	
 	def stop
@@ -157,11 +154,6 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	# OpenVZ guests status: exist, deleted, mouted, umounted, running, down
 	# running | stopped | absent
 	def status
-#                resource.properties.each do |prop|
-#                        if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
-#                                eval prop.to_s
-#                        end
-#                end
 
 		stat = vzctl('status', ctid).split(" ")
 		if exists?
