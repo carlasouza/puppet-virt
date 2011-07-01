@@ -109,6 +109,15 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		vzctl args
 	
 	end
+
+	def sync
+		resource.properties.each do |prop|
+			if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
+				is = eval prop.to_s
+				p is
+			end
+		end
+	end
 	
 	def setpresent
 		install
@@ -151,6 +160,12 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	# OpenVZ guests status: exist, deleted, mouted, umounted, running, down
 	# running | stopped | absent
 	def status
+#                resource.properties.each do |prop|
+#                        if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
+#                                eval prop.to_s
+#                        end
+#                end
+
 		stat = vzctl('status', ctid).split(" ")
 		if exists?
 			if resource[:ensure].to_s == "installed"
@@ -196,8 +211,6 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		conf = @@vzconf + ctid + '.conf'
 		value = open(conf).grep(/^#{arg.upcase}/)
 		result = value.size == 0 ? '' : value[0].split('"')[1].downcase
-		debug "Actual value: " << result
-		debug "Should value: " << String(resource.should(arg))
 		return result
 	end
 	
