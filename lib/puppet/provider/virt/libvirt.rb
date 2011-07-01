@@ -35,7 +35,17 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		else
 			debug "Virtualization type: %s" % [resource[:virt_type]]
 			virtinstall generalargs(bootoninstall) + network + graphic + bootargs
+		
+#			resource.properties.each do |prop|
+#				if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
+#					p "AAAAAAAAAAAAA " + prop.to_s
+#					p resource[:"#{prop.to_s}"]
+#					p eval prop.to_s
+#				end
+#			end
+
 		end
+
 	end
 
 	def generalargs(bootoninstall)
@@ -262,6 +272,12 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	# running | stopped | absent,				
 	def status
+
+		resource.properties.each do |prop|
+			if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
+				eval prop.to_s
+			end
+		end
 
 		if exists? 
 			# 1 = running, 3 = paused|suspend|freeze, 5 = stopped 
