@@ -31,6 +31,13 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			debug "Virtualization type: %s" % [resource[:virt_type]]
 			virtinstall generalargs(bootoninstall) + network + graphic + bootargs
 		end
+
+                resource.properties.each do |prop| 
+                        if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure' 
+                                eval "self.#{prop.to_s}=('#{prop.should}')" 
+                        end 
+                end 
+
 	end
 	
 	def generalargs(bootoninstall = true)

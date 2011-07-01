@@ -108,17 +108,14 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		args << '--name' << resource[:name]
 		vzctl args
 	
+                resource.properties.each do |prop| 
+                        if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure' 
+                                eval "self.#{prop.to_s}=('#{prop.should}')" 
+                        end 
+                end 
+	
 	end
 
-	def sync
-		resource.properties.each do |prop|
-			if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
-				is = eval prop.to_s
-				p is
-			end
-		end
-	end
-	
 	def setpresent
 		install
 	end
