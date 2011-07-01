@@ -251,23 +251,18 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		vzctl('set', ctid, "--meminfo", value, "--save")
 	end
 
-	def autoboot
-		return get_value("onboot") == "yes" ? :true : :false
-	end
-
-	def autoboot=(value)
-		result = value == :true ? 'yes' : 'no'
-		vzctl('set', ctid, '--onboot', result, '--save')
-	end
+	["autoboot", "noatime"].each do |name|
+		arg = name == 'autoboot' ? 'onboot' : name
+		define_method(name.to_s.downcase) do
+			return get_value(arg) == "yes" ? :true : :false
+		end
 	
-	def noatime
-		return get_value("noatime") == "yes" ? :true : :false
+		define_method("#{name}=".downcase) do |value|
+			result = value == :true ? 'yes' : 'no'
+			vzctl('set', ctid, '--'+ arg, result, '--save')
+		end
 	end
 
-	def noatime=(value)
-		result = value == :true ? 'yes' : 'no'
-		vzctl('set', ctid, '--noatime', result, '--save')
-	end
 
 	["nameserver", "iptables", "features", "capability"].each do |arg|
 		define_method(arg.to_s.downcase) do
