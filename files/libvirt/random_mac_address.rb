@@ -17,4 +17,4 @@ unless prefixes[type]
 end
 
 
-puts "#{prefixes[type]<<'.'<<(0..(5-prefixes[type].split(':').length)).collect{ random_hex + random_hex }.join(':')}"
+puts "#{prefixes[type]<<':'<<(0..(5-prefixes[type].split(':').length)).collect{ random_hex + random_hex }.join(':')}"
