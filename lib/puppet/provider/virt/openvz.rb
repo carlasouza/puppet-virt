@@ -7,6 +7,8 @@ Puppet::Type.type(:virt).provide(:openvz) do
 
 	has_features :disabled, :cpu_fair, :disk_quota, :manages_resources, :manages_capabilities, :manages_features, :manages_devices, :manages_user, :iptables, :initial_config, :storage_path
 
+	defaultfor :virtual => ["openvzhn"]
+
 	if [ "Ubuntu", "Debian" ].any? { |os|  Facter.value(:operatingsystem) == os }
 		@@vzcache = "/var/lib/vz/template/cache/"
 		@@vzconf = "/etc/vz/conf/"

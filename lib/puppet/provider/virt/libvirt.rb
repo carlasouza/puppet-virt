@@ -12,16 +12,29 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	
 	has_features :pxe, :manages_behaviour, :graphics, :clocksync, :boot_params
 
-	#defaultfor @resource[:virt_type] => [:xen_fullyvirt, :xen_paravirt, :kvm]
+	defaultfor :virtual => ["kvm", "physical", "xenu"]
 	
 	# Returns the name of the Libvirt::Domain or fails
 	def dom
 		hypervisor = "qemu:///session"
 		Libvirt::open(hypervisor).lookup_domain_by_name(resource[:name]) 
 	end
+
+	# Executes operation over guest
+	def exec
+		hypervisor = case resource[:virt_type]
+			when :openvz then "openvz:///system"
+			else "qemu:///session"
+		end
+		conn = Libvirt::open(hypervisor)
+		@guest = conn.lookup_domain_by_name(resource[:name]) 
+		ret = yield if block_given?
+		conn.close
+		return ret
+	end
 	
 	# Import the declared image file as a new domain.
-	def install(bootoninstall)
+	def install(bootoninstall = true)
 		debug "Installing new vm"
 		debug "Boot on install: %s" % bootoninstall
 	
@@ -29,6 +42,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			xmlinstall
 		else
 			debug "Virtualization type: %s" % [resource[:virt_type]]
+			p generalargs(bootoninstall) + network + graphic + bootargs
 			virtinstall generalargs(bootoninstall) + network + graphic + bootargs
 		end
 
@@ -40,15 +54,15 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	end
 	
-	def generalargs(bootoninstall = true)
+	def generalargs(bootoninstall)
 		debug "Building general arguments"
 	
 		virt_parameter = case resource[:virt_type]
 			when :xen_fullyvirt then "--hvm" #must validate kernel support
 			when :xen_paravirt then "--paravirt" #Must validate kernel support
 			when :kvm then "--accelerate" #Must validate hardware support
-		end
-	
+		end 
+p	
 		arguments = ["--name", resource[:name], "--ram", resource[:memory], "--vcpus" , resource[:cpus], "--noautoconsole", "--force", virt_parameter]
 	
 		if !bootoninstall
@@ -198,11 +212,11 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# Creates config file if absent, and makes sure the domain is not running.
 	def stop
 	
-	debug "Stopping domain %s" % [resource[:name]]
+		debug "Stopping domain %s" % [resource[:name]]
 	
 		if !exists?
 			install(false)
-		elsif status == "running"
+		elsif status == :running
 			case resource[:virt_type]
 				when :qemu then dom.destroy
 				else dom.shutdown
@@ -215,13 +229,13 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# Creates config file if absent, and makes sure the domain is running.
 	def start
 	
-	debug "Starting domain %s" % [resource[:name]]
-	
-	if exists? && status != "running"
-	dom.create # Start the domain
-	elsif status == "absent"
-	install
-	end
+		debug "Starting domain %s" % [resource[:name]]
+		
+		if exists? && status != :running
+			dom.create # Start the domain
+		elsif status == :absent
+			install
+		end
 	
 	end
 	
@@ -237,6 +251,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	
 	# Check if the domain exists.
 	def exists?
+		debug "Existe?"
 		begin
 			dom
 			debug "Domain %s exists? true" % [resource[:name]]
@@ -249,6 +264,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	
 	# running | stopped | absent,				
 	def status
+		debug "Status"
 	
 		if exists? 
 		# 1 = running, 3 = paused|suspend|freeze, 5 = stopped 
@@ -280,9 +296,9 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		debug "Trying to set autoboot %s at domain %s." % [resource[:autoboot], resource[:name]]
 		begin
 			if value.to_s == "false"
-				dom.autostart=(false)
+				exec { @guest.autostart=(false) }
 			else
-				dom.autostart=(true)
+				exec { @guest.autostart=(true) }
 			end
 		rescue Libvirt::RetrieveError => e
 			debug "Domain %s not defined" % [resource[:name]]
@@ -306,7 +322,30 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 		else
 			return :absent
 		end
+	end
 	
+	def memory
+		exec { @guest.max_memory }
+	end
+
+	def memory=(value)
+		exec { @guest.memory=(value) }
+	end
+
+	def cpus
+		#FIXME start guest if not running
+#		exec { @guest.create }
+		begin
+			exec { @guest.max_vcpus }
+		rescue Libvirt::RetrieveError => e
+			debug "Domain is not running"
+		end
+	
+#		exec { @guest.destroy }
+	end
+
+	def cpus=(value)
+		exec { @guest.vcpus=(value) }
 	end
 	
 	#

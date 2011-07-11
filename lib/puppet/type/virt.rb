@@ -468,15 +468,6 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
 			isrequired #FIXME Bug #4049
 			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt, :qemu, :openvz) 
-			
-			munge do |value| 
-				if value == "openvz"
-					@resource[:provider] = value
-				else
-					@resource[:provider] = :libvirt
-				end
-			end
-
 
 		end
 
