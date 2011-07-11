@@ -14,12 +14,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	defaultfor :virtual => ["kvm", "physical", "xenu"]
 	
-	# Returns the name of the Libvirt::Domain or fails
-	def dom
-		hypervisor = "qemu:///session"
-		Libvirt::open(hypervisor).lookup_domain_by_name(resource[:name]) 
-	end
-
 	# Executes operation over guest
 	def exec
 		hypervisor = case resource[:virt_type]
@@ -197,11 +191,11 @@ p
 		debug "Trying to destroy domain %s" % [resource[:name]]
 
 		begin
-			dom.destroy
+			exec { @guest.destroy }
 		rescue Libvirt::Error => e
 			debug "Domain %s already Stopped" % [resource[:name]]
 		end
-		dom.undefine
+		exec { @guest.undefine }
 	
 	end
 	
@@ -218,8 +212,8 @@ p
 			install(false)
 		elsif status == :running
 			case resource[:virt_type]
-				when :qemu then dom.destroy
-				else dom.shutdown
+				when :qemu then exec { @guest.destroy }
+				else exec { @guest.shutdown }
 			end
 		end
 	
@@ -232,7 +226,7 @@ p
 		debug "Starting domain %s" % [resource[:name]]
 		
 		if exists? && status != :running
-			dom.create # Start the domain
+			exec { @guest.create } # Start the domain
 		elsif status == :absent
 			install
 		end
@@ -270,7 +264,7 @@ p
 		# 1 = running, 3 = paused|suspend|freeze, 5 = stopped 
 			if resource[:ensure].to_s == "installed"
 				return :installed
-			elsif dom.info.state != 5
+			elsif exec { @guest.info.state } != 5
 				debug "Domain %s status: running" % [resource[:name]]
 				return :running
 			else
@@ -286,7 +280,7 @@ p
 	
 	# Is the domain autostarting?
 	def autoboot
-		return dom.autostart.to_s
+		return exec { @guest.autostart.to_s }
 	end
 	
 	
