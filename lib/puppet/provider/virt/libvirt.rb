@@ -330,20 +330,17 @@ p
 	end
 
 	def memory=(value)
-		mem=value.to_i * 1024 #MB
+		mem=value * 1024 #MB
 		exec { @guest.memory=(mem) }
 	end
 
 	def cpus
 		#FIXME start guest if not running
-#		exec { @guest.create }
 		begin
 			exec { @guest.max_vcpus }
 		rescue Libvirt::RetrieveError => e
-			debug "Domain is not running"
+			debug "Domain is not running, cannot evaluate cpus parameter"
 		end
-	
-#		exec { @guest.destroy }
 	end
 
 	def cpus=(value)

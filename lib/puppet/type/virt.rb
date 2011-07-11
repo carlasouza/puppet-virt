@@ -62,6 +62,10 @@ module Puppet
 					return false
 				end
 			end
+			
+			munge do |value|
+				value.to_i
+			end
 
 			validate do |value|
 				if numfix(value)
@@ -212,12 +216,9 @@ module Puppet
 		end
 
 		# This will change to properties
-		newproperty(:memory) do
+		newproperty(:memory, :parent => VirtNumericParam) do
 			desc "The maximum amount of memory allocation for the guest domain."
 
-			def insync?(current)
-				current == @should[0].to_i
-			end
 			isrequired #FIXME Bug #4049
 		end
 
