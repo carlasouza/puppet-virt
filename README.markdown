@@ -1,5 +1,4 @@
-Puppet Virtualization Management Module
-=======================================
+# Puppet Virtualization Management Module
 
 Puppet Module to manage virtual machines. Provides a the type: `virt`.
 
@@ -8,13 +7,21 @@ Puppet Module to manage virtual machines. Provides a the type: `virt`.
 ### virt
 
 Manage virtual environments.  
-Xen fullyvirtualization, Xen paravirtualization, KVM, and OpenVZ [1] hypervisors are supported, which of the first three uses libvirt [0] as provider.
+Xen [1], KVM [2], and OpenVZ [3] hypervisors are supported, which of the first three uses libvirt [4] as provider.
 
 This module is the result of my work at GSoC 2010.
+The OpenVZ provider development was funded by Reliant Security [5].
 
-[0] The Virtualization API - http://www.libvirt.org/
+[1] Xen® Hypervisor - xen.org
 
-[1] OpenVZ - http://wiki.openvz.org/
+[2] Kernel Based Virtual Machin - http://www.linux-kvm.org/
+
+[3] OpenVZ - http://wiki.openvz.org/
+
+[4] The Virtualization API - http://www.libvirt.org/
+
+[5] Reliant Security - http://reliantsecurity.com/
+
 
 **Autorequires:** If Puppet is managing Xen or KVM guests, the virt resource will autorequire `libvirt` library.
 
@@ -444,14 +451,25 @@ Valid values are: `vmguarpages`, `physpages`, `oomguarpages`, `lockedpages`, `pr
 
 Requires features `resources_management`.
 
-Future Work
-----
+----------------
+
+## Future Work
 
 For now, some parameters will have a few values acceptable:
-  * `virtpath` will accept only existing .img, .qcow and .qcow2 files;
-  * `memory` and `cpus` will be, initially, not changeable for Libvirt provider;
+  * `virt_path` will accept only existing .img, .qcow and .qcow2 files;
   * Input devices specification like mouse will not be supported for now.
   * The parameters `on_poweroff`; `on_reboot` and `on_crash` are not changeable. They will be used only to create a new domain using Libvirt provider (not for import existing domain's image, because libvirt does not support modify those values)
 
+## License
 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
