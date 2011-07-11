@@ -215,6 +215,9 @@ module Puppet
 		newproperty(:memory) do
 			desc "The maximum amount of memory allocation for the guest domain."
 
+			def insync?(current)
+				current == @should[0].to_i
+			end
 			isrequired #FIXME Bug #4049
 		end
 

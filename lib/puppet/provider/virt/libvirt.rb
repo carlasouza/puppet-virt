@@ -325,11 +325,13 @@ p
 	end
 	
 	def memory
-		exec { @guest.max_memory }
+		mem = exec { @guest.max_memory }
+		mem / 1024 #MB
 	end
 
 	def memory=(value)
-		exec { @guest.memory=(value) }
+		mem=value.to_i * 1024 #MB
+		exec { @guest.memory=(mem) }
 	end
 
 	def cpus
