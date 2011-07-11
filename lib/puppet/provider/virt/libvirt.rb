@@ -201,6 +201,7 @@ p
 	
 	#TODO
 	def purge 
+		destroy
 	end
 	
 	# Creates config file if absent, and makes sure the domain is not running.
@@ -235,19 +236,13 @@ p
 	
 	# Auxiliary method to make sure the domain exists before change it's properties.
 	def setpresent
-#		case resource[:ensure]
-#			when :absent then return #do nothing
-#			when :running then install(true)
-#			else install(false)
-#		end
 		install(false)
 	end
 	
 	# Check if the domain exists.
 	def exists?
-		debug "Existe?"
 		begin
-			dom
+			exec
 			debug "Domain %s exists? true" % [resource[:name]]
 			true
 		rescue Libvirt::RetrieveError => e
@@ -258,8 +253,6 @@ p
 	
 	# running | stopped | absent,				
 	def status
-		debug "Status"
-	
 		if exists? 
 		# 1 = running, 3 = paused|suspend|freeze, 5 = stopped 
 			if resource[:ensure].to_s == "installed"
@@ -275,7 +268,6 @@ p
 			debug "Domain %s status: absent" % [resource[:name]]
 			return :absent
 		end
-	
 	end
 	
 	# Is the domain autostarting?
@@ -300,9 +292,32 @@ p
 	
 	end
 	
+	def memory
+		mem = exec { @guest.max_memory }
+		mem / 1024 #MB
+	end
+
+	def memory=(value)
+		mem=value * 1024 #MB
+		exec { @guest.memory=(mem) }
+	end
+
+	def cpus
+		#FIXME If guest is not running, retrieve value from xml file
+		begin
+			exec { @guest.max_vcpus }
+		rescue Libvirt::RetrieveError => e
+			debug "Domain is not running, cannot evaluate cpus parameter"
+		end
+	end
+
+	def cpus=(value)
+		exec { @guest.vcpus=(value) }
+	end
+		
 	# Not implemented by libvirt yet
 	def on_poweroff
-	
+		#FIXME refactor	
 		path = "/etc/libvirt/qemu/" #Debian/ubuntu path for qemu's xml files
 		extension = ".xml"
 		xml = path + resource[:name] + extension
@@ -317,30 +332,7 @@ p
 			return :absent
 		end
 	end
-	
-	def memory
-		mem = exec { @guest.max_memory }
-		mem / 1024 #MB
-	end
 
-	def memory=(value)
-		mem=value * 1024 #MB
-		exec { @guest.memory=(mem) }
-	end
-
-	def cpus
-		#FIXME start guest if not running
-		begin
-			exec { @guest.max_vcpus }
-		rescue Libvirt::RetrieveError => e
-			debug "Domain is not running, cannot evaluate cpus parameter"
-		end
-	end
-
-	def cpus=(value)
-		exec { @guest.vcpus=(value) }
-	end
-	
 	#
 	def on_poweroff=(value)
 		# Not implemented by libvirt yet

@@ -127,6 +127,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	end
 	
 	def purge
+		destroy
 	#	File.unlink("#{@@vzconf}/#{ctid}.conf.destroyed")
 	end
 	
