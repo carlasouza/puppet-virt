@@ -36,7 +36,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			xmlinstall
 		else
 			debug "Virtualization type: %s" % [resource[:virt_type]]
-			p generalargs(bootoninstall) + network + graphic + bootargs
 			virtinstall generalargs(bootoninstall) + network + graphic + bootargs
 		end
 
@@ -56,7 +55,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 			when :xen_paravirt then "--paravirt" #Must validate kernel support
 			when :kvm then "--accelerate" #Must validate hardware support
 		end 
-p	
 		arguments = ["--name", resource[:name], "--ram", resource[:memory], "--vcpus" , resource[:cpus], "--noautoconsole", "--force", virt_parameter]
 	
 		if !bootoninstall
