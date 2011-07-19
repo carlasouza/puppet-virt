@@ -10,7 +10,7 @@ Manage virtual environments.
 Xen [1], KVM [2], and OpenVZ [3] hypervisors are supported, which of the first three uses libvirt [4] as provider.
 
 This module is the result of my work at GSoC 2010.
-The OpenVZ provider development was funded by Reliant Security [5].
+I thank Reliant Security [5] for funding the OpenVZ provider development.
 
 [1] Xen® Hypervisor - xen.org
 
@@ -40,8 +40,8 @@ Note that some values can be specified as an array of values:
     virt { server:
       ensure => 'installed',
       memory => 512,
-      virt_path => '/data/vms/disk0.qcow2',
-      virt_type => 'xen_fullyvirt',
+      os_template => 'ubuntu-10.10-x86_64',
+      virt_type => 'openvz',
       autoboot => true,
       interfaces => [ "eth0a", "eth1a"]
     }
@@ -99,7 +99,7 @@ The guest's name.
 
 ##### hostname
 
-The guest's hostname.
+The guest's hostname. It not specified, `name` will be used as VE's hostname.
 
 ##### id 
 
@@ -462,14 +462,4 @@ For now, some parameters will have a few values acceptable:
 
 ## License
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+This module is released under GNU General Public License, version 3 (GPLv3) (http://www.opensource.org/licenses/gpl-3.0.html)
