@@ -7,13 +7,16 @@ Puppet Module to manage virtual machines. Provides a the type: `virt`.
 ### virt
 
 Manage virtual environments. Xen [1], KVM [2], and OpenVZ [3] hypervisors are supported, which of the first three uses libvirt [4] as provider.
-
 This module is the result of my work at GSoC 2010. I thank Reliant Security [5] for funding the OpenVZ provider development.
 
 [1] Xen® Hypervisor - xen.org
+
 [2] Kernel Based Virtual Machin - http://www.linux-kvm.org/
+
 [3] OpenVZ - http://wiki.openvz.org/
+
 [4] The Virtualization API - http://www.libvirt.org/
+
 [5] Reliant Security - http://reliantsecurity.com/
 
 
@@ -112,6 +115,7 @@ Optimize the guest configuration for a type of operating system (ex. 'linux', 'w
 Further optimize the guest configuration for a specific operating system variant (ex. 'fedora8', 'winxp'). This parameter is optional for libvirt provider and mandatory for openvz provider.
 
 Available values for libvirt are:
+
 * `linux`
  * `debianetch`: Debian Etch
  * `debianlenny`: Debian Lenny
@@ -161,6 +165,7 @@ Available values for libvirt are:
  * `winxp64`: Microsoft Windows XP (x86\_64)
 
 For OpenVZ provider, available values are:
+
 * `centos-4`: CentOS 4 
 * `centos-5`: CentOS 5
 * `debian-5.0`: Debian Lenny
@@ -191,6 +196,7 @@ Available providers are:
 
 Specify the guest virtualization type. Mandatory field.
 Available values:
+
 * `xen_fullyvirt`: Request the use of full virtualization, if both para & full virtualization are available on the host. This parameter may not be available if connecting to a Xen hypervisor on a machine without hardware virtualization support. This parameter is implied if connecting to a QEMU based hypervisor.
 * `xen_paravirt`: This guest should be a paravirtualized guest. It requires hardware virtualization support
 * `kvm`: When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators.
@@ -236,6 +242,7 @@ IP address(es) of the guest. Multiple IP addresses should be specified as an arr
 ##### interfaces
 
 Connect the guest network to the host using the specified network as a bridge. The value can take one of 2 formats:
+
 * `disabled`: The guest will have no network.
 * `[ "ethX", ... ] | "ethX"`: The guest can receive one or an array with interface's name from host to connect to the guest interfaces.
 * `ifname[,mac,host_ifname,host_mac,[bridge]]`: For OpenVZ hypervisor, the network interface must be specified using the format above, where:
@@ -306,6 +313,7 @@ Requires features `cpu_fair`.
 
 Setup a virtual console in the guest to be imported. If no graphics option is specified, will default to enable.
 Available values:
+
 * `enable`: Setup a virtual console in the guest and export it as a VNC server in the host. The VNC server will run on the first free port number at 5900 or above.
 * `vnc:VNCPORT`: Request a permanent, statically assigned port number for the guest VNC console. Use of this option is discouraged as other guests may automatically choose to run on this port causing a clash.
 * `disable`: No graphical console will be allocated for the guest.
@@ -315,6 +323,7 @@ Requires features `graphics`.
 
 The guest clock synchronization can assume three possible values, allowing fine grained control over how the guest clock is synchronized to the host. NB, not all hypervisors support all modes.
 Available values:       
+
 * `utc`: The guest clock will always be synchronized to UTC when booted
 * `localtime`: The guest clock will be synchronized to the host's configured timezone when booted, if any.
 * `timezone`: The guest clock will be synchronized to the requested timezone using the timezone attribute.
@@ -330,6 +339,7 @@ The URL from where download OpenVZ precreated templates. Default value: `http://
 ##### boot_location
 
 Installation source for guest virtual machine kernel+initrd pair.  The `url` can take one of the following forms:
+
 * `DIRECTORY`: Path to a local directory containing an installable distribution image
 * `nfs:host:/path or nfs://host/path`: An NFS server location containing an installable distribution image
 * `http://host/path`: An HTTP server location containing an installable distribution image
@@ -383,6 +393,7 @@ Requires features `disk_quota`.
 ##### devices 
 
 Give the container an access (r - read only, w - write only, rw - read/write, none - no access) to:
+
 * a device designated by the special file /dev/device. Device file is created in a container by vzctl. 
  * Use format: device:r|w|rw|none
 * a block or character device designated by its major and minor numbers. Device file have to be created manually. 
@@ -396,6 +407,7 @@ Use the PXE boot protocol to load the initial ramdisk and kernel for starting th
 ##### on_crash
 
 The content of this element specifies the action to take when the guest crashes. Available values:
+
 * `destroy`: The domain will be terminated completely and all resources released.
 * `restart`: The domain will be terminated, and then restarted with the same configuration.
 * `preserve`: The domain will be terminated, and its resource preserved to allow analysis.
@@ -448,6 +460,7 @@ Requires features `resources_management`.
 ## Future Work
 
 For now, some parameters will have a few values acceptable:
+
   * `virt_path` will accept only existing .img, .qcow and .qcow2 files;
   * Input devices specification like mouse will not be supported for now.
   * The parameters `on_poweroff`; `on_reboot` and `on_crash` are not changeable. They will be used only to create a new domain using Libvirt provider (not for import existing domain's image, because libvirt does not support modify those values)
