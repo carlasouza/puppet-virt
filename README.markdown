@@ -445,8 +445,6 @@ Valid values are: `vmguarpages`, `physpages`, `oomguarpages`, `lockedpages`, `pr
 
 Requires features `resources_management`.
 
-----------------
-
 ## Future Work
 
 For now, some parameters will have a few values acceptable:
