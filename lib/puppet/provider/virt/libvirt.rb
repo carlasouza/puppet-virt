@@ -17,7 +17,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 	# Executes operation over guest
 	def exec
 		hypervisor = case resource[:virt_type]
-			when :openvz then "openvz:///system"
+			when :xen_fullyvirt, :xen_paravirt then "xen:///"
 			else "qemu:///session"
 		end
 		conn = Libvirt::open(hypervisor)
