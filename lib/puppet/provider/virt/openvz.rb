@@ -239,11 +239,13 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	end
 
 	def memory
-		get_value("meminfo")
+		get_value("PRIVVMPAGES").split(":")[0].to_i / 256 #MB
 	end
 
 	def memory=(value)
-		vzctl('set', ctid, "--meminfo", value, "--save")
+		vzctl('set', ctid, "--vmguarpages", value.to_s + "M", "--save")
+		vzctl('set', ctid, "--oomguarpages", value.to_s + "M", "--save")
+		vzctl('set', ctid, "--privvmpages", value.to_s + "M", "--save")
 	end
 
 	["autoboot", "noatime"].each do |name|
