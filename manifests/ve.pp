@@ -166,7 +166,7 @@ define virt::ve (
       unless => "vzctl exec2 $name 'crontab -l | grep -q puppet-client'",
       timeout => 300,
       returns => [ 0, 2 ],
-      require => [ Notify["notify-puppetize-$name", Virt[$name] ],
+      require => [ Notify["notify-puppetize-$name"], Virt[$name] ],
     }
 
   }
