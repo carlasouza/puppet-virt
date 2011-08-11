@@ -13,7 +13,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		@@vzcache = "/var/lib/vz/template/cache/"
 		@@vzconf = "/etc/vz/conf/"
 	else
-		fail "Sorry, this provider is not supported for your Operation System, yet :)"
+		raise Puppet::Error, "Sorry, this provider is not supported for your Operation System, yet :)"
 	end
 
 	# Returns all host's guests
@@ -40,7 +40,8 @@ Puppet::Type.type(:virt).provide(:openvz) do
 			else "x86"
 		end
 	
-		return resource[:os_template] + "-" + arch
+		#return resource[:os_template] + "-" + arch
+		return resource[:os_template] 
 	end
 	
 	# Private method to download OpenVZ template if don't already exists
@@ -49,7 +50,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		file = @@vzcache + template + '.tar.gz'
 		if !File.file? file
 			require 'open-uri'
-			debug "Downloading template '" + template + "' to directory: '" + @@vzcache + "'"
+			Puppet.info "Downloading #{url}#{template}.tar.gz"
 			writeOut = open(file, "wb")
 			writeOut.write(open(url + '/' + template + '.tar.gz').read)
 			writeOut.close
@@ -69,14 +70,12 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		if id
 			return id
 		else
-			fail "CTID not specified"
+			raise Puppet::Error, "CTID not specified"
 		end
 	end
 	
 	def install
-		if resource[:os_template].nil?
-			fail "Paramenter 'os_template' is required."
-		end
+    raise Puppet::Error, "Paramenter 'os_template' is required." if resource[:os_template].nil?
 		
 		if resource[:tmpl_repo]
 			download(resource[:tmpl_repo])

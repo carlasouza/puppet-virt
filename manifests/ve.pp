@@ -26,6 +26,10 @@
 # puppetize: If set to true, vzctl will run the puppet agent inside
 # the VE. The following assumptions are made here:
 #
+# The remaining parameters should be self-explanitory
+#
+# Assumptions:
+#
 # 1. The OS template used to create the VE is equipped with a
 # legitimate puppet agent.
 #
@@ -36,8 +40,6 @@
 # is a singleton, it's best to manage the resource in the same scope
 # where this definition is used. See the "Example" section for more
 # info.
-#
-# The remaining variables should be self-explanitory
 #
 # Example:
 #
@@ -80,6 +82,7 @@ define virt::ve (
   $tmpl_repo = undef,
   $ipaddr = undef,
   $nameserver = undef,
+  $searchdomain = undef,
   $configfile = 'basic',
   $virt_type = 'openvz',
   $lvm_vg = 'vg0',
@@ -116,6 +119,7 @@ define virt::ve (
     ve_root => "${vedir}/${name}/root",
     ve_private => "${vedir}/${name}/private",
     nameserver => $nameserver,
+    searchdomain => $searchdomain,
     memory => $memory,
     require => $ensure ? {
       present => Mount["${vedir}/$name"],
@@ -153,39 +157,19 @@ define virt::ve (
     size => $lvm_size,
   }
 
-    if ($puppetize) and ($ensure == 'present') {
+  if ($puppetize) and ($ensure == 'present') {
 
-      # A message from Adam on this ghetto approach to managing
-      # /etc/hosts in the VE: Using an exec to call vzctl exec
-      # <ctid> puppet apply -e 'host ... either doesn't work or I'm
-      # just not smart enough to escape it properly.  Augeas appears
-      # to be unable to "see" files which belong to a VE.
+    notify { "notify-puppetize-$name": message "Puppetizing ${name}" }
 
-      # augtool print /files/etc/sudoers | wc -l 
-      # 20 
-      # augtool print /files/vz/101/private/etc/sudoers | wc -l 
-      # 0
-      #
-      file { "ve-hosts-${name}":
-        ensure => present,
-        path => "${vedir}/${name}/private/etc/hosts",
-        owner => 'root',
-        group => 'root',
-        mode => 0644,
-        content => "127.0.0.1\t${name} localhost\n${serverip}\tpuppet\n",
-        require => Virt[$name],
-        noop => $ensure ? { absent => true, default => false, };
-      }
-
-      exec { "puppetize-${name}":
-        command => "vzctl exec2 $name 'puppet agent -t -l /tmp/install.log --pluginsync true'",
-        unless => "vzctl exec2 $name 'crontab -l | grep -q puppet-client'",
-        timeout => 300,
-        returns => [ 0, 2 ],
-        require => File["ve-hosts-${name}"],
-      }
-
+    exec { "puppetize-$name":
+      command => "vzctl exec2 $name 'puppet agent -t -l /tmp/install.log --pluginsync true'",
+      unless => "vzctl exec2 $name 'crontab -l | grep -q puppet-client'",
+      timeout => 300,
+      returns => [ 0, 2 ],
+      require => [ Notify["notify-puppetize-$name", Virt[$name] ],
     }
+
+  }
 
 }
 
