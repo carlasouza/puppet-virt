@@ -159,7 +159,7 @@ define virt::ve (
 
   if ($puppetize) and ($ensure == 'present') {
 
-    notify { "notify-puppetize-$name": message "Puppetizing ${name}" }
+    notify { "notify-puppetize-$name": message => "Puppetizing ${name}" }
 
     exec { "puppetize-$name":
       command => "vzctl exec2 $name 'puppet agent -t -l /tmp/install.log --pluginsync true'",
