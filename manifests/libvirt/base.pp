@@ -1,5 +1,5 @@
 class virt::libvirt::base {
-  package{ [ 'libvirt', 'python-virtinst', 'ruby-libvirt', 'qemu' ]:
+  package{ [ 'libvirt', 'python-virtinst', 'ruby-libvirt' ]:
     ensure => installed,
   }
 
