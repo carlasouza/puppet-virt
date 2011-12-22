@@ -15,7 +15,10 @@ class virt::xen::xen0::debian inherits virt::xen::xen0::base {
   }
 
   Package['xen-libs']{
-    name => 'xen-utils-3.2-1',
+    name => $lsbdistcodename ? {
+      lenny => 'xen-utils-3.2-1',
+      default => 'xen-utils-4.0'
+    }
   }
 
   Service['xend']{
