@@ -33,6 +33,7 @@ class virt::xen::xen0::base {
   file{'/etc/xen/xend-config.sxp':
     source => [ "puppet:///modules/site-virt/xen/${fqdn}/config/xend-config.sxp",
                 "puppet:///modules/site-virt/xen/config/${domain}/xend-config.sxp",
+                "puppet:///modules/site-virt/xen/config/${operatingsystem}.${lsbmajdistrelease}/xend-config.sxp",
                 "puppet:///modules/site-virt/xen/config/${operatingsystem}/xend-config.sxp",
                 "puppet:///modules/site-virt/xen/config/xend-config.sxp",
                 "puppet:///modules/virt/xen/config/${operatingsystem}/xend-config.sxp",
