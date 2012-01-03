@@ -14,7 +14,7 @@ class ovz-guest {
 		virt_type  => 'openvz',
 		autoboot   => 'false',
 		configfile => 'basic',
-		ipaddr     => ['10.0.0.1']
+		ipaddr     => ['10.0.0.1'],
 		features => ["nfs:on", "sit:off"],
 		resources_parameters => ["NUMPTY=20:20", "NUMSIGINFO=255:255"],
 	}
