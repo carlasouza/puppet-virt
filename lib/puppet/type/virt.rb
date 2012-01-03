@@ -13,7 +13,7 @@ module Puppet
 
 		feature :manages_resources,
 			"A set of limits and guarantees controlled per guest. More information at http://wiki.openvz.org/UBC_parameter_properties"
-	
+
 		feature :manages_capabilities,
 			"A set of capabilities management for a guest."
 
@@ -62,7 +62,7 @@ module Puppet
 					return false
 				end
 			end
-			
+
 			munge do |value|
 				value.to_i
 			end
@@ -88,7 +88,7 @@ module Puppet
 				when false, "false", :false
 					:false
 			else
-				fail("munge_boolean only takes booleans")
+				fail("This parameter only takes booleans")
 			end
 		end
 
@@ -107,7 +107,7 @@ module Puppet
 			newvalue(:stopped) do
 				provider.stop
 			end
-	
+
 			newvalue(:running) do
 				provider.start
 			end
@@ -119,23 +119,23 @@ module Puppet
 			newvalue(:absent) do
 				provider.destroy
 			end
-			
+
 			newvalue(:purged) do
 				provider.purge
 			end
 
 			defaultto(:running)
-			
+
 			def retrieve
 				provider.status
 			end
-	
+
 		end
-		
+
 		newparam(:desc) do
 			desc "The guest's description."
 		end
-	
+
 		newparam(:name, :namevar => true) do
 			desc "The guest's name."
 		end
@@ -157,7 +157,7 @@ module Puppet
 		end
 
 		newproperty(:user, :required_features => :manages_users) do
-			desc "Sets password for the given user in the guest, creating the user if it does not exists. 
+			desc "Sets password for the given user in the guest, creating the user if it does not exists.
 	In case guest is not running, it is automatically mounted, then all the appropriate file changes are applied, then it is unmounted."
 		end
 
@@ -234,19 +234,19 @@ module Puppet
 			Maximum value is 500000, minimal is 8. Number is relative to weights of all the other running guests.
 			If cpuunits are not specified, default value of 1000 is used."
 		end
-	
+
 		newproperty(:cpulimit, :parent => VirtNumericParam, :required_features => :cpu_fair) do
 			desc "Limit of CPU usage for the guest, in per cent. Note if the computer has 2 CPUs, it has total of 200% CPU time. Default CPU limit is 0 (no CPU limit)."
 		end
-	
-		#XXX	:required_features => 
+
+		#XXX	:required_features =>
 		newproperty(:ioprio, :parent => VirtNumericParam, :required_features => :manages_resources) do
 			desc "Assigns  I/O priority to guest.
 			Priority range is 0-7.
 			The greater priority is, the more time for I/O activity guest has.
 			By default each guest has priority of 4."
 		end
-	
+
 		newparam(:graphics, :requires_features => :graphics) do
 			desc "Setup a virtual console in the guest to be imported. If no graphics option is specified, will default to enable.
 	Available values:
@@ -267,10 +267,10 @@ module Puppet
 
 			newvalues("i386","i686","amd64","ia64","powerpc","hppa")
 		end
-	
+
 		newparam(:clocksync, :requires_features => :clocksync) do
 			desc "The guest clock synchronization can assume three possible values, allowing fine grained control over how the guest clock is synchronized to the host. NB, not all hypervisors support all modes.
-	Available values:			
+	Available values:
 	`utc`:
 		The guest clock will always be synchronized to UTC when booted
 	`localtime`:
@@ -283,7 +283,7 @@ module Puppet
 
 			newvalues("UTC", "localtime", "timezone", "variable")
 		end
-	
+
 
 		# Installation method
 
@@ -311,11 +311,11 @@ module Puppet
 		#Kickstart file location on the network
 		newparam(:kickstart, :requires_features => :boot_params) do
 			desc "Kickstart file location. "
-			
+
 			munge do |value|
 				"ks=" + value
-			end	
-		
+			end
+
 		end
 
 		newparam(:boot_options, :requires_features => :boot_params) do
@@ -339,12 +339,12 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 				return value
 			end
 
-			munge do |value| 
+			munge do |value|
 				"path=" + value
 			end
 
 		end
-	
+
 		####
 		# Disk properties
 		# Disk size (only used for creating new guests
@@ -359,7 +359,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 		newproperty(:quotatime, :parent => VirtNumericParam, :required_features => :disk_quota) do
 			desc "Sets soft overusage time limit for disk quota (also known as grace period)."
 		end
-	
+
 		newproperty(:quotaugidlimit, :parent => VirtNumericParam, :required_features => :disk_quota) do
 			desc "Sets maximum number of user/group IDs in a guest for which disk quota inside the guest will be accounted. If this value is set to 0, user and group quotas inside the guest will not be accounted.
 			Note that if you have previously set value of this parameter to 0, changing it while the guest is running will not take effect."
@@ -377,9 +377,9 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
 		newproperty(:devices, :array_matching => :all, :required_features => :manages_devices) do
 			desc "Give the container an access (r - read only, w - write only, rw - read/write, none - no access) to:
-	1) a device designated by the special file /dev/device. Device file is created in a container by vzctl. 
+	1) a device designated by the special file /dev/device. Device file is created in a container by vzctl.
 		Use format: device:r|w|rw|none
-	2) a block or character device designated by its major and minor numbers. Device file have to be created manually. 
+	2) a block or character device designated by its major and minor numbers. Device file have to be created manually.
 		Use format: b|c:major:minor|all:[r|w|rw|none]"
 			def insync?(current)
 				current.sort == @should.sort
@@ -399,13 +399,13 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
 			defaultto(:false)
 		end
-	
+
 		newparam(:os_type) do
 			desc "Optimize the guest configuration for a type of operating system (ex. 'linux', 'windows'). Not changable."
 
 			newvalues(:linux, :windows, :unix, :solaris, :other)
 		end
-	
+
 		newparam(:os_template) do #TODO change 'os_template' to 'os'
 			desc "Further optimize the guest configuration for a specific operating system variant (ex. 'fedora8', 'winxp'). This parameter is optional, and does not require an `os-type` to be specified.
 	Available values:
@@ -464,26 +464,26 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 	`xen_fullyvirt`:
 		Request the use of full virtualization, if both para & full virtualization are available on the host. This parameter may not be available if connecting to a Xen hypervisor on a machine without hardware virtualization support. This parameter is implied if connecting to a QEMU based hypervisor.
 	`xen_paravirt`:
-		This guest should be a paravirtualized guest. 
+		This guest should be a paravirtualized guest.
 	`kvm`:
 		When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators.
 	`openvz`:
 		When defining an OpenVZ guest, the os_template must be defined."
 
 			isrequired #FIXME Bug #4049
-			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt, :qemu, :openvz) 
+			newvalues(:kvm, :xen_fullyvirt, :xen_paravirt, :qemu, :openvz)
 
 		end
 
 		newparam(:xml_file) do
 			desc "This is the path to a predefined xml config file, to be used with the import function."
 
-			munge do |value| 
+			munge do |value|
 				"path=" + value
 			end
 
 		end
-		
+
 		newproperty(:interfaces) do
 			desc "Connect the guest network to the host using the specified network as a bridge. The value can take one of 2 formats:
 	`disabled`:
@@ -508,7 +508,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 		end
 
 		newproperty(:macaddrs) do
-			desc "Fixed MAC address for the guest; 
+			desc "Fixed MAC address for the guest;
 If this parameter is omitted, or the value \"RANDOM\" is specified a suitable address will be randomly generated.
 For Xen virtual machines it is required that the first 3 pairs in the MAC address be the sequence '00:16:3e', while for QEMU or KVM virtual machines it must be '54:52:00'."
 		end
@@ -521,7 +521,7 @@ For Xen virtual machines it is required that the first 3 pairs in the MAC addres
 			end
 
 		end
-	
+
 		newproperty(:on_poweroff, :required_features => :manages_behaviour) do
 			desc "The content of this element specifies the action to take when the guest requests a poweroff.
 	Available values:
@@ -569,7 +569,7 @@ Available values:
 			newvalues(:destroy, :restart, :preserv, :renamerestart)
 
 		end
-	
+
 		newproperty(:autoboot) do
 			desc "Determines if the guest should start when the host starts."
 
@@ -625,23 +625,23 @@ To force the start of a disabled guest, use vzctl start with --force option."
 			desc "Sets a capability for a guest. Note that setting capability when the guest is running does not take immediate effect; restart the guest in order for the changes to take effect. Note a guest has default set of capabilities, thus any operation on capabilities is 'logical and' with the default capability mask.
 	You can use the following values for capname: chown, dac_override, dac_read_search, fowner, fsetid, kill, setgid, setuid, setpcap, linux_immutable, net_bind_service, net_broadcast, net_admin, net_raw, ipc_lock, ipc_owner, sys_module, sys_rawio, sys_chroot, sys_ptrace, sys_pacct, sys_admin, sys_boot, sys_nice, sys_resource, sys_time, sys_tty_config, mknod, lease, setveid, ve_admin.
 	WARNING: setting some of those capabilities may have far reaching security implications, so do not do it unless you know what you are doing. Also note that setting setpcap:on for a guest will most probably lead to inability to start it."
-	
+
 			validate do |value|
 				capability, mode = value.split(':')
-				if !["chown", " dac_override", " dac_read_search", " fowner", " fsetid", " kill", " setgid", " setuid", " setpcap", " linux_immutable", " net_bind_service", " net_broadcast", " net_admin", " net_raw", " ipc_lock", " ipc_owner", " sys_module", " sys_rawio", " sys_chroot", " sys_ptrace", " sys_pacct", " sys_admin", " sys_boot", " sys_nice", " sys_resource", " sys_time", " sys_tty_config", " mknod", " lease", " setveid", " ve_admin"].include?(capability)
+				if !["chown", "dac_override", "dac_read_search", "fowner", "fsetid", "kill", "setgid", "setuid", "setpcap", "linux_immutable", "net_bind_service", "net_broadcast", "net_admin", "net_raw", "ipc_lock", "ipc_owner", "sys_module", "sys_rawio", "sys_chroot", "sys_ptrace", "sys_pacct", "sys_admin", "sys_boot", "sys_nice", "sys_resource", "sys_time", "sys_tty_config", "mknod", "lease", "setveid", "ve_admin"].include?(capability)
 					raise ArgumentError, "\"#{capability}\" is not a valid capability."
 				end
 				if !["on", "off"].include?(mode)
 					raise ArgumentError, "Capability \"#{capability}\" only accepts \"on\" or \"off\" modes."
 				end
-			end	
+			end
 		end
 
-		### 
+		###
 		# UBC parameters (in form of barrier:limit)
 		# Requires one or two arguments. In case of one argument, vzctl sets barrier and limit to the same value. In case of two colon-separated arguments, the first is a barrier, and the second is a limit. Each argument is either a number, a number with a suffix, or the special value 'unlimited'."
 		# UBC parameters description can be found at: http://wiki.openvz.org/UBC_parameters_table
-	
+
 		newproperty(:resources_parameters, :array_matching => :all, :required_features => :manages_resources) do
 			desc "Manages settings of the host's resources usage limit by the guest"
 
@@ -650,12 +650,12 @@ To force the start of a disabled guest, use vzctl start with --force option."
 				features = ["vmguarpages", "physpages", "oomguarpages", "lockedpages", "privvmpages", "shmpages", "numproc", "numtcpsock", "numothersock", "numfile", "numflock", "numpty", "numsiginfo", "dcachesize", "numiptent", "kmemsize", "tcpsndbuf", "tcprcvbuf", "othersockbuf", "dgramrcvbuf"]
 				raise ArgumentError, "Feature #{feature} is not valid." unless features.include? feature
 			end
-			
+
 			def insync?(current)
 				current.sort == @should.sort
 			end
 
 		end
-		
+
 	end
 end
