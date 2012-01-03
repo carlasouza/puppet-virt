@@ -93,7 +93,7 @@ define virt::ve (
         fail("The os_template parameter must be defined.")
     }
 
-    include virt 
+    include virt
     include virt::params
 
     virt { $name:
@@ -128,14 +128,14 @@ define virt::ve (
             default => [ Lvm::Volume[$name], File ["${virt::params::vedir}/$name"] ],
         },
 	}
-		
+
 	file { "${virt::params::vedir}/$name":
         ensure => directory,
         owner => 'root',
         group => 'root',
         mode => 0755,
     }
- 
+
 	lvm::volume { $name:
 		ensure => present,
 		vg => $lvm_vg,

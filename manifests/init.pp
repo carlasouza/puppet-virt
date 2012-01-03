@@ -10,15 +10,20 @@ class virt {
 		subscribe => Package[$virt::params::packages],
 	}
 
+  service { $servicename:
+    ensure => 'running',
+    enable => 'true',
+  }
+
 	case $virtual {
-	
+
 		/^openvzhn/: {
 
-			file { 
+			file {
 				"${virt::params::basedir}/vz.conf":
 				ensure => present,
 				source => 'puppet:///modules/virt/global/vz.conf',
-				notify => Service[$virt::params::service];
+				notify => Service[$virt::params::servicename];
 				[ $virt::params::confdir, $virt::params::vedir ]: ensure => directory;
 			}
 
