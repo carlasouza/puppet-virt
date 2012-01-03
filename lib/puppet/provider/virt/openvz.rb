@@ -27,27 +27,27 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		end
 		guests
 	end
-	
-	def ostemplate 
+
+	def ostemplate
 		os = resource[:os_template]
-		if File.file? @@vzcache + os + '.tar.gz'
+		if File.file? @@vzcache + os + '.tar.gz' || !resource[:tmpl_repo].nil?
 			return os
 		end
 		arch = resource[:arch].nil? ? Facter.value(:architecture) : resource[:arch]
 		arch = case arch.to_s
-			#when "i386","i686" then "x86"
-			when "amd64","ia64","x86_64" then "x86_64"
+		#when "i386","i686" then "x86"
+		when "amd64","ia64","x86_64" then "x86_64"
 			else "x86"
 		end
-	
+
 		return resource[:os_template] + "-" + arch
 	end
-	
+
 	# Private method to download OpenVZ template if don't already exists
 	def download(url='http://download.openvz.org/template/precreated/')
 		template = ostemplate
 		file = @@vzcache + template + '.tar.gz'
-		if !File.file? file
+    if !File.file? file or File.zero? file
 			require 'open-uri'
 			debug "Downloading template '" + template + "' to directory: '" + @@vzcache + "'"
 			writeOut = open(file, "wb")
