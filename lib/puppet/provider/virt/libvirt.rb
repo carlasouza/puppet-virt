@@ -155,6 +155,16 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	end
 
+  #TODO the Libvirt biding for ruby doesnt support this feature :(
+  def interface
+    warnonce("It is not possible to change interfaces settings for an existing guest.")
+    resource[:interfaces]
+  end
+
+  def interfaces=(value)
+    warnonce("It is not possible to change interfaces settings for an existing guest.")
+  end
+
 	# Setup the virt-install graphic configuration arguments
 	def graphic
 
@@ -204,7 +214,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	end
 
-	#TODO
+	#FIXME
 	def purge
 		destroy
 	end
@@ -325,7 +335,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
 	# Not implemented by libvirt yet
 	def on_poweroff
-		#FIXME refactor
+		#TODO refactor
 		path = "/etc/libvirt/qemu/" #Debian/ubuntu path for qemu's xml files
 		extension = ".xml"
 		xml = path + resource[:name] + extension
