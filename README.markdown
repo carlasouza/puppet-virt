@@ -26,7 +26,7 @@ Example:
 
     virt { server:
       ensure     => 'running',
-      ctid       => 101,
+      id       => 101,
       os_template => 'ubuntu-10.10',
       virt_type  => 'openvz',
       autoboot   => 'false'
