@@ -1,4 +1,5 @@
 # virt_libvirt.rb
+require 'libvirt'
 
 Facter.add("virt_conn_type") do
   setcode do
