@@ -17,13 +17,26 @@ Facter.add("virt_libvirt") do
       require 'libvirt'
       true
     rescue LoadError
-      nil
+      false
+    end
+  end
+end
+
+Facter.add("virt_conn") do
+  confine :virt_libvirt => true
+  setcode do
+    begin
+      libvirt_connect
+      true
+    rescue Libvirt::Error
+      false
     end
   end
 end
 
 Facter.add("virt_conn_type") do
   confine :virt_libvirt => true
+  confine :virt_conn => true
   setcode do
     begin
       libvirt_connect.type.chomp
@@ -35,6 +48,7 @@ end
 
 Facter.add("virt_hypervisor_version") do
   confine :virt_libvirt => true
+  confine :virt_conn => true
   setcode do
     begin
       libvirt_connect.version.chomp
@@ -46,6 +60,7 @@ end
 
 Facter.add("virt_libvirt_version") do
   confine :virt_libvirt => true
+  confine :virt_conn => true
   setcode do
     begin
       libvirt_connect.libversion.chomp
@@ -57,6 +72,7 @@ end
 
 Facter.add("virt_hostname") do
   confine :virt_libvirt => true
+  confine :virt_conn => true
   setcode do
     begin
       libvirt_connect.hostname.chomp
@@ -68,6 +84,7 @@ end
 
 Facter.add("virt_uri") do
   confine :virt_libvirt => true
+  confine :virt_conn => true
   setcode do
     begin
       libvirt_connect.uri.chomp
@@ -79,6 +96,7 @@ end
 
 Facter.add("virt_max_vcpus") do
   confine :virt_libvirt => true
+  confine :virt_conn => true
   setcode do
     begin
       libvirt_connect.max_vcpus.chomp
@@ -90,6 +108,7 @@ end
 
 Facter.add("virt_domains_active") do
   confine :virt_libvirt => true
+  confine :virt_conn => true
   setcode do
     begin
       domains = []
@@ -106,6 +125,7 @@ end
 
 Facter.add("virt_domains_inactive") do
   confine :virt_libvirt => true
+  confine :virt_conn => true
   setcode do
     begin
       domains = []
@@ -122,6 +142,7 @@ end
 
 Facter.add("virt_networks_active") do
   confine :virt_libvirt => true
+  confine :virt_conn => true
   setcode do
     networks = []
     conn = libvirt_connect
@@ -134,6 +155,7 @@ end
 
 Facter.add("virt_networks_inactive") do
   confine :virt_libvirt => true
+  confine :virt_conn => true
   setcode do
     networks = []
     conn = libvirt_connect
@@ -146,6 +168,7 @@ end
 
 Facter.add("virt_nodes") do
   confine :virt_libvirt => true
+  confine :virt_conn => true
   setcode do
     nodes = []
     conn = libvirt_connect
@@ -158,6 +181,7 @@ end
 
 Facter.add("virt_nwfilters") do
   confine :virt_libvirt => true
+  confine :virt_conn => true
   setcode do
     nwfilters = []
     conn = libvirt_connect
@@ -170,6 +194,7 @@ end
 
 Facter.add("virt_secrets") do
   confine :virt_libvirt => true
+  confine :virt_conn => true
   setcode do
     secrets = []
     conn = libvirt_connect
@@ -182,6 +207,7 @@ end
 
 Facter.add("virt_storage_pools_active") do
   confine :virt_libvirt => true
+  confine :virt_conn => true
   setcode do
     pools = []
     conn = libvirt_connect
@@ -194,6 +220,7 @@ end
 
 Facter.add("virt_storage_pools_inactive") do
   confine :virt_libvirt => true
+  confine :virt_conn => true
   setcode do
     pools = []
     conn = libvirt_connect
