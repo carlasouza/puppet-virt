@@ -4,6 +4,7 @@ def libvirt_connect
   begin
     require 'libvirt'
     Libvirt::open('qemu:///system')
+  rescue NoMethodError
   rescue Libvirt::Error => e
     if e.libvirt_code == 3
       # do nothing
