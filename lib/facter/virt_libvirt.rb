@@ -144,12 +144,16 @@ Facter.add("virt_networks_active") do
   confine :virt_libvirt => true
   confine :virt_conn => true
   setcode do
-    networks = []
-    conn = libvirt_connect
-    conn.list_networks.each do |netname|
-      networks.concat(netname)
+    begin
+      networks = []
+      conn = libvirt_connect
+      conn.list_networks.each do |netname|
+        networks.concat(netname)
+      end
+      networks.join(',')
+    rescue Libvirt::Error
+      nil
     end
-    networks.join(',')
   end
 end
 
@@ -157,12 +161,16 @@ Facter.add("virt_networks_inactive") do
   confine :virt_libvirt => true
   confine :virt_conn => true
   setcode do
-    networks = []
-    conn = libvirt_connect
-    conn.list_defined_networks.each do |netname|
-      networks.concat(netname)
+    begin
+      networks = []
+      conn = libvirt_connect
+      conn.list_defined_networks.each do |netname|
+        networks.concat(netname)
+      end
+      networks.join(',')
+    rescue Libvirt::Error
+      nil
     end
-    networks.join(',')
   end
 end
 
@@ -170,12 +178,16 @@ Facter.add("virt_nodes") do
   confine :virt_libvirt => true
   confine :virt_conn => true
   setcode do
-    nodes = []
-    conn = libvirt_connect
-    conn.list_nodedevices.each do |nodename|
-      nodes.concat(nodename)
+    begin
+      nodes = []
+      conn = libvirt_connect
+      conn.list_nodedevices.each do |nodename|
+        nodes.concat(nodename)
+      end
+      nodes.join(',')
+    rescue Libvirt::Error
+      nil
     end
-    nodes.join(',')
   end
 end
 
@@ -183,12 +195,16 @@ Facter.add("virt_nwfilters") do
   confine :virt_libvirt => true
   confine :virt_conn => true
   setcode do
-    nwfilters = []
-    conn = libvirt_connect
-    conn.list_nwfilters.each do |filtername|
-      nwfilters.concat(filtername)
+    begin
+      nwfilters = []
+      conn = libvirt_connect
+      conn.list_nwfilters.each do |filtername|
+        nwfilters.concat(filtername)
+      end
+      nwfilters.join(',')
+    rescue Libvirt::Error
+      nil
     end
-    nwfilters.join(',')
   end
 end
 
@@ -196,12 +212,16 @@ Facter.add("virt_secrets") do
   confine :virt_libvirt => true
   confine :virt_conn => true
   setcode do
-    secrets = []
-    conn = libvirt_connect
-    conn.list_secrets.each do |secret|
-      secrets.concat(secret)
+    begin
+      secrets = []
+      conn = libvirt_connect
+      conn.list_secrets.each do |secret|
+        secrets.concat(secret)
+      end
+      secrets.join(',')
+    rescue Libvirt::Error
+      nil
     end
-    secrets.join(',')
   end
 end
 
@@ -209,12 +229,16 @@ Facter.add("virt_storage_pools_active") do
   confine :virt_libvirt => true
   confine :virt_conn => true
   setcode do
-    pools = []
-    conn = libvirt_connect
-    conn.list_storage_pools.each do |pool|
-      pools.concat(pool)
+    begin
+      pools = []
+      conn = libvirt_connect
+      conn.list_storage_pools.each do |pool|
+        pools.concat(pool)
+      end
+      pools.join(',')
+    rescue Libvirt::Error
+      nil
     end
-    pools.join(',')
   end
 end
 
@@ -222,11 +246,15 @@ Facter.add("virt_storage_pools_inactive") do
   confine :virt_libvirt => true
   confine :virt_conn => true
   setcode do
-    pools = []
-    conn = libvirt_connect
-    conn.list_defined_storage_pools.each do |pool|
-      pools.concat(pool)
+    begin
+      pools = []
+      conn = libvirt_connect
+      conn.list_defined_storage_pools.each do |pool|
+        pools.concat(pool)
+      end
+      pools.join(',')
+    rescue Libvirt::Error
+      nil
     end
-    pools.join(',')
   end
 end
