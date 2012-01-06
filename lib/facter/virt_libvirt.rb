@@ -5,12 +5,9 @@ def libvirt_connect
     require 'libvirt'
     Libvirt::open('qemu:///system')
   rescue NoMethodError
-  rescue Libvirt::Error => e
-    if e.libvirt_code == 3
-      # do nothing
-    else
-      raise
-    end
+    nil
+  rescue Libvirt::Error
+    nil
   end
 end
 
@@ -19,7 +16,7 @@ Facter.add("virt_libvirt") do
     begin
       require 'libvirt'
       true
-    rescue LoadError => e
+    rescue LoadError
       nil
     end
   end
@@ -28,7 +25,11 @@ end
 Facter.add("virt_conn_type") do
   confine :virt_libvirt => true
   setcode do
-    libvirt_connect.type.chomp
+    begin
+      libvirt_connect.type.chomp
+    rescue NoMethodError
+      nil
+    end
   end
 end
 
