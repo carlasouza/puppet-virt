@@ -13,50 +13,61 @@ def libvirt_connect
   end
 end
 
+Facter.add("virt_libvirt") do
+  setcode do
+    begin
+      require 'libvirt'
+      true
+    rescue LoadError => e
+      nil
+    end
+  end
+end
+
 Facter.add("virt_conn_type") do
-  confine :kernel => "Linux"
+  confine :virt_libvirt => true
   setcode do
     libvirt_connect.type.chomp
   end
 end
 
 Facter.add("virt_hypervisor_version") do
-  confine :kernel => "Linux"
+  confine :virt_libvirt => true
   setcode do
     libvirt_connect.version.chomp
   end
 end
 
 Facter.add("virt_libvirt_version") do
-  confine :kernel => "Linux"
+  confine :virt_libvirt => true
   setcode do
     libvirt_connect.libversion.chomp
   end
 end
 
 Facter.add("virt_hostname") do
-  confine :kernel => "Linux"
+  confine :virt_libvirt => true
   setcode do
     libvirt_connect.hostname.chomp
   end
 end
 
 Facter.add("virt_uri") do
-  confine :kernel => "Linux"
+  confine :virt_libvirt => true
   setcode do
     libvirt_connect.uri.chomp
   end
 end
 
 Facter.add("virt_max_vcpus") do
-  confine :kernel => "Linux"
+  confine :virt_libvirt => true
   setcode do
     libvirt_connect.max_vcpus.chomp
   end
 end
 
 Facter.add("virt_domains_active") do
-  confine :kernel => "Linux"
+  confine :virt_libvirt => true
   setcode do
     domains = []
     conn = libvirt_connect
@@ -68,7 +79,7 @@ Facter.add("virt_domains_active") do
 end
 
 Facter.add("virt_domains_inactive") do
-  confine :kernel => "Linux"
+  confine :virt_libvirt => true
   setcode do
     domains = []
     conn = libvirt_connect
@@ -80,7 +91,7 @@ Facter.add("virt_domains_inactive") do
 end
 
 Facter.add("virt_networks_active") do
-  confine :kernel => "Linux"
+  confine :virt_libvirt => true
   setcode do
     networks = []
     conn = libvirt_connect
@@ -92,7 +103,7 @@ Facter.add("virt_networks_active") do
 end
 
 Facter.add("virt_networks_inactive") do
-  confine :kernel => "Linux"
+  confine :virt_libvirt => true
   setcode do
     networks = []
     conn = libvirt_connect
@@ -104,7 +115,7 @@ Facter.add("virt_networks_inactive") do
 end
 
 Facter.add("virt_nodedevices") do
-  confine :kernel => "Linux"
+  confine :virt_libvirt => true
   setcode do
     nodedevices = []
     conn = libvirt_connect
