@@ -36,59 +36,87 @@ end
 Facter.add("virt_hypervisor_version") do
   confine :virt_libvirt => true
   setcode do
-    libvirt_connect.version.chomp
+    begin
+      libvirt_connect.version.chomp
+    rescue NoMethodError
+      nil
+    end
   end
 end
 
 Facter.add("virt_libvirt_version") do
   confine :virt_libvirt => true
   setcode do
-    libvirt_connect.libversion.chomp
+    begin
+      libvirt_connect.libversion.chomp
+    rescue NoMethodError
+      nil
+    end
   end
 end
 
 Facter.add("virt_hostname") do
   confine :virt_libvirt => true
   setcode do
-    libvirt_connect.hostname.chomp
+    begin
+      libvirt_connect.hostname.chomp
+    rescue NoMethodError
+      nil
+    end
   end
 end
 
 Facter.add("virt_uri") do
   confine :virt_libvirt => true
   setcode do
-    libvirt_connect.uri.chomp
+    begin
+      libvirt_connect.uri.chomp
+    rescue NoMethodError
+      nil
+    end
   end
 end
 
 Facter.add("virt_max_vcpus") do
   confine :virt_libvirt => true
   setcode do
-    libvirt_connect.max_vcpus.chomp
+    begin
+      libvirt_connect.max_vcpus.chomp
+    rescue NoMethodError
+      nil
+    end
   end
 end
 
 Facter.add("virt_domains_active") do
   confine :virt_libvirt => true
   setcode do
-    domains = []
-    conn = libvirt_connect
-    conn.list_domains.each do |domid|
-      domains.concat(conn.lookup_domain_by_id(domid).name)
+    begin
+      domains = []
+      conn = libvirt_connect
+      conn.list_domains.each do |domid|
+        domains.concat(conn.lookup_domain_by_id(domid).name)
+      end
+      domains.join(',')
+    rescue NoMethodError
+      nil
     end
-    domains.join(',')
   end
 end
 
 Facter.add("virt_domains_inactive") do
   confine :virt_libvirt => true
   setcode do
-    domains = []
-    conn = libvirt_connect
-    conn.list_defined_domains.each do |domname|
-      domains.concat(domname)
+    begin
+      domains = []
+      conn = libvirt_connect
+      conn.list_defined_domains.each do |domid|
+        domains.concat(conn.lookup_domain_by_id(domid).name)
+      end
+      domains.join(',')
+    rescue NoMethodError
+      nil
     end
-    domains.join(',')
   end
 end
 
