@@ -38,7 +38,7 @@ Facter.add("virt_hypervisor_version") do
   setcode do
     begin
       libvirt_connect.version.chomp
-    rescue NoMethodError
+    rescue Libvirt::Error
       nil
     end
   end
@@ -49,7 +49,7 @@ Facter.add("virt_libvirt_version") do
   setcode do
     begin
       libvirt_connect.libversion.chomp
-    rescue NoMethodError
+    rescue Libvirt::Error
       nil
     end
   end
@@ -60,7 +60,7 @@ Facter.add("virt_hostname") do
   setcode do
     begin
       libvirt_connect.hostname.chomp
-    rescue NoMethodError
+    rescue Libvirt::Error
       nil
     end
   end
@@ -71,7 +71,7 @@ Facter.add("virt_uri") do
   setcode do
     begin
       libvirt_connect.uri.chomp
-    rescue NoMethodError
+    rescue Libvirt::Error
       nil
     end
   end
@@ -82,7 +82,7 @@ Facter.add("virt_max_vcpus") do
   setcode do
     begin
       libvirt_connect.max_vcpus.chomp
-    rescue NoMethodError
+    rescue Libvirt::Error
       nil
     end
   end
@@ -98,7 +98,7 @@ Facter.add("virt_domains_active") do
         domains.concat(conn.lookup_domain_by_id(domid).name)
       end
       domains.join(',')
-    rescue NoMethodError
+    rescue Libvirt::Error
       nil
     end
   end
@@ -114,7 +114,7 @@ Facter.add("virt_domains_inactive") do
         domains.concat(conn.lookup_domain_by_id(domid).name)
       end
       domains.join(',')
-    rescue NoMethodError
+    rescue Libvirt::Error
       nil
     end
   end
