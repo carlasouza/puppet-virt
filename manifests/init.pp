@@ -9,6 +9,11 @@ class virt {
 		mode => 0644,
 		subscribe => Package[$virt::params::packages],
 	}
+	
+	service { $virt::params::service:
+		ensure => running,
+		enable => true,
+	}
 
   service { $servicename:
     ensure => 'running',

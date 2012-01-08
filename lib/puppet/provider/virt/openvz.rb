@@ -1,7 +1,7 @@
 #require 'facter/util/plist'
 Puppet::Type.type(:virt).provide(:openvz) do
 	desc "Manages OpenVZ guests."	# More information about OpenVZ at: openvz.org
-	
+
 	commands :vzctl  => "/usr/sbin/vzctl"
 	commands :vzlist => "/usr/sbin/vzlist"
 
@@ -13,7 +13,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		@@vzcache = "/var/lib/vz/template/cache/"
 		@@vzconf = "/etc/vz/conf/"
 	else
-		fail "Sorry, this provider is not supported for your Operation System, yet :)"
+		raise Puppet::Error, "Sorry, this provider is not supported for your Operation System, yet :)"
 	end
 
 	# Returns all host's guests
@@ -39,8 +39,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		when "amd64","ia64","x86_64" then "x86_64"
 			else "x86"
 		end
-
-		return resource[:os_template] + "-" + arch
+		return resource[:os_template]
 	end
 
 	# Private method to download OpenVZ template if don't already exists
@@ -49,13 +48,13 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		file = @@vzcache + template + '.tar.gz'
     if !File.file? file or File.zero? file
 			require 'open-uri'
-			debug "Downloading template '" + template + "' to directory: '" + @@vzcache + "'"
+			Puppet.info "Downloading #{url}#{template}.tar.gz"
 			writeOut = open(file, "wb")
 			writeOut.write(open(url + '/' + template + '.tar.gz').read)
 			writeOut.close
 		end
 	end
-	
+
 	# If CTID not specified, it will assign the first possible value
 	# Note that CT ID <= 100 are reserved for OpenVZ internal purposes.
 	def ctid
@@ -69,15 +68,13 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		if id
 			return id
 		else
-			fail "CTID not specified"
+			raise Puppet::Error, "CTID not specified"
 		end
 	end
-	
+
 	def install
-		if resource[:os_template].nil?
-			fail "Paramenter 'os_template' is required."
-		end
-		
+    raise Puppet::Error, "Paramenter 'os_template' is required." if resource[:os_template].nil?
+
 		if resource[:tmpl_repo]
 			download(resource[:tmpl_repo])
 		end
@@ -86,7 +83,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		if priv = resource[:ve_private]
 			args << '--private' << priv
 		end
-	
+
 		if root = resource[:ve_root]
 			args << '--root' << root
 		end
@@ -106,45 +103,45 @@ Puppet::Type.type(:virt).provide(:openvz) do
 
 		args << '--name' << resource[:name]
 		vzctl args
-	
-                resource.properties.each do |prop| 
-                        if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure' 
+
+                resource.properties.each do |prop|
+                        if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
                                 eval "self.#{prop.to_s}=prop.should"
-                        end 
-                end 
-	
+                        end
+                end
+
 	end
 
 	def setpresent
 		install
 	end
-	
+
 	def destroy
 		if status == :running
 			vzctl('stop', ctid)
 		end
 		vzctl('destroy', ctid)
 	end
-	
+
 	def purge
 		destroy
 	#	File.unlink("#{@@vzconf}/#{ctid}.conf.destroyed")
 	end
-	
+
 	def stop
 		if !exists?
 			install
 		end
 		vzctl('stop', ctid)
 	end
-	
+
 	def start
 		if !exists?
 			install
 		end
 		vzctl('start', ctid)
 	end
-	
+
 	def exists?
 		stat = vzctl('status', ctid).split(" ")
 		if stat.nil? || stat[2] == "deleted"
@@ -153,7 +150,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 			return true
 		end
 	end
-	
+
 	# OpenVZ guests status: exist, deleted, mouted, umounted, running, down
 	# running | stopped | absent
 	def status
@@ -166,7 +163,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 				return :running
 			elsif stat[4] == "down"
 				return :stopped
-			else 
+			else
 				return :absent
 			end
 		else
@@ -186,17 +183,17 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	end
 
 	SET_PARAMS = ["name", "capability", "applyconfig", "applyconfig_map", "iptables", "features", "searchdomain", "hostname", "disabled", "setmode", "cpuunits", "cpulimit", "quotatime", "quotaugidlimit", "ioprio", "cpus", "diskspace", "diskinodes", "devices", "devnodes"]
-	
+
 	SET_PARAMS.each do |arg|
 		define_method(arg.to_s.downcase) do
 			get_value(arg)
 		end
-	
+
 		define_method("#{arg}=".downcase) do |value|
 			vzctl('set', ctid, "--#{arg}", value, "--save")
 		end
 	end
-	
+
 	# private method
 	def get_value(arg)
 		debug "Getting parameter #{arg} value"
@@ -205,7 +202,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		result = value.size == 0 ? '' : value[0].split('"')[1].downcase
 		return result
 	end
-	
+
 	private
 	def apply(paramname, value)
 		args = ['set', ctid]
@@ -220,7 +217,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 
 		results = []
 		resource[:resources_parameters].flatten.each do |value|
-			
+
 			tmp = open(conf).grep(/^#{value.split("=")[0].upcase}/)[0].delete! "\""
 			tmp.delete! "\n"
 			results << tmp
@@ -253,7 +250,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		define_method(name.to_s.downcase) do
 			return get_value(arg) == "yes" ? :true : :false
 		end
-	
+
 		define_method("#{name}=".downcase) do |value|
 			result = value == :true ? 'yes' : 'no'
 			vzctl('set', ctid, '--'+ arg, result, '--save')
@@ -265,7 +262,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		define_method(arg.to_s.downcase) do
 			get_value(arg).split
 		end
-	
+
 		define_method("#{arg}=".downcase) do |value|
 			apply(arg, value)
 		end
@@ -316,5 +313,5 @@ Puppet::Type.type(:virt).provide(:openvz) do
 		vzctl args, '--save'
 	end
 
-	
+
 end

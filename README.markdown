@@ -451,19 +451,22 @@ WARNING: setting some of those capabilities may have far reaching security impli
 
 ##### resources_parameters
 
-Requires one or two arguments. In case of one argument, vzctl sets barrier and limit to the same value. In case of two colon-separated arguments, the first is a barrier, and the second is a limit. Each argument is either a number, a number with a suffix, or the special value `unlimited`. UBC parameters description can be found at: http://wiki.openvz.org/UBC_parameters_table.
+Requires one or two arguments. In case of one argument, vzctl sets barrier and limit to the same value. In case of two colon-separated arguments, the first is a barrier, and the second is a limit. Each argument is either a number, a number with a suffix, or the special value `unlimited`. UBC parameters description can be found at: `http://wiki.openvz.org/UBC_parameters_table`.
 
 Valid values are: `vmguarpages`, `physpages`, `oomguarpages`, `lockedpages`, `privvmpages`, `shmpages`, `numproc`, `numtcpsock`, `numothersock`, `numfile`, `numflock`, `numpty`, `numsiginfo`, `dcachesize`, `numiptent`, `kmemsize`, `tcpsndbuf`, `tcprcvbuf`, `othersockbuf`, `dgramrcvbuf`.
 
 Requires features `resources_management`.
 
+
 ## Future Work
 
 For now, some parameters will have a few values acceptable:
 
+  * Add to Facter facts about host's OpenVZ information;
+  * Implement VServer provider;
   * `virt_path` will accept only existing .img, .qcow and .qcow2 files;
-  * Input devices specification like mouse will not be supported for now.
-  * The parameters `on_poweroff`; `on_reboot` and `on_crash` are not changeable. They will be used only to create a new domain using Libvirt provider (not for import existing domain's image, because libvirt does not support modify those values)
+  * Input devices specification like mouse will not be supported for now;
+  * The parameters `on_poweroff`, `on_reboot` and `on_crash` for libvirt provider are not changeable. They will be used only to create a new domain using Libvirt provider (not for import existing domain's image, because libvirt does not support modify those values).
 
 ## License
 
