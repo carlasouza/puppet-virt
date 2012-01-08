@@ -452,6 +452,8 @@ Valid values are: `vmguarpages`, `physpages`, `oomguarpages`, `lockedpages`, `pr
 
 Requires features `resources_management`.
 
+----------------
+
 
 ## Future Work
 
