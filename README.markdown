@@ -6,8 +6,8 @@ Puppet Module to manage virtual machines. Provides a the type: `virt`.
 
 ### virt
 
-Manage virtual environments. Xen [1], KVM [2], and OpenVZ [3] hypervisors are supported, which of the first three uses libvirt [4] as provider.
-This module is the result of my work at GSoC 2010. I thank Reliant Security [5] for funding the OpenVZ provider development.
+Manage virtual environments. [Xen] [1], [KVM] [2], and [OpenVZ] [3] hypervisors are supported, which of the first three uses [libvirt] [4] as provider.
+This module is the result of my work at GSoC 2010. I thank [Reliant Security] [5] for funding the OpenVZ provider development.
 
 [1] Xen® Hypervisor - xen.org
 
