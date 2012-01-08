@@ -20,22 +20,22 @@ This module is the result of my work at GSoC 2010. I thank [Reliant Security] [5
 Example:
 
     virt { server:
-      ensure     => 'running',
-      id       => 101,
+      ensure      => 'running',
+      id          => 101,
       os_template => 'ubuntu-10.10',
-      virt_type  => 'openvz',
-      autoboot   => 'false'
+      virt_type   => 'openvz',
+      autoboot    => 'false'
     }
 
 Note that some values can be specified as an array of values:
 
     virt { server:
-      ensure => 'installed',
-      memory => 512,
+      ensure      => 'installed',
+      memory      => 512,
       os_template => 'ubuntu-10.10-x86_64',
-      virt_type => 'openvz',
-      autoboot => true,
-      interfaces => [ "eth0a", "eth1a"]
+      virt_type   => 'openvz',
+      autoboot    => true,
+      interfaces  => [ "eth0", "eth1"]
     }
 
 #### Features
