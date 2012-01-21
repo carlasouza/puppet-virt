@@ -10,6 +10,7 @@ class virt::xen::xen0::debian inherits virt::xen::xen0::base {
     name => $archtiecture ? {
       x86_64 => "linux-image-xen-amd64",
       default => "linux-image-xen-${architecture}",
+    }
   }
 
   Package['xen']{
