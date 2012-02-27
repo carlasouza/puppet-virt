@@ -240,9 +240,11 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	end
 
 	def memory=(value)
-		vzctl('set', ctid, "--vmguarpages", value.to_s + "M", "--save")
-		vzctl('set', ctid, "--oomguarpages", value.to_s + "M", "--save")
-		vzctl('set', ctid, "--privvmpages", value.to_s + "M", "--save")
+    unless resource[:configfile] == "unlimited"
+      vzctl('set', ctid, "--vmguarpages", value.to_s + "M", "--save")
+      vzctl('set', ctid, "--oomguarpages", value.to_s + "M", "--save")
+      vzctl('set', ctid, "--privvmpages", value.to_s + "M", "--save")
+    end
 	end
 
 	["autoboot", "noatime"].each do |name|
