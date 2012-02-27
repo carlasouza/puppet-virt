@@ -35,7 +35,7 @@ Note that some values can be specified as an array of values:
       os_template => 'ubuntu-10.10-x86_64',
       virt_type   => 'openvz',
       autoboot    => true,
-      interfaces  => [ "eth0", "eth1"]
+      interfaces  => ["eth0", "eth1"]
     }
 
 #### Features
@@ -84,7 +84,7 @@ storage_path         |         |  *X*   |
 
 A description of the virutal machine. Generally is what services it provides.
 
-##### name 
+##### name
 
 - **namevar**
 The guest's name.
@@ -93,7 +93,7 @@ The guest's name.
 
 The guest's hostname. It not specified, `name` will be used as VE's hostname.
 
-##### id 
+##### id
 
 OpenVZ CT ID. It must be an integer greater then 100. CT ID <= 100 are reserved for OpenVZ internal purposes. If not specified, the provider will automatically generate it with the first valid value.
 
@@ -103,11 +103,11 @@ Valid values are `running`, `stopped`, `installed`, `absent`.
 
 ##### os_type
 
-Optimize the guest configuration for a type of operating system (ex. 'linux', 'windows') for libvirt provider. It is used during the guest creation.
+Optimize the guest configuration for a type of operating system (ex. `linux`, `windows`) for libvirt provider. It is used during the guest creation.
 
 ##### os_template
 
-Further optimize the guest configuration for a specific operating system variant (ex. 'fedora8', 'winxp'). This parameter is optional for libvirt provider and mandatory for openvz provider.
+Further optimize the guest configuration for a specific operating system variant (ex. `fedora8`, `winxp`). This parameter is optional for libvirt provider and mandatory for openvz provider.
 
 Available values for libvirt are:
 
@@ -161,7 +161,7 @@ Available values for libvirt are:
 
 For OpenVZ provider, available values are:
 
-* `centos-4`: CentOS 4 
+* `centos-4`: CentOS 4
 * `centos-5`: CentOS 5
 * `debian-5.0`: Debian Lenny
 * `debian-6.0`: Debian Squeeze
@@ -204,23 +204,23 @@ This is the path to a predefined xml config file, to be used with the import fun
 
 ##### ve_root
 
-Sets the path to the mount point for the container root directory (default is VE_ROOT specified in vz.conf(5) file). Argument can contain literal string $VEID, which will be substituted with the numeric CT ID.
+Sets the path to the mount point for the container root directory (default `VE_ROOT` is specified at `vz.conf` file). Argument can contain literal string `$VEID`, which will be substituted with the numeric CT ID.
 
 Requires features `storage_path`.
 
 ##### ve_private
 
-Set the path to directory in which all the files and directories specific to this very container are stored (default is VE_PRIVATE specified in vz.conf(5) file). Argument can contain literal string $VEID, which will be substituted with the numeric CT ID.
+Set the path to directory in which all the files and directories specific to this very container are stored (default `VE_PRIVATE` is specified at `vz.conf` file). Argument can contain literal string `$VEID`, which will be substituted with the numeric CT ID.
 
 Requires features `storage_path`.
 
 ##### configfile
 
-If specified, values from example configuration file /etc/vz/conf/ve-<VALUE>.conf-sample are put into the container configuration file. If this container configuration file already exists, it will be removed.
+If specified, values from example configuration file `/etc/vz/conf/ve-<VALUE>.conf-sample` are put into the container configuration file. If this container configuration file already exists, it will be removed.
 
 Requires features `initial_config`.
 
-##### user 
+##### user
 
 User name and password. It is generally a good idea to keep to the degenerate 8 characters, beginning with a letter.
 
@@ -230,7 +230,7 @@ Requires features `manages_users`.
 
 For OpenVZ guests, must use the format: "user:password"
 
-##### ipaddr 
+##### ipaddr
 
 IP address(es) of the guest. Multiple IP addresses should be specified as an array.
 
@@ -244,7 +244,7 @@ Connect the guest network to the host using the specified network as a bridge. T
  * 'ifname' is the ethernet device name in the guest;
  * 'mac' is its MAC address;
  * 'host_ifname' is the ethernet device name on the host;
- * 'host_mac' is its MAC address. MAC addresses should be in the format like XX:XX:XX:XX:XX:XX.
+ * 'host_mac' is its MAC address. MAC addresses should be in the format like `XX:XX:XX:XX:XX:XX`.
 
 Bridge is an optional parameter which can be used in custom network start scripts to automatically add the interface to a bridge. All parameters except ifname are optional and are automatically generated if not specified.
 
@@ -252,18 +252,18 @@ If the specified interfaces does not exist, it will be ignored and raises a warn
 
 ##### macaddrs
 
-Fixed MAC address for the guest; 
+Fixed MAC address for the guest;
 If this parameter is omitted, or the value \"RANDOM\" is specified a suitable address will be randomly generated.
 
 For Xen virtual machines it is required that the first 3 pairs in the MAC address be the sequence '00:16:3e', while for QEMU or KVM virtual machines it must be '54:52:00'.
 For OpenVZ virtual machine, the interface must exists previously.
 
-##### network_cards 
+##### network_cards
 
 Moves network device from the host system to a specified OpenVZ guest. Multiple network cards should be specified as an array.
 Requires features `manages_devices`.
 
-##### nameserver 
+##### nameserver
 
 DNS name server(s). Multiple name servers should be specified as an array.
 
@@ -271,7 +271,7 @@ DNS name server(s). Multiple name servers should be specified as an array.
 
 DNS search domain name(s).
 
-##### iptables 
+##### iptables
 
 Requires features iptables.
 
@@ -284,24 +284,24 @@ If not specified for OpenVZ guests, it will assume the same archtecture from hos
 
 The maximum amount of memory allocation for the guest domain.
 
-##### cpus 
+##### cpus
 
 Number of virtual CPUs active in the guest domain.
 
-##### cpuunits 
+##### cpuunits
 
 CPU weight for a guest. Argument is positive non-zero number, passed to and used in the kernel fair scheduler.
 The larger the number is, the more CPU time this guest gets. Maximum value is 500000, minimal is 8. Number is relative to weights of all the other running guests. If cpuunits are not specified, default value of 1000 is used.
 Requires features `cpu_fair`.
 
-##### cpulimit 
+##### cpulimit
 
 Limit of CPU usage for the guest, in per cent. Note if the computer has 2 CPUs, it has total of 200% CPU time. Default CPU limit is 0 (no CPU limit).
 Requires features `cpu_fair`.
 
-##### ioprio 
+##### ioprio
 
-Assigns  I/O priority to guest. Priority range is 0-7. The greater priority is, the more time for I/O activity guest has. By default each guest has priority of 4.
+Assigns I/O priority to guest. Priority range is 0-7. The greater priority is, the more time for I/O activity guest has. By default each guest has priority of 4.
 Requires features `cpu_fair`.
 
 ##### graphics
@@ -317,7 +317,7 @@ Requires features `graphics`.
 ##### clocksync
 
 The guest clock synchronization can assume three possible values, allowing fine grained control over how the guest clock is synchronized to the host. NB, not all hypervisors support all modes.
-Available values:       
+Available values:
 
 * `utc`: The guest clock will always be synchronized to UTC when booted
 * `localtime`: The guest clock will be synchronized to the host's configured timezone when booted, if any.
@@ -357,45 +357,45 @@ Path to disk image file. This field is mandatory for Xen and KVM guests. NB: Ini
 
 ##### private
 
-Whether specified to set the path to directory in which all the files and directories specific to this very guest are stored (default is VE_PRIVATE specified in vz.conf(5) file). Argument can contain string $VEID, which will be substituted with the numeric CT ID.
+Whether specified to set the path to directory in which all the files and directories specific to this very guest are stored (default `VE_PRIVATE` is specified in `vz.conf` file). Argument can contain string `$VEID`, which will be substituted with the numeric CT ID.
 
-##### disk_size 
+##### disk_size
 
 Size (in GB) to use if creating new guest storage. Not changeable.
 
-##### quotatime 
+##### quotatime
 
 Sets soft overusage time limit for disk quota (also known as grace period).
 Requires features `disk_quota`.
 
-##### quotaugidlimit 
+##### quotaugidlimit
 
 Sets maximum number of user/group IDs in a guest for which disk quota inside the guest will be accounted. If this value is set to 0, user and group quotas inside the guest will not be accounted.
 
 Note that if you have previously set value of this parameter to 0, changing it while the guest is running will not take effect.
 Requires features `disk_quota`.
 
-##### diskinodes 
+##### diskinodes
 
 Sets soft and hard disk quotas, in i-nodes. Must follow the format: `N:N` where first parameter is soft quota, second is hard quota.
 Requires features `disk_quota`.
 
-##### diskspace 
+##### diskspace
 
 Sets soft and hard disk quotas, in blocks. Must follow the format: `N:N` where first parameter is soft quota, second is hard quota. One block is currently equal to 1Kb. Also suffixes G, M, K can be specified.
 Requires features `disk_quota`.
 
-##### devices 
+##### devices
 
-Give the container an access (r - read only, w - write only, rw - read/write, none - no access) to:
+Give the container an access (`r` - read only, `w` - write only, `rw` - read/write, `none` - no access) to:
 
-* a device designated by the special file /dev/device. Device file is created in a container by vzctl. 
- * Use format: device:r|w|rw|none
-* a block or character device designated by its major and minor numbers. Device file have to be created manually. 
- * Use format: b|c:major:minor|all:[r|w|rw|none]
+* a device designated by the special file `/dev/device`. Device file is created in a container by vzctl.
+ * Use format: `device:r|w|rw|none`
+* a block or character device designated by its major and minor numbers. Device file have to be created manually.
+ * Use format: `b|c:major:minor|all:[r|w|rw|none]`
 Requires features `manages_devices`.
 
-##### pxe 
+##### pxe
 
 Use the PXE boot protocol to load the initial ramdisk and kernel for starting the guest installation process. Valid values are `true`, `false`. Requires features `pxe`.
 
@@ -423,26 +423,26 @@ Requires features `manages_behaviour`.
 
 Determines if the guest should start when the host starts. Valid values are `true`, `false`.
 
-##### disabled 
+##### disabled
 
 Disable guest star. Valid values are `true`, `false`. Requires features `disabled`.
 
-##### noatime 
+##### noatime
 
 Sets noatime flag (do not update inode access times) on file system. Valid values are `true`, `false`. Requires features `manages_resources`.
 
-##### features 
+##### features
 
 Enable or disable a specific guest feature.  Known features are: `sysfs`, `nfs`, `sit`, `ipip`. Requires features `manages_features`.
 
-##### capability 
+##### capability
 
 Sets a capability for a guest. Note that setting capability when the guest is running does not take immediate effect; restart the guest in order for the changes to take effect. Note a guest has default set of capabilities, thus any operation on capabilities is 'logical and' with the default capability mask.
 
 You can use the following values for capname: `chown`, `dac_override`, `dac_read_search`, `fowner`, `fsetid`, `kill`, `setgid`, `setuid`, `setpcap`, `linux_immutable`, `net_bind_service`, `net_broadcast`, `net_admin`, `net_raw`, `ipc_lock`, `ipc_owner`, `sys_module`, `sys_rawio`, `sys_chroot`, `sys_ptrace`, `sys_pacct`, `sys_admin`, `sys_boot`, `sys_nice`, `sys_resource`, `sys_time`, `sys_tty_config`, `mknod`, `lease`, `setveid`, `ve_admin`.
 
 Requires features `manages_capabilities`.
-WARNING: setting some of those capabilities may have far reaching security implications, so do not do it unless you know what you are doing. Also note that setting setpcap:on for a guest will most probably lead to inability to start it.
+WARNING: setting some of those capabilities may have far reaching security implications, so do not do it unless you know what you are doing. Also note that setting `setpcap` to `on` for a guest will most probably lead to inability to start it.
 
 ##### resources_parameters
 
