@@ -1,5 +1,5 @@
 class virt::openvz {
-  case $virtual {
+  case $::virtual {
     openvzhn: { include virt::openvz::hn }
   }
 }

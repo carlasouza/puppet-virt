@@ -21,7 +21,7 @@ class virt::xen::xen0::base {
   }
   # only ensure xendomains running if we have more
   # than one domain running
-  if $virtual_guests_count and $virtual_guests_count > 0 {
+  if $::virtual_guests_count and $::virtual_guests_count > 0 {
     Service['xendomains']{
       ensure => running,
     }
@@ -31,12 +31,12 @@ class virt::xen::xen0::base {
   }
 
   file{'/etc/xen/xend-config.sxp':
-    source => [ "puppet:///modules/site-virt/xen/${fqdn}/config/xend-config.sxp",
-                "puppet:///modules/site-virt/xen/config/${domain}/xend-config.sxp",
-                "puppet:///modules/site-virt/xen/config/${operatingsystem}.${lsbdistcodename}/xend-config.sxp",
-                "puppet:///modules/site-virt/xen/config/${operatingsystem}/xend-config.sxp",
-                "puppet:///modules/site-virt/xen/config/xend-config.sxp",
-                "puppet:///modules/virt/xen/config/${operatingsystem}/xend-config.sxp",
+    source => [ "puppet:///modules/site_virt/xen/${::fqdn}/config/xend-config.sxp",
+                "puppet:///modules/site_virt/xen/config/${::domain}/xend-config.sxp",
+                "puppet:///modules/site_virt/xen/config/${::operatingsystem}.${::lsbdistcodename}/xend-config.sxp",
+                "puppet:///modules/site_virt/xen/config/${::operatingsystem}/xend-config.sxp",
+                "puppet:///modules/site_virt/xen/config/xend-config.sxp",
+                "puppet:///modules/virt/xen/config/${::operatingsystem}/xend-config.sxp",
                 "puppet:///modules/virt/xen/config/xend-config.sxp" ],
     notify => Service['xend'],
     owner => root, group => 0, mode => 0644;
