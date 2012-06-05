@@ -9,7 +9,7 @@ class virt::xen::xen0::debian inherits virt::xen::xen0::base {
   Package['kernel-xen']{
     name => $::architecture ? {
       x86_64 => "linux-image-xen-amd64",
-      default => "linux-image-xen-${architecture}",
+      default => "linux-image-xen-${::architecture}",
     }
   }
 
