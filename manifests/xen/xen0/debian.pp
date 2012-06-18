@@ -33,10 +33,11 @@ class virt::xen::xen0::debian inherits virt::xen::xen0::base {
         source => "puppet:///modules/virt/xen/${::operatingsystem}/default/xendomains",
   }
 
-  config_file {
+  file {
     "/etc/ld.so.conf.d/nosegneg.conf":
       ensure => $xen_ensure,
       content => "hwcap 0 nosegneg\n",
+      owner => root, group => 0, mode => 0644;
     }
 }
 
