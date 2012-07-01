@@ -1,0 +1,68 @@
+#!/usr/bin/env ruby
+
+require 'facter'
+class GuestStarter
+  def self.factory
+    if Facter[:virtual].value == 'xen0'
+      XenGuestStarter.new
+    else
+      raise "No such virtual type supported so far!"
+    end 
+  end
+
+  def guests
+    @guests ||= get_guests
+  end
+
+  def started_guests
+    @started_guests ||= `virsh list | egrep -v '(^.*Id.*Name.*State$|^-*$|Domain-0|^$)' | awk '{ print $2 }'`.split("\n")
+  end
+
+  def start_missing_guests
+    ret = 0
+    guests.keys.reject{ |name| started_guests.include?(name) }.each do |guest|
+      if (missing_disks=guests[guest][:disks].reject{|disk| File.exists?(disk) }).empty?
+        start_guest(guest)
+      else
+        ret += 1
+        puts "Guest #{guest} can't yet be started as the following disks are missing: #{missing_disks.join(',')}"
+      end
+    end
+    ret
+  end 
+
+  def start_guest(guest)
+    puts "Starting guest #{guest}"
+    system start_guest_cmd(guest)
+  end
+
+  def get_guests
+    raise "Implement method!"
+  end
+  def start_guest_cmd(guest)
+    raise "Implement method!"
+  end
+end
+
+class XenGuestStarter < GuestStarter
+  def get_guests
+    guests = {}
+    (Dir['/etc/xen/auto/*'] | Dir['/etc/xen/*.sxp']).each do |file|
+      next if File.basename(file) =~ /^xend\-.*.sxp$/
+      content = File.read(file).split("\n").select{|l| l =~ /^.*(name|disk).*=.*$/ }.join("\n")
+      name = disk = nil
+      eval content
+      guests[name] = {
+        :file => file,
+        :disks => disk.collect{|d| d.split(':',2).last.split(',').first }
+      }
+    end
+    guests
+  end
+
+  def start_guest_cmd(guest)
+    "xm create #{guests[guest][:file]}" 
+  end
+end
+
+exit GuestStarter.factory.start_missing_guests

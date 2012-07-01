@@ -1,0 +1,11 @@
+# NB. changing these requires a reboot.
+# A simple 'xend restart' will not take effect
+
+# Log all hypervisor messages (cf xm dmesg)
+#XENCONSOLED_LOG_HYPERVISOR=no
+
+# Log all guest console output (cf xm console)
+#XENCONSOLED_LOG_GUESTS=no
+
+# Location to store guest & hypervisor logs
+#XENCONSOLED_LOG_DIR=/var/log/xen/console

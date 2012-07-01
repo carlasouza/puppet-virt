@@ -50,6 +50,15 @@ module Puppet
 		feature :storage_path,
 			"Sets the path to storage VE files"
 
+		feature :buildable, "The provider can build a new guest from scratch",
+			:methods => [:build]
+		
+		feature :importable, "The provider can import and existing guest image",
+			:methods => [:import]
+
+		feature :livemigratable, "The provider supports live migration",
+			:methods => [:migrate]
+
 		# A base class for numeric Virt parameters validation.
 		class VirtNumericParam < Puppet::Property
 
@@ -102,21 +111,20 @@ module Puppet
 		Creates config file, and makes sure the domain is not running.
 	`absent`:
 		Removes config file, and makes sure the domain is not running.
-	`purged`:
-		Purge all files related."
-			newvalue(:stopped) do
+		
+			newvalues(:stopped) do
 				provider.stop
 			end
-
-			newvalue(:running) do
+	
+			newvalues(:running) do
 				provider.start
 			end
 
-			newvalue(:installed) do
-				provider.setpresent
+			newvalues(:installed) do
+				provider.setinstalled
 			end
 
-			newvalue(:absent) do
+			newvalues(:absent) do
 				provider.destroy
 			end
 
