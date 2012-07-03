@@ -45,10 +45,16 @@ module Puppet
 			"Support parameters for the guest boot."
 
 		feature :initial_config,
-			"Config file with default values for VE creation"
+			"Config file with default values for VE or LXC creation"
 
 		feature :storage_path,
 			"Sets the path to storage VE files"
+
+		feature :cloneable,
+			"Linux container template name"
+
+		feature :backingstore,
+			"'backingstore' is one of 'none', 'lvm', or 'btrfs"
 
 		# A base class for numeric Virt parameters validation.
 		class VirtNumericParam < Puppet::Property
@@ -124,6 +130,10 @@ module Puppet
 				provider.purge
 			end
 
+			newvalue(:freeze) do
+				provider.freeze
+			end
+
 			defaultto(:running)
 
 			def retrieve
@@ -172,8 +182,9 @@ module Puppet
 		newparam(:configfile, :required_features => :initial_config) do
 			desc "If specified, values from example configuration file /etc/vz/conf/ve-<VALUE>.conf-sample are put into the container configuration file. If this container configuration file already exists, it will be removed."
 
+      # FIXME: VZ validation interferes with lxc configfiles
 			validate do |file|
-				unless File.file? "/etc/vz/conf/ve-#{file}.conf-sample"
+				unless File.file? "#{file}" #"/etc/vz/conf/ve-#{file}.conf-sample"
 					raise ArgumentError, "Config file \"#{file}\" does not exist."
 				end
 			end
@@ -286,6 +297,27 @@ module Puppet
 
 
 		# Installation method
+
+    newparam(:backingstore, :requires_feature => :backingstore) do
+      desc 'backingstore is one of none, lvm, or btrfs'
+      newvalues(:none, :lvm, :btrfs)
+    end
+
+    newparam(:clone, :requires_feature => :cloneable) do
+      desc 'Name of container to clone'
+    end
+
+    newparam(:snapshot, :requires_feature => :cloneable) do
+      desc 'make the new rootfs a snapshot of the original'
+      newvalues(:true)
+      newvalues(:false)
+
+      munge do |value|
+        @resource.munge_boolean(value)
+      end
+
+      defaultto(:false)
+    end
 
 		# URL repository to download OpenVZ Templates
 		newparam(:tmpl_repo) do
