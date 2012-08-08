@@ -375,8 +375,19 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
     #
     def on_reboot
-        # Not implemented by libvirt yet
-        resource[:on_reboot]
+        path = "/etc/libvirt/qemu/" #Debian/ubuntu/el path for qemu's xml files
+        extension = ".xml"
+        xml = path + resource[:name] + extension
+
+        if File.exists?(xml)
+            arguments =  ["on_reboot", xml]
+            line = ""
+            debug "Line: %s" % [line]
+            line = grep arguments
+            return line.split('>')[1].split('<')[0] 
+        else
+            return :absent
+        end
     end
 
     #
@@ -386,13 +397,23 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
     #
     def on_crash
-        # Not implemented by libvirt yet
-        resource[:on_crash]
+        path = "/etc/libvirt/qemu/" #Debian/ubuntu/el path for qemu's xml files
+        extension = ".xml"
+        xml = path + resource[:name] + extension
+
+        if File.exists?(xml)
+            arguments =  ["on_crash", xml]
+            line = ""
+            debug "Line: %s" % [line]
+            line = grep arguments
+            return line.split('>')[1].split('<')[0] 
+        else
+            return :absent
+        end
     end
 
     #
     def on_crash=(value)
         # Not implemented by libvirt yet
     end
-
 end
