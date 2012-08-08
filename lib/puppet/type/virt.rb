@@ -104,32 +104,31 @@ module Puppet
                 Removes config file, and makes sure the domain is not running.
         `purged`:
                 Purge all files related."
-                newvalue(:stopped) do
-                    provider.stop
-                end
+            newvalue(:stopped) do
+                provider.stop
+            end
 
-                newvalue(:running) do
-                    provider.start
-                end
+            newvalue(:running) do
+                provider.start
+            end
 
-                newvalue(:installed) do
-                    provider.setpresent
-                end
+            newvalue(:installed) do
+                provider.setpresent
+            end
 
-                newvalue(:absent) do
-                    provider.destroy
-                end
+            newvalue(:absent) do
+                provider.destroy
+            end
 
-                newvalue(:purged) do
-                    provider.purge
-                end
+            newvalue(:purged) do
+                provider.purge
+            end
 
-                defaultto(:running)
+            defaultto(:running)
 
-                def retrieve
-                    provider.status
-                end
-
+            def retrieve
+                provider.status
+            end
         end
 
         newparam(:desc) do
@@ -257,8 +256,8 @@ module Puppet
         `disable`:
                 No graphical console will be allocated for the guest."
 
-                newvalues(:enable,:disable,/^vnc:[0-9]+$/)
-                defaultto(:enable)
+            newvalues(:enable,:disable,/^vnc:[0-9]+$/)
+            defaultto(:enable)
 
         end
 
@@ -281,7 +280,7 @@ module Puppet
                 The guest clock will have an arbitrary offset applied relative to UTC. The delta relative to UTC is specified in seconds, using the adjustment attribute. The guest is free to adjust the RTC over time an expect that it will be honoured at next reboot. This is in contrast to 'utc' mode, where the RTC adjustments are lost at each reboot.
                 NB, at time of writing, only QEMU supports the variable clock mode, or custom timezones."
 
-                newvalues("UTC", "localtime", "timezone", "variable")
+            newvalues("UTC", "localtime", "timezone", "variable")
         end
 
 
@@ -324,25 +323,23 @@ module Puppet
 
         newparam(:virt_path) do
             desc "Path to disk image file. This field is mandatory. NB: Initially only import existing disk is available.
-Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
+Image files must end with `*.img`, `*.qcow`, `*.qcow2`, or `*.raw`"
+            isrequired #FIXME Bug #4049
 
-isrequired #FIXME Bug #4049
+            # Value must end with .img or .qcow, .qcow2, or .raw
+            validate do |value|
+                case value
+                    when String
+                        if (value =~ /.(img|raw|qcow|qcow2)$/).nil?
+                            self.fail "%s is not a valid %s" % [value, self.class.name]
+                        end
+                    end
+                return value
+            end
 
-# Value must end with .img or .qcow or .qcow2
-validate do |value|
-    case value
-    when String
-        if (value =~ /.(img|qcow|qcow2)$/).nil?
-            self.fail "%s is not a valid %s" % [value, self.class.name]
-        end
-    end
-    return value
-end
-
-munge do |value|
-    "path=" + value
-end
-
+            munge do |value|
+                "path=" + value
+            end
         end
 
         ####
@@ -381,11 +378,38 @@ end
                 Use format: device:r|w|rw|none
         2) a block or character device designated by its major and minor numbers. Device file have to be created manually.
                 Use format: b|c:major:minor|all:[r|w|rw|none]"
-                def insync?(current)
-                    current.sort == @should.sort
-                end
-
+            def insync?(current)
+                current.sort == @should.sort
+            end
         end
+
+        # Disk model (only used for creating new guests)
+        newparam(:disk_model) do
+            desc "disk model"
+
+            munge do |value|
+                "model=" + value
+            end
+        end
+
+        newparam(:disk_format) do
+            desc "disk format"
+
+            munge do |value|
+                "format=" + value
+            end
+        end
+
+        newparam(:disk_cache) do
+            desc "disk cache"
+            newvalues("none","writethrough","writeback")
+
+            munge do |value|
+                "cache=" + value
+            end
+        end
+
+
 
         # Will it install using PXE?
         newparam(:pxe, :required_features => :pxe) do
@@ -460,18 +484,18 @@ end
 
         newparam(:virt_type) do
             desc "Specify the guest virtualization type. Mandatory field.
-        Available values:
-        `xen_fullyvirt`:
+                Available values:
+                `xen_fullyvirt`:
                 Request the use of full virtualization, if both para & full virtualization are available on the host. This parameter may not be available if connecting to a Xen hypervisor on a machine without hardware virtualization support. This parameter is implied if connecting to a QEMU based hypervisor.
-        `xen_paravirt`:
-                This guest should be a paravirtualized guest.
-        `kvm`:
-                When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators.
-        `openvz`:
-                When defining an OpenVZ guest, the os_template must be defined."
+            `xen_paravirt`:
+            This guest should be a paravirtualized guest.
+            `kvm`:
+            When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators.
+            `openvz`:
+            When defining an OpenVZ guest, the os_template must be defined."
 
-                isrequired #FIXME Bug #4049
-                newvalues(:kvm, :xen_fullyvirt, :xen_paravirt, :qemu, :openvz)
+            isrequired #FIXME Bug #4049
+            newvalues(:kvm, :xen_fullyvirt, :xen_paravirt, :qemu, :openvz)
 
         end
 
@@ -486,11 +510,11 @@ end
 
         newproperty(:interfaces) do
             desc "Connect the guest network to the host using the specified network as a bridge. The value can take one of 2 formats:
-        `disabled`:
+                `disabled`:
                 The guest will have no network.
-        `[ \"ethX\", ... ] | \"ethX\" `
-                The guest can receive one or an array with interface's name from host to connect to the guest interfaces.
-        'ifname[,mac,host_ifname,host_mac,[bridge]]'
+                `[ \"ethX\", ... ] | \"ethX\" `
+            The guest can receive one or an array with interface's name from host to connect to the guest interfaces.
+            'ifname[,mac,host_ifname,host_mac,[bridge]]'
                 For OpenVZ hypervisor, the network interface must be specified using the format above, where:
                 * 'ifname' is the ethernet device name in the guest;
                 * 'mac' is its MAC address;
@@ -499,12 +523,20 @@ end
 
                 Bridge is an optional parameter which can be used in custom network start scripts to automatically add the interface to a bridge. All parameters except ifname are optional and are automatically generated if not specified.
 
-        If the specified interfaces does not exist, it will be ignored and raises a warning."
-        validate do |value|
-            unless value.is_a?(Array) or value.is_a?(String)
-                self.devfail "interfaces field must be a String or an Array"
+            If the specified interfaces does not exist, it will be ignored and raises a warning."
+            validate do |value|
+                unless value.is_a?(Array) or value.is_a?(String)
+                    self.devfail "interfaces field must be a String or an Array"
+                end
             end
         end
+
+        newparam(:net_model) do
+            desc "Define the network if model"
+
+            munge do |value|
+                "model=" + value
+            end
         end
 
         newproperty(:macaddrs) do
@@ -519,7 +551,6 @@ For Xen virtual machines it is required that the first 3 pairs in the MAC addres
             def insync?(current)
                 current.sort == @should.sort
             end
-
         end
 
         newproperty(:on_poweroff, :required_features => :manages_behaviour) do
@@ -534,8 +565,7 @@ For Xen virtual machines it is required that the first 3 pairs in the MAC addres
 `rename-restart`:
         The domain will be terminated, and then restarted with a new name."
 
-        newvalues(:destroy, :restart, :preserv, :renamerestart)
-
+            newvalues(:destroy, :restart, :preserv, :renamerestart)
         end
 
         newproperty(:on_reboot, :required_features => :manages_behaviour) do
@@ -550,8 +580,7 @@ Available values:
 `rename-restart`:
         The domain will be terminated, and then restarted with a new name."
 
-        newvalues(:destroy, :restart, :preserv, :renamerestart)
-
+            newvalues(:destroy, :restart, :preserv, :renamerestart)
         end
 
         newproperty(:on_crash, :required_features => :manages_behaviour) do
@@ -566,8 +595,7 @@ Available values:
 `rename-restart`:
         The domain will be terminated, and then restarted with a new name."
 
-        newvalues(:destroy, :restart, :preserv, :renamerestart)
-
+            newvalues(:destroy, :restart, :preserv, :renamerestart)
         end
 
         newproperty(:autoboot) do
@@ -579,20 +607,18 @@ Available values:
             munge do |value|
                 @resource.munge_boolean(value)
             end
-
         end
 
         newproperty(:disabled, :required_features => :disabled) do
             desc "Disable guest start for OpenVZ guests.
 To force the start of a disabled guest, use vzctl start with --force option."
 
-newvalue(:true)
-newvalue(:false)
+            newvalue(:true)
+            newvalue(:false)
 
-munge do |value|
-    return value == :true ? :yes : :no
-end
-
+            munge do |value|
+                return value == :true ? :yes : :no
+            end
         end
 
         newproperty(:noatime, :required_features => :manages_resources) do
@@ -604,7 +630,6 @@ end
             munge do |value|
                 return value == :true ? :yes : :no
             end
-
         end
 
         newproperty(:features, :array_matching => :all, :required_features => :manages_features) do
@@ -626,15 +651,15 @@ end
         You can use the following values for capname: chown, dac_override, dac_read_search, fowner, fsetid, kill, setgid, setuid, setpcap, linux_immutable, net_bind_service, net_broadcast, net_admin, net_raw, ipc_lock, ipc_owner, sys_module, sys_rawio, sys_chroot, sys_ptrace, sys_pacct, sys_admin, sys_boot, sys_nice, sys_resource, sys_time, sys_tty_config, mknod, lease, setveid, ve_admin.
         WARNING: setting some of those capabilities may have far reaching security implications, so do not do it unless you know what you are doing. Also note that setting setpcap:on for a guest will most probably lead to inability to start it."
 
-        validate do |value|
-            capability, mode = value.split(':')
-            if !["chown", "dac_override", "dac_read_search", "fowner", "fsetid", "kill", "setgid", "setuid", "setpcap", "linux_immutable", "net_bind_service", "net_broadcast", "net_admin", "net_raw", "ipc_lock", "ipc_owner", "sys_module", "sys_rawio", "sys_chroot", "sys_ptrace", "sys_pacct", "sys_admin", "sys_boot", "sys_nice", "sys_resource", "sys_time", "sys_tty_config", "mknod", "lease", "setveid", "ve_admin"].include?(capability)
-                raise ArgumentError, "\"#{capability}\" is not a valid capability."
+            validate do |value|
+                capability, mode = value.split(':')
+                if !["chown", "dac_override", "dac_read_search", "fowner", "fsetid", "kill", "setgid", "setuid", "setpcap", "linux_immutable", "net_bind_service", "net_broadcast", "net_admin", "net_raw", "ipc_lock", "ipc_owner", "sys_module", "sys_rawio", "sys_chroot", "sys_ptrace", "sys_pacct", "sys_admin", "sys_boot", "sys_nice", "sys_resource", "sys_time", "sys_tty_config", "mknod", "lease", "setveid", "ve_admin"].include?(capability)
+                    raise ArgumentError, "\"#{capability}\" is not a valid capability."
+                end
+                if !["on", "off"].include?(mode)
+                    raise ArgumentError, "Capability \"#{capability}\" only accepts \"on\" or \"off\" modes."
+                end
             end
-            if !["on", "off"].include?(mode)
-                raise ArgumentError, "Capability \"#{capability}\" only accepts \"on\" or \"off\" modes."
-            end
-        end
         end
 
         ###
@@ -654,8 +679,6 @@ end
             def insync?(current)
                 current.sort == @should.sort
             end
-
         end
-
     end
 end
