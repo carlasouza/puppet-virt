@@ -90,6 +90,13 @@ Puppet::Type.type(:virt).provide(:libvirt) do
             # ["--location", resource[:boot_location]] #initrd+kernel location
         end
 
+        # if the boot_location is specified, override import and pxe
+        if resource[:boot_location]
+            arguments.delete("--import")
+            arguments.delete("--pxe")
+            arguments << ["--location", resource[:boot_location]]
+        end
+
         arguments
     end
 
