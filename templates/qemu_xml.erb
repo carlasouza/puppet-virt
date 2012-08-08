@@ -17,6 +17,7 @@
     <disk type='file' device='disk'>
       <source file='<=% resource[:virt_path] %>'/>
       <target dev='<=% resource[:hd_device] %>'/>
+      <driver name="qemu" type="raw" cache="writethrough"/>
     </disk>
     <interface type='network'>
       <source network='<=% resource[:network] %>'/>
