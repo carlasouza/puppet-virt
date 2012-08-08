@@ -14,7 +14,6 @@ class virt::params {
 
   case $::operatingsystem {
     Debian: {
-
       $packages = $virtual ? {
         kvm => [ 'kvm', 'virt-manager', 'libvirt', 'libvirt-python', 'python-virtinst', 'qemu', 'qemu-img', 'qspice-libs' ],
         xen => [ 'linux-image-xen-686', 'xen-hypervisor', 'xen-tools', 'xen-utils' ],
@@ -38,6 +37,21 @@ class virt::params {
         openvzhn =>  [ 'ovzkernel', 'vzctl', 'vzquota' ],
       }
 
+    CentOS,RHEL: {
+      if $virtual == 'xen' {
+        fail ("Xen not supported in RHEL/CentOS")
+      }
+      if $virtual == 'openvzhn' {
+        # OpenVZ is untested. Default to failing.
+        fail ("OpenVZ not supported in RHEL/CentOS")
+      }
+      if $virtual == 'kvm' {
+        if $operatingsystemrelease >= 6.0 {
+          $packages = [ 'qemu-kvm', 'qemu', 'libvirt', 'python-virtinst', 'ruby-libvirt' ]
+        else
+          $packages = [ 'kvm', 'qemu', 'libvirt', 'python-virtinst', 'ruby-libvirt' ]
+        }
+      }
     }
 
     default: {

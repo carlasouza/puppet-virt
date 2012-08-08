@@ -33,5 +33,13 @@ class virt {
       }
 
     }
+    /^kvm/: {
+      augeas { "libvirt.conf defaults":
+        context => "/file/etc/libvirt/libvirtd.conf",
+        changes => ["set max_clients 256",
+          ],
+        notify => Service["libvirtd"],
+      }
+    }
   }
 }
