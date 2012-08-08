@@ -358,7 +358,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
         xml = path + resource[:name] + extension
 
         if File.exists?(xml)
-            arguments =  ["poweroff", xml]
+            arguments =  ["on_poweroff", xml]
             line = ""
             debug "Line: %s" % [line]
             line = grep arguments
