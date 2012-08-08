@@ -40,7 +40,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
             xmlinstall
         else
             debug "Virtualization type: %s" % [resource[:virt_type]]
-            virtinstall generalargs(bootoninstall) + network + graphic + bootargs
+            debug (virtinstall generalargs(bootoninstall) + network + graphic + bootargs)
 
         end
 
