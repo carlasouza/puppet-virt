@@ -32,3 +32,12 @@ class ovz-guest {
 	}
 
 }
+
+node /^vmhost$/ {
+  virt::kvm { "intranet":
+    desc      => "intranet.ewcs.com",
+    eth1_addr => "10.253.0.251", # fixed ip, eth0 is assigned by dhcp
+    ensure    => running,
+    targetmem => 393216,
+  }
+}
