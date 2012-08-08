@@ -66,7 +66,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
                          when :xen_paravirt then "--paravirt" #Must validate kernel support
                          when :kvm then "--accelerate" #Must validate hardware support
                          end
-        arguments = ["--name", resource[:name], "--ram", resource[:memory], "--vcpus" , resource[:cpus], "--noautoconsole", "--force", virt_parameter]
+        arguments = ["--os-variant",resource[:os_variant],"--name", resource[:name], "--ram", resource[:memory], "--vcpus" , resource[:cpus], "--noautoconsole", "--force", virt_parameter, "-d"]
 
         if !bootoninstall
             arguments << "--noreboot"
