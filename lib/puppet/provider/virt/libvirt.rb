@@ -110,6 +110,15 @@ Puppet::Type.type(:virt).provide(:libvirt) do
         if resource[:disk_size]
             parameters.concat("," + resource[:disk_size])
         end
+        if resource[:disk_format]
+            parameters.concat("," + resource[:disk_format])
+        end
+        if resource[:disk_model]
+            parameters.concat("," + resource[:disk_model])
+        end
+        if resource[:disk_cache]
+            parameters.concat("," + resource[:disk_cache])
+        end
         if !parameters.nil?
             args = ["--disk", parameters]
         end
@@ -132,6 +141,10 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
         debug "Network paramentrs"
         network = []
+        parameters = ""
+        if resource[:net_model]
+            parameters.concat("," + resource[:net_model])
+        end
         iface = resource[:interfaces]
         if iface.nil?
             network = ["--network", "network=default"]
