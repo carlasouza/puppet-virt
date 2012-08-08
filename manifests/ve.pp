@@ -94,7 +94,7 @@ define virt::ve (
 ) {
 
   if $os_template == undef {
-      fail("The os_template parameter must be defined.")
+    fail("The os_template parameter must be defined.")
   }
 
   include virt
@@ -102,77 +102,77 @@ define virt::ve (
 
   if ($vedir_override != '') {
     $vedir = $vedir_override
-  } else {
-    $vedir = $virt::params::vedir
-  }
-
-  virt { $name:
-    ensure => $ensure ? {
-        absent => 'stopped',
-        default => 'running',
-    },
-    virt_type => $virt_type,
-    os_template => $os_template,
-    tmpl_repo => $tmpl_repo,
-    configfile => $configfile,
-    ipaddr => $ipaddr,
-    ve_root => "${vedir}/${name}/root",
-    ve_private => "${vedir}/${name}/private",
-    nameserver => $nameserver,
-    searchdomain => $searchdomain,
-    memory => $memory,
-    require => $ensure ? {
-      present => Mount["${vedir}/$name"],
-      default => undef,
-    },
-  }
-
-  # mount when the VE is present. Otherwise, unmount it
-  mount { "${vedir}/$name":
-    ensure => $ensure ? {
-      absent => unmounted,
-      default => mounted,
-    },
-    fstype => $lvm_fstype,
-    options => 'rw,noatime',
-    device => "/dev/mapper/${lvm_vg}-$name",
-    require => $ensure ? {
-      absent => Virt[$name],
-      default => [ Lvm::Volume[$name], File ["${vedir}/$name"] ],
-    },
-  }
-
-  file { "${vedir}/$name":
-    ensure => directory,
-    owner => 'root',
-    group => 'root',
-    mode => 0755,
-  }
-
-  lvm::volume { $name:
-    ensure => present,
-    vg => $lvm_vg,
-    pv => $lvm_pv,
-    fstype => $lvm_fstype,
-    size => $lvm_size,
-  }
-
-  if ($puppetize) and ($ensure == 'present') {
-
-    notify { "notify-puppetize-$name":
-			message => "Puppetizing $name",
-      require => Virt[$name],
-		}
-
-    exec { "puppetize-$name":
-      command => "vzctl exec2 $name 'puppet agent -t -l /tmp/install.log --pluginsync true'",
-      unless => "vzctl exec2 $name 'crontab -l | grep -q puppet-client'",
-      timeout => 300,
-      returns => [ 0, 2 ],
-      require => Notify["notify-puppetize-$name"],
+    } else {
+      $vedir = $virt::params::vedir
     }
 
-  }
+    virt { $name:
+      ensure => $ensure ? {
+        absent => 'stopped',
+        default => 'running',
+      },
+      virt_type => $virt_type,
+      os_template => $os_template,
+      tmpl_repo => $tmpl_repo,
+      configfile => $configfile,
+      ipaddr => $ipaddr,
+      ve_root => "${vedir}/${name}/root",
+      ve_private => "${vedir}/${name}/private",
+      nameserver => $nameserver,
+      searchdomain => $searchdomain,
+      memory => $memory,
+      require => $ensure ? {
+        present => Mount["${vedir}/$name"],
+        default => undef,
+      },
+    }
+
+    # mount when the VE is present. Otherwise, unmount it
+    mount { "${vedir}/$name":
+      ensure => $ensure ? {
+        absent => unmounted,
+        default => mounted,
+      },
+      fstype => $lvm_fstype,
+      options => 'rw,noatime',
+      device => "/dev/mapper/${lvm_vg}-$name",
+      require => $ensure ? {
+        absent => Virt[$name],
+        default => [ Lvm::Volume[$name], File ["${vedir}/$name"] ],
+      },
+    }
+
+    file { "${vedir}/$name":
+      ensure => directory,
+      owner => 'root',
+      group => 'root',
+      mode => 0755,
+    }
+
+    lvm::volume { $name:
+      ensure => present,
+      vg => $lvm_vg,
+      pv => $lvm_pv,
+      fstype => $lvm_fstype,
+      size => $lvm_size,
+    }
+
+    if ($puppetize) and ($ensure == 'present') {
+
+      notify { "notify-puppetize-$name":
+        message => "Puppetizing $name",
+        require => Virt[$name],
+      }
+
+      exec { "puppetize-$name":
+        command => "vzctl exec2 $name 'puppet agent -t -l /tmp/install.log --pluginsync true'",
+        unless => "vzctl exec2 $name 'crontab -l | grep -q puppet-client'",
+        timeout => 300,
+        returns => [ 0, 2 ],
+        require => Notify["notify-puppetize-$name"],
+      }
+
+    }
 
 }
 
