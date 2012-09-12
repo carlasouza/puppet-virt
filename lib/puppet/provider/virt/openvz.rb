@@ -9,8 +9,12 @@ Puppet::Type.type(:virt).provide(:openvz) do
 
 	defaultfor :virtual => ["openvzhn"]
 
-	if [ "Ubuntu", "Debian" ].any? { |os|  Facter.value(:operatingsystem) == os }
+	case Facter.value(:operationsystem)
+  when "Ubuntu", "Debian"
 		@@vzcache = "/var/lib/vz/template/cache/"
+		@@vzconf = "/etc/vz/conf/"
+  when "CentOS"
+		@@vzcache = "/vz/template/cache/"
 		@@vzconf = "/etc/vz/conf/"
 	else
 		raise Puppet::Error, "Sorry, this provider is not supported for your Operation System, yet :)"
