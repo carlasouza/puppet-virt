@@ -37,7 +37,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     else
       debug "Virtualization type: %s" % [resource[:virt_type]]
       virtinstall generalargs(bootoninstall) + network + graphic + bootargs
-
     end
 
     resource.properties.each do |prop|
@@ -46,11 +45,11 @@ Puppet::Type.type(:virt).provide(:libvirt) do
       end
     end
 
-                resource.properties.each do |prop|
-                        if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
-                                eval "self.#{prop.to_s}=prop.should"
-                        end
-                end
+    resource.properties.each do |prop|
+      if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
+        eval "self.#{prop.to_s}=prop.should"
+      end
+    end
 
   end
 
@@ -73,14 +72,14 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     end
 
     if resource[:boot_options]
-      arguments << ["--extra-args='#{resource[:boot_options]}'"]
+      arguments << [ "-x", resource[:boot_options] ]
     end
 
     arguments << diskargs
 
     if resource[:boot_location]
-      fail 'To to boot_location, you need to specify the virt_path to store it' if resource[:virt_path].nil?
-      arguments << "--location='#{resource[:boot_location]}'"
+      fail "To use 'boot_location', you need to specify the 'virt_path' parameter." if resource[:virt_path].nil?
+      arguments << ["-l", resource[:boot_location]]
     else
       if File.exists?(resource[:virt_path].split('=')[1])
         if resource[:pxe]
