@@ -61,7 +61,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
       when :xen_paravirt then "--paravirt" #Must validate kernel support
       when :kvm then "--accelerate" #Must validate hardware support
     end
-    arguments = ["--name", resource[:name], "--ram", resource[:memory], "--vcpus" , resource[:cpus], "--noautoconsole", "--force", virt_parameter]
+    arguments = ["--name", resource[:name], "--ram", resource[:memory], "--noautoconsole", "--force", virt_parameter]
 
     if !bootoninstall
       arguments << "--noreboot"
@@ -74,6 +74,9 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     if resource[:boot_options]
       arguments << [ "-x", resource[:boot_options] ]
     end
+
+    max_cpus = ::Facter.value('processorcount')
+    arguments << ["--vcpus", "#{resource[:cpus]},maxvcpus=#{max_cpus}"]
 
     arguments << diskargs
 
@@ -253,6 +256,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
     if exists? && status != :running
       exec { @guest.create }
+      cpus=resource[:cpus] unless resource[:cpus].nil? #It seems to reset the # of cpus to 1 after a reboot
 
     elsif status == :absent
       install
@@ -261,8 +265,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   end
 
   # Auxiliary method to make sure the domain exists before change it's properties.
-      #dom.create # Start the domain
-      #dom.create # Start the domain
   def setpresent
     install(false)
   end
@@ -327,19 +329,30 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
   def memory=(value)
     mem=value * 1024 #MB
-    exec { @guest.memory=(mem) }
+    exec { @guest.destroy }
+
+    # 10 seconds of timeout to wait for the domain to stop
+    timeout = 5
+    count = 0
+    while now<timeout && state != :stopped
+      sleep 2
+      count += 1
+    end
+    fail "Unable to stop the guest." unless state != :stopped
+    exec { @guest.max_memory=(mem) }
+    exec { start }
   end
 
   def cpus
-    #FIXME If guest is not running, retrieve value from xml file
     begin
-      exec { @guest.max_vcpus }
+      exec { @guest.num_vcpus 0 } #Why 0? See at http://www.libvirt.org/html/libvirt-libvirt.html#virDomainGetVcpusFlags
     rescue Libvirt::RetrieveError => e
       debug "Domain is not running, cannot evaluate cpus parameter"
     end
   end
 
   def cpus=(value)
+    warn "It is not possible to set the # of cpus if the guest is not running." if status != :running
     exec { @guest.vcpus=(value) }
   end
 
