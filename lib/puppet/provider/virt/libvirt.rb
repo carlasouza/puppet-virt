@@ -3,6 +3,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   # Ruby-Libvirt API Reference: http://libvirt.org/ruby/api/index.html
 
   commands :virtinstall => "/usr/bin/virt-install"
+  commands :virtclone => "/usr/bin/virt-clone"
   commands :virsh => "/usr/bin/virsh"
   commands :grep => "/bin/grep"
   commands :ip => "/sbin/ip"
@@ -10,7 +11,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   # The provider is chosen by virt_type
   confine :feature => :libvirt
 
-  has_features :pxe, :manages_behaviour, :graphics, :clocksync, :boot_params
+  has_features :pxe, :manages_behaviour, :graphics, :clocksync, :boot_params, :cloning
 
   defaultfor :virtual => ["kvm", "physical", "xenu"]
 
@@ -27,13 +28,15 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     return ret
   end
 
-  # Import the declared image file as a new domain.
+  # Installs the new domain.
   def install(bootoninstall = true)
     debug "Installing new vm"
     debug "Boot on install: %s" % bootoninstall
 
     if resource[:xml_file]
       xmlinstall
+    elsif resource[:clone]
+      #TODO
     else
       debug "Virtualization type: %s" % [resource[:virt_type]]
       virtinstall generalargs(bootoninstall) + network + graphic + bootargs
@@ -45,6 +48,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
       end
     end
 
+    # wat? Repeated code!?
     resource.properties.each do |prop|
       if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
         eval "self.#{prop.to_s}=prop.should"
@@ -161,19 +165,18 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
   # Auxiliary method. Checks if declared interface exists.
   def interface?(ifname)
-
     ip('link', 'list',  ifname)
     rescue Puppet::ExecutionFailure
       warnonce("Network interface " + ifname + " does not exist")
-
   end
 
-  #TODO the Libvirt biding for ruby doesnt support this feature :(
+  #TODO the Libvirt biding for ruby doesnt support this feature
   def interface
     warnonce("It is not possible to change interfaces settings for an existing guest.")
     resource[:interfaces]
   end
 
+  #TODO the Libvirt biding for ruby doesnt support this feature
   def interfaces=(value)
     warnonce("It is not possible to change interfaces settings for an existing guest.")
   end

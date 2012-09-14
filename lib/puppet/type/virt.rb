@@ -238,7 +238,6 @@ Puppet::Type.newtype(:virt) do
       desc "Limit of CPU usage for the guest, in per cent. Note if the computer has 2 CPUs, it has total of 200% CPU time. Default CPU limit is 0 (no CPU limit)."
     end
 
-    #XXX  :required_features =>
     newproperty(:ioprio, :parent => VirtNumericParam, :required_features => :manages_resources) do
       desc "Assigns  I/O priority to guest.
       Priority range is 0-7.
@@ -318,6 +317,12 @@ Puppet::Type.newtype(:virt) do
 
     newparam(:boot_options, :requires_features => :boot_params) do
       desc "Additional kernel command line arguments to pass to the installer when performing a guest install from declared location."
+    end
+
+    newparam(:clone, :required_features => :cloning) do
+      desc "Clones from an existing guest."
+
+      #TODO
     end
 
     newparam(:virt_path) do
@@ -479,8 +484,8 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
       munge do |value|
         "path=" + value
       end
-
     end
+
 
     newproperty(:interfaces) do
       desc "Connect the guest network to the host using the specified network as a bridge. The value can take one of 2 formats:
