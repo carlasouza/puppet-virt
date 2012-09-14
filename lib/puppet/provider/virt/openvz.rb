@@ -9,8 +9,12 @@ Puppet::Type.type(:virt).provide(:openvz) do
 
 	defaultfor :virtual => ["openvzhn"]
 
-	if [ "Ubuntu", "Debian" ].any? { |os|  Facter.value(:operatingsystem) == os }
+	case Facter.value(:operatingsystem)
+  when "Ubuntu", "Debian"
 		@@vzcache = "/var/lib/vz/template/cache/"
+		@@vzconf = "/etc/vz/conf/"
+  when "CentOS"
+		@@vzcache = "/vz/template/cache/"
 		@@vzconf = "/etc/vz/conf/"
 	else
 		raise Puppet::Error, "Sorry, this provider is not supported for your Operation System, yet :)"
@@ -58,7 +62,8 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	# If CTID not specified, it will assign the first possible value
 	# Note that CT ID <= 100 are reserved for OpenVZ internal purposes.
 	def ctid
-		if tmp = vzlist('--no-header', '-a','-N',resource[:name]).split(" ")[0]
+		if tmp = vzlist('-1', '-a','-N',resource[:name]).split(" ")[0]
+		#if tmp = vzlist('--no-header', '-a','-N',resource[:name]).split(" ")[1]
 			id = tmp
 		elsif !id = resource[:id]
 			out = vzlist('--no-header', '-a', '-o','ctid')
