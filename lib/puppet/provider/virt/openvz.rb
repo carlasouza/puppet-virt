@@ -62,7 +62,8 @@ Puppet::Type.type(:virt).provide(:openvz) do
 	# If CTID not specified, it will assign the first possible value
 	# Note that CT ID <= 100 are reserved for OpenVZ internal purposes.
 	def ctid
-		if tmp = vzlist('--no-header', '-a','-N',resource[:name]).split(" ")[0]
+		if tmp = vzlist('-1', '-a','-N',resource[:name]).split(" ")[0]
+		#if tmp = vzlist('--no-header', '-a','-N',resource[:name]).split(" ")[1]
 			id = tmp
 		elsif !id = resource[:id]
 			out = vzlist('--no-header', '-a', '-o','ctid')
