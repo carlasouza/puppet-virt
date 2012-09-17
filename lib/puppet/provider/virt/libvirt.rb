@@ -15,12 +15,16 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
   defaultfor :virtual => ["kvm", "physical", "xenu"]
 
-  # Executes operation over guest
-  def exec
-    hypervisor = case resource[:virt_type]
+  def hypervisor
+    #FIXME add support to autentication
+    case resource[:virt_type]
       when :xen_fullyvirt, :xen_paravirt then "xen:///"
       else "qemu:///session"
     end
+  end
+
+  # Executes operation over guest
+  def exec
     conn = Libvirt::open(hypervisor)
     @guest = conn.lookup_domain_by_name(resource[:name])
     ret = yield if block_given?
@@ -36,7 +40,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     if resource[:xml_file]
       xmlinstall
     elsif resource[:clone]
-      #TODO
+      clone
     else
       debug "Virtualization type: %s" % [resource[:virt_type]]
       virtinstall generalargs(bootoninstall) + network + graphic + bootargs
@@ -49,12 +53,24 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     end
 
     # wat? Repeated code!?
-    resource.properties.each do |prop|
-      if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
-        eval "self.#{prop.to_s}=prop.should"
-      end
-    end
+#    resource.properties.each do |prop|
+#      if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
+#        eval "self.#{prop.to_s}=prop.should"
+#      end
+#    end
+  end
 
+  def clone
+    # TODO test it
+    # virt-clone -o web_devel        -n database_devel  -f /path/to/database_devel.img --connect=qemu:///system
+    # virt-clone -o resource[:clone] -n resource[:name] -f resource[:virt_path]        --connect=qemu:///system
+    args = ["-o", resource[:clone], "--connect=#{hypervisor}", "-n", resource[:name]]
+    if resource[:virt_path].nil?
+      args << "--auto-clone"
+    else
+      args << ["-f", resource[:virt_path]]
+    end
+    virtclone args
   end
 
   def generalargs(bootoninstall)
