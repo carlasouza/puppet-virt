@@ -1,3 +1,4 @@
+# TODO Update methods' visibility to private
 Puppet::Type.type(:virt).provide(:libvirt) do
   desc "Creates a new Xen (fully or para-virtualized) or KVM guest using libvirt."
   # Ruby-Libvirt API Reference: http://libvirt.org/ruby/api/index.html
@@ -105,9 +106,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
       arguments << ["-l", resource[:boot_location]]
     else
       if File.exists?(resource[:virt_path].split('=')[1])
-        if resource[:pxe]
-          warnonce("Ignoring PXE boot. Domain image already exists")
-        end
+        warnonce("Ignoring PXE boot. Domain image already exists") if resource[:pxe]
         debug "File already exists. Importing domain"
         arguments << "--import"
       elsif resource[:pxe]
@@ -151,8 +150,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
   # Creates network arguments for virt-install command
   def network
-
-    debug "Network paramentrs"
+    debug "Network paramenters"
     network = []
     iface = resource[:interfaces]
     if iface.nil?
@@ -161,9 +159,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
       network = ["--nonetworks"]
     else
       iface.each do |iface|
-        if interface?(iface)
-          network << ["--network","bridge="+iface]
-        end
+        network << ["--network","bridge="+iface] if interface?(iface)
       end
     end
 
@@ -188,18 +184,17 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
   #TODO the Libvirt biding for ruby doesnt support this feature
   def interface
-    warnonce("It is not possible to change interfaces settings for an existing guest.")
+    warnonce "It is not possible to change interfaces settings for an existing guest."
     resource[:interfaces]
   end
 
   #TODO the Libvirt biding for ruby doesnt support this feature
   def interfaces=(value)
-    warnonce("It is not possible to change interfaces settings for an existing guest.")
+    warnonce "It is not possible to change interfaces settings for an existing guest."
   end
 
   # Setup the virt-install graphic configuration arguments
   def graphic
-
     opt = resource[:graphics]
     case opt
       when :enable || nil then args = ["--vnc"]
@@ -207,13 +202,11 @@ Puppet::Type.type(:virt).provide(:libvirt) do
       else args = ["--vncport=" + opt.split(':')[1]]
     end
     args
-
   end
 
   # Install guests using virsh with xml when virt-install is still not yet supported.
   # Libvirt XML <domain> specification: http://libvirt.org/formatdomain.html
   def xmlinstall
-
     if !File.exists?(resource[:xml_file])
       require "erb"
       debug "Creating the XML file: %s " % resource[:xml_file]
@@ -234,7 +227,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
   # Changing ensure to absent
   def destroy #Changing ensure to absent
-
     debug "Trying to destroy domain %s" % [resource[:name]]
 
     begin
@@ -243,17 +235,15 @@ Puppet::Type.type(:virt).provide(:libvirt) do
       debug "Domain %s already Stopped" % [resource[:name]]
     end
     exec { @guest.undefine }
-
   end
 
-  #FIXME
+  #FIXME remove the guest's files
   def purge
     destroy
   end
 
   # Creates config file if absent, and makes sure the domain is not running.
   def stop
-
     debug "Stopping domain %s" % [resource[:name]]
 
     if !exists?
@@ -264,13 +254,11 @@ Puppet::Type.type(:virt).provide(:libvirt) do
         else exec { @guest.shutdown }
       end
     end
-
   end
 
 
   # Creates config file if absent, and makes sure the domain is running.
   def start
-
     debug "Starting domain %s" % [resource[:name]]
 
     if exists? && status != :running
@@ -280,7 +268,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     elsif status == :absent
       install
     end
-
   end
 
   # Auxiliary method to make sure the domain exists before change it's properties.
@@ -324,7 +311,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     return exec { @guest.autostart.to_s }
   end
 
-
   # Set true or false to autoboot property
   def autoboot=(value)
     debug "Trying to set autoboot %s at domain %s." % [resource[:autoboot], resource[:name]]
@@ -338,7 +324,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     rescue Libvirt::RetrieveError => e
       debug "Domain %s not defined" % [resource[:name]]
     end
-
   end
 
   def memory
@@ -351,6 +336,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     exec { @guest.destroy }
 
     # 10 seconds of timeout to wait for the domain to stop
+    # TODO refactor
     timeout = 5
     count = 0
     while now<timeout && state != :stopped

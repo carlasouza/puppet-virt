@@ -186,7 +186,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
     end
   end
 
-  # private method
+  private
   def get_value(arg)
     debug "Getting parameter #{arg} value"
     conf = @@vzconf + ctid + '.conf'
@@ -195,7 +195,6 @@ Puppet::Type.type(:virt).provide(:openvz) do
     result
   end
 
-  private
   def apply(paramname, value)
     args = ['set', ctid]
     [value].flatten.each do |value|
