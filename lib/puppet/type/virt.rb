@@ -101,6 +101,8 @@ Puppet::Type.newtype(:virt) do
     Creates config file, and makes sure the domain is not running.
   `absent`:
     Removes config file, and makes sure the domain is not running.
+  `suspended`:
+    Creates config file, but does not start it. It already running, suspends it.
   `purged`:
     Purge all files related."
       newvalue(:stopped) do
@@ -117,6 +119,10 @@ Puppet::Type.newtype(:virt) do
 
       newvalue(:absent) do
         provider.destroy
+      end
+
+      newvalue(:suspended) do
+        provider.suspend
       end
 
       newvalue(:purged) do

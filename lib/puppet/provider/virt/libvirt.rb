@@ -142,9 +142,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     debug "Bootargs"
 
     bootargs = []
-    if !resource[:kickstart].nil? #kickstart support
-      bootargs = ["-x", resource[:kickstart]]
-    end
+    bootargs = ["-x", resource[:kickstart]] if resource[:kickstart] #kickstart support
     bootargs
   end
 
@@ -256,6 +254,18 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     end
   end
 
+  def suspend
+    if !exists?
+      install(false)
+    elsif status == :suspended
+      exec { @guest.resume }
+    elsif status == :running
+      case resource[:virt_type]
+           when :kvm,:qemu then exec { @guest.suspend }
+           else exec { @guest.shutdown } # TODO
+      end
+    end
+  end
 
   # Creates config file if absent, and makes sure the domain is running.
   def start
@@ -293,6 +303,9 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     # 1 = running, 3 = paused|suspend|freeze, 5 = stopped
       if resource[:ensure].to_s == "installed"
         return :installed
+      elsif exec { @guest.info.state } == 3
+        debug "Domain %s status: suspended" % [resource[:name]]
+        return :suspended
       elsif exec { @guest.info.state } != 5
         debug "Domain %s status: running" % [resource[:name]]
         return :running
