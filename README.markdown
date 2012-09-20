@@ -6,14 +6,15 @@ Puppet Module to manage virtual machines. Provides a the type: `virt`.
 
 ### virt
 
-Manage virtual environments. [Xen] [1], [KVM] [2], and [OpenVZ] [3] hypervisors are supported, which of the first three uses [libvirt] [4] as provider.
-This module is the result of my work at GSoC 2010. I thank [Reliant Security] [5] for funding the OpenVZ provider development.
+Manage virtual environments. [Xen] [1], [KVM] [2], [OpenVZ] [3], and [LXC] [4] hypervisors are supported, which of the first three uses [libvirt] [5] as provider.
+This module is the result of my work at GSoC 2010. I thank [Reliant Security] [6] for funding the OpenVZ provider development.
 
   [1]: http://xen.org "Xen® Hypervisor"
   [2]: http://www.linux-kvm.org/  "Kernel Based Virtual Machin"
   [3]: http://wiki.openvz.org/  "OpenVZ"
-  [4]: http://www.libvirt.org/ "The Virtualization API"
-  [5]: http://reliantsecurity.com/  "Reliant Security"
+  [4]: http://lxc.sourceforge.net/  "LXC"
+  [5]: http://www.libvirt.org/ "The Virtualization API"
+  [6]: http://reliantsecurity.com/  "Reliant Security"
 
 **Autorequires:** If Puppet is managing Xen or KVM guests, the virt resource will autorequire `libvirt` library.
 
@@ -38,6 +39,24 @@ Note that some values can be specified as an array of values:
       interfaces  => ["eth0", "eth1"]
     }
 
+LXC Example:
+
+    virt { 'lxc1':
+      ensure      => running,
+      os_template => 'ubuntu',
+      provider    => 'lxc'
+    }
+
+    # clone from lxc1
+    virt { 'lxc2':
+      ensure   => running,
+      clone    => 'lxc1',
+      snapshot => true,
+      provider => 'lxc',
+      require  => Virt['lxc1']
+    }
+
+
 #### Features
 
 - *disabled*: The provider can disable guest start.
@@ -54,29 +73,32 @@ Note that some values can be specified as an array of values:
 - *manages_devices*: The provider can give the guest an access to a device.
 - *manages_users*: The provider manage guest's users and passwords.
 - *manages_behaviour*: The provider manage the quest's behaviour for reboot, crash and shutdown.
-- *initial_config*: The provider can receive a config file with default values for VE creation.
+- *initial_config*: The provider can receive a config file with default values for VE or lxc creation.
 - *storage_path*: The provider can set the path to storage and mount VE files.
+- *cloneable*: The provider can create clones of other instances
+- *backingstore*: The provider can use a backingstore such as lvm or btrfs
 
 
-Features \ Provider  | libvirt | openvz |
--------------------- | ------- | ------ |
-disabled             |         |  *X*   |
-cpu_fair             |         |  *X*   |
-disk_quota           |         |  *X*   |
-pxe                  |   *X*   |        |
-iptables             |         |  *X*   |
-graphics             |   *X*   |        |
-clocksync            |   *X*   |        |
-boot_params          |   *X*   |        |
-manages_resources    |         |  *X*   |
-manages_capabilities |         |  *X*   |
-manages_features     |         |  *X*   |
-manages_devices      |         |  *X*   |
-manages_users        |         |  *X*   |
-manages_behaviour    |   *X*   |        |
-initial_config       |         |  *X*   |
-storage_path         |         |  *X*   |
-
+Features \ Provider  | libvirt | openvz | lxc   |
+-------------------- | ------- | ------ | ------|
+disabled             |         |  *X*   |       |
+cpu_fair             |         |  *X*   |       |
+disk_quota           |         |  *X*   |       |
+pxe                  |   *X*   |        |       |
+iptables             |         |  *X*   |       |
+graphics             |   *X*   |        |       |
+clocksync            |   *X*   |        |       |
+boot_params          |   *X*   |        |       |
+manages_resources    |         |  *X*   |       |
+manages_capabilities |         |  *X*   |       |
+manages_features     |         |  *X*   |       |
+manages_devices      |         |  *X*   |       |
+manages_users        |         |  *X*   |       |
+manages_behaviour    |   *X*   |        |       |
+initial_config       |         |  *X*   |  *X*  |
+storage_path         |         |  *X*   |       |
+cloneable            |         |        |  *X*  |
+backingstore         |         |        |  *X*  |
 
 #### Parameters
 
@@ -175,6 +197,16 @@ For OpenVZ provider, available values are:
 * `ubuntu-10.10`: Ubuntu 10.10
 * `ubuntu-11.04`: Ubuntu 11.04
 
+For LXC provider, available values on Ubuntu Precise are:
+
+* `busybox`
+* `debian`
+* `fedora`
+* `opensuse`
+* `sshd`
+* `ubuntu`
+* `ubuntu-cloud`
+
 Also, you can use a custom value with your custom template name. Example: `my-customized-ubuntu-10` or `fedora-mycompany`.
 
 When using OpenVZ provider, the template for the new guest will be automaticaly downloaded if don't already exists. It will download from official OpenVZ repository or from URL specified at `tmpl_repo` parameter.
@@ -186,6 +218,7 @@ Available providers are:
 
 * **openvz**: Guest management for OpenVZ guests. Supported features: `disabled`, `cpu_fair`, `disk_quota`, `iptables`, `manages_resources`, `manages_capabilities`, `manages_features`, `manages_devices` and `manages_users`.
 * **libvirt**: Guest management for Xen and KVM guests. Note that you will need to install the `libvirt` Ruby library. Supported features: `pxe`, `graphics`, `clocksync`, `boot_params` and `manages_behaviour`
+* **lxc**: Guest management for LXC guests. Supported features: `cloneable`, `initial_config`, `backingstore`
 
 ##### virt_type
 
@@ -196,6 +229,8 @@ Available values:
 * `xen_paravirt`: This guest should be a paravirtualized guest. It requires hardware virtualization support
 * `kvm`: When installing a QEMU guest, make use of the KVM or KQEMU kernel acceleration capabilities if available. Use of this option is recommended unless a guest OS is known to be incompatible with the accelerators.
 * `openvz`: When defining an OpenVZ guest, the `os_template` paramenter must be defined.
+* `lxc`: When defining an lxc guest, the `os_template` paramenter must be defined.
+
 The values `xen_fullyvirt`, `xen_paravirt` and `kvm` will use libvirt as provider. `openvz` will use the `openvz` provider.
 
 ##### xml_file
@@ -216,7 +251,13 @@ Requires features `storage_path`.
 
 ##### configfile
 
+OpenVZ:
+
 If specified, values from example configuration file `/etc/vz/conf/ve-<VALUE>.conf-sample` are put into the container configuration file. If this container configuration file already exists, it will be removed.
+
+LXC:
+
+Specify the configuration file to configure the virtualization and isolation functionalities for the container
 
 Requires features `initial_config`.
 
@@ -451,6 +492,24 @@ Requires one or two arguments. In case of one argument, vzctl sets barrier and l
 Valid values are: `vmguarpages`, `physpages`, `oomguarpages`, `lockedpages`, `privvmpages`, `shmpages`, `numproc`, `numtcpsock`, `numothersock`, `numfile`, `numflock`, `numpty`, `numsiginfo`, `dcachesize`, `numiptent`, `kmemsize`, `tcpsndbuf`, `tcprcvbuf`, `othersockbuf`, `dgramrcvbuf`.
 
 Requires features `resources_management`.
+
+##### clone
+
+Clone a different container to be the base image for this container
+
+Requires features `cloneable`.
+
+##### snapshot
+
+Make the new rootfs a snapshot of the cloned container
+
+Requires features `cloneable`.
+
+##### backingstore
+
+bacckingstore' is one of 'none', 'lvm', or 'btrfs'
+
+Requires features `backingstore`.
 
 ----------------
 
