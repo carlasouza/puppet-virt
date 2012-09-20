@@ -49,6 +49,9 @@ Puppet::Type.newtype(:virt) do
     feature :storage_path,
       "Sets the path to storage VE files"
 
+    feature :cloneable,
+      "Linux container template name"
+
     # A base class for numeric Virt parameters validation.
     class VirtNumericParam < Puppet::Property
 
@@ -325,7 +328,7 @@ Puppet::Type.newtype(:virt) do
       desc "Additional kernel command line arguments to pass to the installer when performing a guest install from declared location."
     end
 
-    newparam(:clone, :required_features => :cloning) do
+    newparam(:clone, :required_features => :cloneable) do
       desc "Clones from an existing guest."
 
       #TODO
