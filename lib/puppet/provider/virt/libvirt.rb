@@ -12,7 +12,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   # The provider is chosen by virt_type
   confine :feature => :libvirt
 
-  has_features :pxe, :manages_behaviour, :graphics, :clocksync, :boot_params, :cloning
+  has_features :pxe, :manages_behaviour, :graphics, :clocksync, :boot_params, :cloneable
 
   defaultfor :virtual => ["kvm", "physical", "xenu"]
 

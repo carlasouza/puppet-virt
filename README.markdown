@@ -18,9 +18,9 @@ This module is the result of my work at GSoC 2010. I thank [Reliant Security] [6
 
 **Autorequires:** If Puppet is managing Xen or KVM guests, the virt resource will autorequire `libvirt` library.
 
-Example:
+OpenVZ Examples:
 
-    virt { server:
+    virt { guest-openvz1:
       ensure      => 'running',
       id          => 101,
       os_template => 'ubuntu-10.10',
@@ -30,7 +30,7 @@ Example:
 
 Note that some values can be specified as an array of values:
 
-    virt { server:
+    virt { guest-openvz2:
       ensure      => 'installed',
       memory      => 512,
       os_template => 'ubuntu-10.10-x86_64',
@@ -39,18 +39,34 @@ Note that some values can be specified as an array of values:
       interfaces  => ["eth0", "eth1"]
     }
 
-LXC Example:
+KVM examples:
 
-    virt { 'lxc1':
+    virt { guest-kvm1:
+      memory    => 512,
+      virt_path => '/home/user/disk0.qcow2',
+      ensure    => installed,
+      virt_type => 'kvm'
+    }
+
+    # clone from kvm1
+    virt { guest-kvm2:
+      clone     => 'guest-kvm1'
+      ensure    => running,
+      virt_type => 'kvm'
+    }
+
+lXC Examples:
+
+    virt { guest-lxc1:
       ensure      => running,
       os_template => 'ubuntu',
       provider    => 'lxc'
     }
 
     # clone from lxc1
-    virt { 'lxc2':
+    virt { guest-lxc2:
       ensure   => running,
-      clone    => 'lxc1',
+      clone    => 'guest-lxc1',
       snapshot => true,
       provider => 'lxc',
       require  => Virt['lxc1']
@@ -97,7 +113,7 @@ manages_users        |         |  *X*   |       |
 manages_behaviour    |   *X*   |        |       |
 initial_config       |         |  *X*   |  *X*  |
 storage_path         |         |  *X*   |       |
-cloneable            |         |        |  *X*  |
+cloneable            |   *X*   |        |  *X*  |
 backingstore         |         |        |  *X*  |
 
 #### Parameters
