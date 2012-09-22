@@ -137,7 +137,7 @@ OpenVZ CT ID. It must be an integer greater then 100. CT ID <= 100 are reserved 
 
 ##### ensure
 
-Valid values are `running`, `stopped`, `installed`, `absent`.
+Valid values are `running`, `stopped`, `installed`, `absent`, `suspended` and `freezed`.
 
 ##### os_type
 

@@ -81,7 +81,7 @@ Puppet::Type.newtype(:virt) do
       end
     end
 
-    def self.instances()
+    def self.instances
       []
     end
 
@@ -130,12 +130,12 @@ Puppet::Type.newtype(:virt) do
         provider.suspend
       end
 
-      newvalue(:purged) do
-        provider.purge
+      newvalue(:freezed) do
+        provider.freeze
       end
 
-      newvalue(:freeze) do
-        provider.freeze
+      newvalue(:purged) do
+        provider.purge
       end
 
       defaultto(:running)
@@ -186,9 +186,13 @@ Puppet::Type.newtype(:virt) do
     newparam(:configfile, :required_features => :initial_config) do
       desc "If specified, values from example configuration file /etc/vz/conf/ve-<VALUE>.conf-sample are put into the container configuration file. If this container configuration file already exists, it will be removed."
 
-      # FIXME: VZ validation interferes with lxc configfiles
+      # XXX: VZ validation interferes with lxc configfiles
       validate do |file|
-        unless File.file? "#{file}" #"/etc/vz/conf/ve-#{file}.conf-sample"
+        # Im going to leave this using only the OpenVZ file's name for now.
+        # The following commented line is right way to do this
+        # unless File.file? "#{file}"
+
+        unless File.file? "/etc/vz/conf/ve-#{file}.conf-sample"
           raise ArgumentError, "Config file \"#{file}\" does not exist."
         end
       end

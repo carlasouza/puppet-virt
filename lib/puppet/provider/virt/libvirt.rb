@@ -16,6 +16,11 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
   defaultfor :virtual => ["kvm", "physical", "xenu"]
 
+  def self.instances
+    # TODO
+    []
+  end
+
   def hypervisor
     #FIXME add support to autentication
     case resource[:virt_type]
@@ -382,7 +387,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     xml = path + resource[:name] + extension
 
     if File.exists?(xml)
-      arguments =  ["poweroff", xml]
+      arguments =  ["on_poweroff", xml]
       line = ""
       debug "Line: %s" % [line]
       line = grep arguments
