@@ -101,7 +101,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
       arguments << [ "-x", resource[:boot_options] ]
     end
 
-    max_cpus = ::Facter.value('processorcount')
+    max_cpus = Facter.value('processorcount')
     arguments << ["--vcpus", "#{resource[:cpus]},maxvcpus=#{max_cpus}"]
 
     arguments << diskargs
