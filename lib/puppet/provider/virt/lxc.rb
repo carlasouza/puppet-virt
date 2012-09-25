@@ -46,7 +46,7 @@ Puppet::Type.type(:virt).provide :lxc do
     def start
       if !exists?
         install
-      elsif status == :freeze
+      elsif status == :suspended
         unfreeze
       end
       lxcstart('-n', @resource[:name], '-d')
@@ -59,7 +59,7 @@ Puppet::Type.type(:virt).provide :lxc do
       lxcstop('-n', @resource[:name])
     end
 
-    def freeze
+    def suspend
       if !exists?
         install
         start
