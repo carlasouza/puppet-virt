@@ -55,6 +55,9 @@ Puppet::Type.newtype(:virt) do
     feature :backingstore,
       "'backingstore' is one of 'none', 'lvm', or 'btrfs"
 
+    feature :ip,
+      "Assign an IP for the guest"
+
     # A base class for numeric Virt parameters validation.
     class VirtNumericParam < Puppet::Property
 
@@ -189,7 +192,7 @@ Puppet::Type.newtype(:virt) do
       end
     end
 
-    newproperty(:ipaddr, :array_matching => :all) do
+    newproperty(:ipaddr, :array_matching => :all, :required_features => :ip) do
       desc "IP address(es) of the VE."
 
       validate do |ip|

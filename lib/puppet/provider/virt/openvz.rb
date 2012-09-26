@@ -5,7 +5,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
   commands :vzctl  => "/usr/sbin/vzctl"
   commands :vzlist => "/usr/sbin/vzlist"
 
-  has_features :disabled, :cpu_fair, :disk_quota, :manages_resources, :manages_capabilities, :manages_features, :manages_devices, :manages_user, :iptables, :initial_config, :storage_path
+  has_features :disabled, :cpu_fair, :disk_quota, :manages_resources, :manages_capabilities, :manages_features, :manages_devices, :manages_user, :iptables, :initial_config, :storage_path, :ip
 
   defaultfor :virtual => ["openvzhn"]
 
