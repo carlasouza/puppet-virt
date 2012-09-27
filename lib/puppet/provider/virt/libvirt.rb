@@ -96,8 +96,8 @@ Puppet::Type.type(:virt).provide(:libvirt) do
       arguments << "--noreboot"
     end
 
-    if resource[:description]
-      arguments << ["--description='#{resource[:description]}'"]
+    if resource[:desc]
+      arguments << ["--description='#{resource[:desc]}'"]
     end
 
     if resource[:boot_options]

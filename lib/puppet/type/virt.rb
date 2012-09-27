@@ -304,7 +304,7 @@ Puppet::Type.newtype(:virt) do
     end
 
     newparam(:clone, :requires_feature => :cloneable) do
-      desc 'Name of container to clone'
+      desc 'Name of an existing container to clone from'
     end
 
     newparam(:snapshot, :requires_feature => :cloneable) do
@@ -351,10 +351,6 @@ Puppet::Type.newtype(:virt) do
 
     newparam(:boot_options, :requires_features => :boot_params) do
       desc "Additional kernel command line arguments to pass to the installer when performing a guest install from declared location."
-    end
-
-    newparam(:clone, :required_features => :cloneable) do
-      desc "Clones from an existing guest."
     end
 
     newparam(:virt_path) do
@@ -693,4 +689,3 @@ To force the start of a disabled guest, use vzctl start with --force option."
     end
 
   end
-end
