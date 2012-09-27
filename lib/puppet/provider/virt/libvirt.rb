@@ -265,12 +265,13 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   def suspend
     if !exists?
       install(false)
-    elsif status == :suspended
-      exec { @guest.resume }
-    elsif status == :running
-      case resource[:virt_type]
-           when :kvm,:qemu then exec { @guest.suspend }
-           else exec { @guest.shutdown } # TODO
+    elsif
+      case status
+      when :running
+        exec { @guest.suspend }
+      else
+        exec { @guest.create }
+        exec { @guest.suspend }
       end
     end
   end
@@ -279,10 +280,13 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   def start
     debug "Starting domain %s" % [resource[:name]]
 
-    if exists? && status != :running
-      exec { @guest.create }
-      cpus=resource[:cpus] unless resource[:cpus].nil? #It seems to reset the # of cpus to 1 after a reboot
-
+    if exists?
+      case status
+      when :suspended
+        exec { @guest.resume }
+      else
+        exec { @guest.create }
+      end
     elsif status == :absent
       install
     end
@@ -297,10 +301,8 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   def exists?
     begin
       exec
-      debug "Domain %s exists? true" % [resource[:name]]
       true
     rescue Libvirt::RetrieveError => e
-      debug "Domain %s exists? false" % [resource[:name]]
       false # The vm with that name doesnt exist
     end
   end
@@ -355,18 +357,9 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   def memory=(value)
     mem=value * 1024 #MB
     exec { @guest.destroy }
-
-    # 10 seconds of timeout to wait for the domain to stop
-    # TODO refactor
-    timeout = 5
-    count = 0
-    while now<timeout && state != :stopped
-      sleep 2
-      count += 1
-    end
-    fail "Unable to stop the guest." unless state != :stopped
+    fail "Unable to stop the guest." if status != :stopped
     exec { @guest.max_memory=(mem) }
-    exec { start }
+    start
   end
 
   def cpus
