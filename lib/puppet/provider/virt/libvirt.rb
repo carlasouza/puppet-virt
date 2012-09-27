@@ -49,7 +49,10 @@ Puppet::Type.type(:virt).provide(:libvirt) do
       clone
     else
       debug "Virtualization type: %s" % [resource[:virt_type]]
-      virtinstall generalargs(bootoninstall) + network + graphic + bootargs
+
+      args = generalargs(bootoninstall) + network + graphic + bootargs
+      debug "[INFO] virt-install arguments: #{args}"
+      virtinstall args
     end
 
     resource.properties.each do |prop|
