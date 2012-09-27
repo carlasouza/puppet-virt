@@ -186,7 +186,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   end
 
   #TODO the Libvirt biding for ruby doesnt support this feature
-  def interface
+  def interfaces
     warnonce "It is not possible to change interfaces settings for an existing guest."
     resource[:interfaces]
   end
