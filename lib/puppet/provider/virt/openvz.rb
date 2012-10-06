@@ -109,7 +109,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
     vzctl args
 
     resource.properties.each do |prop|
-      if self.class.supports_parameter? :"#{prop.to_s}" && prop.to_s != 'ensure'
+      if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
         eval "self.#{prop.to_s}=prop.should"
       end
     end
@@ -234,7 +234,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
   end
 
   def memory=(value)
-    unless resource[:configfile] == "unlimited"
+    unless resource[:configfile] == "unlimited" #FIXME use regex for the match
       vzctl('set', ctid, "--vmguarpages", value.to_s + "M", "--save")
       vzctl('set', ctid, "--oomguarpages", value.to_s + "M", "--save")
       vzctl('set', ctid, "--privvmpages", value.to_s + "M", "--save")
