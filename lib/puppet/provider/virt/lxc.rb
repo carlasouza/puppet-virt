@@ -13,12 +13,27 @@ Puppet::Type.type(:virt).provide :lxc do
     has_features :cloneable
     has_features :backingstore
     has_features :initial_config
+    has_features :manages_lvm
 
     def install
       args = ['-n', @resource[:name]]
       args.push('-t', @resource[:os_template])
       if !@resource[:backingstore].nil?
          args.push('-B', @resource[:backingstore])
+      end
+      if @resource[:backingstore].to_s == 'lvm'
+        if !@resource[:vgname].nil?
+          args.push('--vgname', @resource[:vgname])
+        end
+        if !@resource[:lvname].nil?
+          args.push('--lvname', @resource[:lvname])
+        end
+        if !@resource[:fssize].nil?
+          args.push('--fssize', @resource[:fssize])
+        end
+        if !@resource[:fstype].nil?
+          args.push('--fstype', @resource[:fstype])
+        end
       end
       if !@resource[:configfile].nil?
          args.push('-f', @resource[:configfile])
@@ -33,6 +48,15 @@ Puppet::Type.type(:virt).provide :lxc do
     def clone
       args = ['-o', @resource[:clone]]
       args.push('-n', @resource[:name])
+
+      if @resource[:backingstore].to_s == 'lvm'
+        if !@resource[:vgname].nil?
+          args.push('-v', @resource[:vgname])
+        end
+        if !@resource[:fssize].nil?
+          args.push('-L', @resource[:fssize])
+        end
+      end
       if @resource[:snapshot]
          args.push('-s')
       end
