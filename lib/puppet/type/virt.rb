@@ -515,7 +515,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
     end
 
 
-    newproperty(:interfaces) do
+    newproperty(:interfaces, :array_matching => :all) do
       desc "Connect the guest network to the host using the specified network as a bridge. The value can take one of 2 formats:
   `disabled`:
     The guest will have no network.
