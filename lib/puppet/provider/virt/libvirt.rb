@@ -219,7 +219,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
       debug "Creating the domain: %s " % [resource[:name]]
       virsh args
 
-      start if bootoninstall
+      exec { @guest.create } if bootoninstall
     else
       fail "Error: XML file not found: " + resource[:xml_file]
     end
