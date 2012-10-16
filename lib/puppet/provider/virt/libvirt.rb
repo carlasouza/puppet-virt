@@ -218,7 +218,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
       debug "Creating the XML file: %s " % resource[:xml_file]
 
       debug "Detected hypervisor type: %s " % resource[:virt_type]
-      xargs = "-c qemu:///session define --file "
+      xargs = "-c " + hypervisor + " define --file "
       xmlqemu = File.new(resource[:xml_file], 'a') # 'a' means Append
       xmlwrite = ERB.new("puppet-virt/templates/qemu_xml.erb")
       xmlqemu.puts = xmlwrite.result

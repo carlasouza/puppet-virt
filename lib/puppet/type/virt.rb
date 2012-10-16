@@ -508,12 +508,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
     newparam(:xml_file) do
       desc "This is the path to a predefined xml config file, to be used with the import function."
-
-      munge do |value|
-        "path=" + value
-      end
     end
-
 
     newproperty(:interfaces, :array_matching => :all) do
       desc "Connect the guest network to the host using the specified network as a bridge. The value can take one of 2 formats:
