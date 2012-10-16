@@ -214,10 +214,10 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   # Libvirt XML <domain> specification: http://libvirt.org/formatdomain.html
   def xmlinstall
     if File.exists?(resource[:xml_file])
-      args = ["-c", hypervisor, "define"]
+      args = ["-c", hypervisor, "define", resource[:xml_file]]
 
       debug "Creating the domain: %s " % [resource[:name]]
-      virsh args + resource[:xml_file]
+      virsh args
     else
       fail "Error: XML file not found: " + resource[:xml_file]
     end
