@@ -349,8 +349,8 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   end
 
   def memory=(value)
-    mem=value * 1024 #MB
-    exec { @guest.destroy }
+    mem = value * 1024 #MB
+    exec { @guest.destroy } unless status == :stopped
     fail "Unable to stop the guest." if status != :stopped
     exec { @guest.max_memory=(mem) }
     start
