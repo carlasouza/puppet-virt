@@ -213,21 +213,13 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   # Install guests using virsh with xml when virt-install is still not yet supported.
   # Libvirt XML <domain> specification: http://libvirt.org/formatdomain.html
   def xmlinstall
-    if !File.exists?(resource[:xml_file])
-      require "erb"
-      debug "Creating the XML file: %s " % resource[:xml_file]
-
-      debug "Detected hypervisor type: %s " % resource[:virt_type]
-      xargs = "-c " + hypervisor + " define --file "
-      xmlqemu = File.new(resource[:xml_file], 'a') # 'a' means Append
-      xmlwrite = ERB.new("puppet-virt/templates/qemu_xml.erb")
-      xmlqemu.puts = xmlwrite.result
-      xmlqemu.close
+    if File.exists?(resource[:xml_file])
+      args = "-c " + hypervisor + " create "
 
       debug "Creating the domain: %s " % [resource[:name]]
-      virsh xargs + resource[:xml_file]
+      virsh args + resource[:xml_file]
     else
-      fail("Error: XML already exists on disk " + resource[:xml_file] + "." )
+      fail "Error: XML file not found: " + resource[:xml_file]
     end
   end
 
