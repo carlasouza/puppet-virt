@@ -538,7 +538,7 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
       end
     end
 
-    newproperty(:macaddrs) do
+    newproperty(:macaddrs, :array_matching => :all) do
       desc "Fixed MAC address for the guest;
 If this parameter is omitted, or the value \"RANDOM\" is specified a suitable address will be randomly generated.
 For Xen virtual machines it is required that the first 3 pairs in the MAC address be the sequence '00:16:3e', while for QEMU or KVM virtual machines it must be '54:52:00'."

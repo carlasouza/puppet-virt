@@ -105,7 +105,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     end
 
     max_cpus = Facter.value('processorcount')
-    arguments << ["--vcpus", "#{resource[:cpus]},maxvcpus=#{max_cpus}"]
+    arguments << ["--vcpus=#{resource[:cpus]},maxvcpus=#{max_cpus}"]
 
     arguments << diskargs
 
@@ -185,7 +185,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   def interface?(ifname)
     ip('link', 'list',  ifname)
     rescue Puppet::ExecutionFailure
-      warnonce("Network interface " + ifname + " does not exist")
+      fail("Network interface " + ifname + " does not exist")
   end
 
   #TODO the Libvirt biding for ruby doesnt support this feature
@@ -219,7 +219,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
       debug "Detected hypervisor type: %s " % resource[:virt_type]
       xargs = "-c qemu:///session define --file "
-      xmlqemu = File.new(resource[:xml_file], APPEND)
+      xmlqemu = File.new(resource[:xml_file], 'a') # 'a' means Append
       xmlwrite = ERB.new("puppet-virt/templates/qemu_xml.erb")
       xmlqemu.puts = xmlwrite.result
       xmlqemu.close
