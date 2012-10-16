@@ -44,7 +44,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     debug "Boot on install: %s" % bootoninstall
 
     if resource[:xml_file]
-      xmlinstall
+      xmlinstall(bootoninstall)
     elsif resource[:clone]
       clone
     else
@@ -212,12 +212,14 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
   # Install guests using virsh with xml when virt-install is still not yet supported.
   # Libvirt XML <domain> specification: http://libvirt.org/formatdomain.html
-  def xmlinstall
+  def xmlinstall(bootoninstall)
     if File.exists?(resource[:xml_file])
       args = ["-c", hypervisor, "define", resource[:xml_file]]
 
       debug "Creating the domain: %s " % [resource[:name]]
       virsh args
+
+      start if bootoninstall
     else
       fail "Error: XML file not found: " + resource[:xml_file]
     end
