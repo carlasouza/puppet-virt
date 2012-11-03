@@ -15,7 +15,7 @@ class virt::params {
     /^physical|^kvm/: {
       $servicename = 'libvirtd'
       $packages = $operatingsystem ? {
-        Debian => [ 'kvm', 'virt-manager', 'libvirt', 'python-virtinst', 'qemu', 'qemu-img' ],
+        Debian => [ 'kvm', 'libvirt0', 'libvirt-bin', 'qemu', 'virtinst', 'libvirt-ruby' ],
         Ubuntu => [ 'ubuntu-virt-server', 'python-vm-builder', 'kvm', 'qemu', 'qemu-kvm', 'libvirt-ruby' ],
         Fedora => [ 'kvm', 'qemu', 'libvirt', 'python-virtinst', 'ruby-libvirt' ],
       }
