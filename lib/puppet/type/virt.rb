@@ -28,6 +28,9 @@ Puppet::Type.newtype(:virt) do
     feature :manages_users,
       "Manages guest's users."
 
+    feature :manages_lvm,
+      "Manages LVM."
+
     feature :iptables,
       "Load iptables modules."
 
@@ -402,6 +405,24 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
 
     newproperty(:diskspace, :required_features => :disk_quota) do
       desc "Sets soft and hard disk quotas, in blocks. First parameter is soft quota, second is hard quota. One block is currently equal to 1Kb. Also suffixes G, M, K can be specified."
+    end
+
+    # LXC/LVM specific paramters
+
+    newparam(:vgname, :required_features => :manages_lvm) do
+      desc "Use specified Volume Group (defaults to lxc) in LXC."
+    end
+
+    newparam(:lvname, :required_features => :manages_lvm) do
+      desc "Use specified name for Logical Volume (defaults to hostname) in LXC."
+    end
+
+    newparam(:fssize, :required_features => :manages_lvm) do
+      desc "Specify LV size (defaults to 1G) for LXC."
+    end
+
+    newparam(:fstype, :required_features => :manages_lvm) do
+      desc "Specify LV filesystem type  (defaults to ext4) for LXC."
     end
 
     # Device access management
