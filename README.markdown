@@ -2,6 +2,11 @@
 
 Puppet Module to manage virtual machines. Provides a the type: `virt`.
 
+## Requirements
+
+  ruby-libvirt 0.4.0 (gem)
+  virtinst 0.600 (package)
+
 ----------------
 
 ### virt
@@ -83,6 +88,7 @@ lXC Examples:
 - *graphics*: The provider can setup a virtual console in the guest for VNC.
 - *clocksync*: The provider can specify the guest's clock syncronization method.
 - *boot_params*: The provider support parameters for the guest boot.
+- *manages_lvm*: The provider manages LVM configuration.
 - *manages_resources*: The provider manage a set of limits and guarantees controlled per guest.
 - *manages_capabilities*: The provider manage a set of capabilities for a guest.
 - *manages_features*: The provider can enable or disable a specific guest feature.
@@ -105,6 +111,7 @@ iptables             |         |  *X*   |       |
 graphics             |   *X*   |        |       |
 clocksync            |   *X*   |        |       |
 boot_params          |   *X*   |        |       |
+manages_lvm          |         |        |  *X*  |
 manages_resources    |         |  *X*   |       |
 manages_capabilities |         |  *X*   |       |
 manages_features     |         |  *X*   |       |
@@ -523,9 +530,34 @@ Requires features `cloneable`.
 
 ##### backingstore
 
-bacckingstore' is one of 'none', 'lvm', or 'btrfs'
+backingstore' is one of 'none', 'lvm', or 'btrfs'
 
 Requires features `backingstore`.
+
+##### vgname
+
+Use specified Volume Group (defaults to lxc) in LXC.
+
+Requires features `manages_lvm`.
+
+##### lvname
+
+Use specified name for Logical Volume (defaults to hostname) in LXC.
+
+Requires features `manages_lvm`.
+
+##### fssize
+
+Specify LV size (defaults to 1G) for LXC.
+
+Requires features `manages_lvm`.
+
+##### fstype
+
+Specify LV filesystem type  (defaults to ext4) for LXC.
+
+Requires features `manages_lvm`.
+
 
 ----------------
 
