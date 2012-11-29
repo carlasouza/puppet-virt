@@ -37,7 +37,7 @@ class virt::params {
         openvzhn =>  [ 'ovzkernel', 'vzctl', 'vzquota' ],
       }
 
-    CentOS,RHEL: {
+    CentOS,redhat: {
       if $virtual == 'xen' {
         fail ("Xen not supported in RHEL/CentOS")
       }
