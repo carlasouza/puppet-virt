@@ -17,6 +17,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     has_features :pxe, :manages_behaviour, :graphics, :clocksync, :boot_params
 
     defaultfor :virtual => ["kvm", "physical", "xenu"]
+    defaultfor :operatingsystem => :redhat
 
     # Executes operation over guest
     def exec
