@@ -146,7 +146,8 @@ Puppet::Type.type(:virt).provide(:libvirt) do
             network = ["--nonetworks"]
         else
             iface.each do |iface|
-                if interface?(iface)
+                ifname = iface.split(",").first
+                if interface?(ifname)
                     network << ["--network","bridge="+iface+parameters]
                 end
             end
