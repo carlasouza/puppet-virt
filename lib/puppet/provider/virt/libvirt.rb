@@ -180,6 +180,9 @@ Puppet::Type.type(:virt).provide(:libvirt) do
         resource[:interfaces]
     end
 
+    def interfaces
+    end
+
     def interfaces=(value)
         warnonce("It is not possible to change interfaces settings for an existing guest.")
     end
