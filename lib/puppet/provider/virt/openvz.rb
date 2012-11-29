@@ -13,8 +13,6 @@ Puppet::Type.type(:virt).provide(:openvz) do
     if [ "Ubuntu", "Debian" ].any? { |os|  Facter.value(:operatingsystem) == os }
         @@vzcache = "/var/lib/vz/template/cache/"
         @@vzconf = "/etc/vz/conf/"
-    else
-        raise Puppet::Error, "Sorry, this provider is not supported for your Operation System, yet :)"
     end
 
     # Returns all host's guests
