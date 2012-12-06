@@ -113,7 +113,7 @@ Facter.add("virt_domains_active") do
         begin
             domains = []
             libvirt_connect.list_domains.each do |domid|
-                domains.concat([ conn.lookup_domain_by_id(domid).name ])
+                domains.concat([ libvirt_connect.lookup_domain_by_id(domid).name ])
             end
             domains.join(',')
         rescue Libvirt::Error, NoMethodError
@@ -129,7 +129,7 @@ Facter.add("virt_domains_inactive") do
         begin
             domains = []
             libvirt_connect.list_defined_domains.each do |domid|
-                domains.concat([ conn.lookup_domain_by_id(domid).name ])
+                domains.concat([ libvirt_connect.lookup_domain_by_id(domid).name ])
             end
             domains.join(',')
         rescue Libvirt::Error, NoMethodError

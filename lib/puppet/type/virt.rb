@@ -430,7 +430,7 @@ Image files must end with `*.img`, `*.qcow`, `*.qcow2`, or `*.raw`"
             newvalues(:linux, :windows, :unix, :solaris, :other)
         end
 
-        newparam(:os_template) do #TODO change 'os_template' to 'os'
+        newparam(:os_variant) do 
             desc "Further optimize the guest configuration for a specific operating system variant (ex. 'fedora8', 'winxp'). This parameter is optional, and does not require an `os-type` to be specified.
         Available values:
         `linux`

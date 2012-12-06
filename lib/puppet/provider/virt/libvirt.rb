@@ -17,6 +17,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     has_features :pxe, :manages_behaviour, :graphics, :clocksync, :boot_params
 
     defaultfor :virtual => ["kvm", "physical", "xenu"]
+    defaultfor :operatingsystem => :redhat
 
     # Executes operation over guest
     def exec
@@ -145,7 +146,8 @@ Puppet::Type.type(:virt).provide(:libvirt) do
             network = ["--nonetworks"]
         else
             iface.each do |iface|
-                if interface?(iface)
+                ifname = iface.split(",").first
+                if interface?(ifname)
                     network << ["--network","bridge="+iface+parameters]
                 end
             end
@@ -176,6 +178,9 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     def interface
         warnonce("It is not possible to change interfaces settings for an existing guest.")
         resource[:interfaces]
+    end
+
+    def interfaces
     end
 
     def interfaces=(value)
