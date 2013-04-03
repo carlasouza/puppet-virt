@@ -191,7 +191,6 @@ Puppet::Type.type(:virt).provide(:openvz) do
     end
   end
 
-  private
   def get_value(arg)
     debug "Getting parameter #{arg} value"
     conf = @@vzconf + ctid + '.conf'
