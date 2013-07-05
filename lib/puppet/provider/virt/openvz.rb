@@ -70,11 +70,8 @@ Puppet::Type.type(:virt).provide(:openvz) do
       tmp = out.empty? ? 100 : Integer(out.split.last)
       id = tmp <= 100 ? 101 : tmp + 1
     end
-    if id
-      return id
-    else
-      raise Puppet::Error, "CTID not specified"
-    end
+    return id if id
+    raise Puppet::Error, "CTID not specified"
   end
 
   def install
@@ -141,11 +138,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
 
   def exists?
     stat = vzctl('status', ctid).split(" ")
-    if stat.nil? || stat[2] == "deleted"
-      return false
-    else
-      return true
-    end
+    !(stat.nil? || stat[2] == "deleted")
   end
 
   # OpenVZ guests status: exist, deleted, mouted, umounted, running, down
@@ -195,8 +188,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
     debug "Getting parameter #{arg} value"
     conf = @@vzconf + ctid + '.conf'
     value = open(conf).grep(/^#{arg.upcase}/)
-    result = value.size == 0 ? '' : value[0].split('"')[1].downcase
-    result
+    value.size == 0 ? '' : value[0].split('"')[1].downcase
   end
 
   def apply(paramname, value)

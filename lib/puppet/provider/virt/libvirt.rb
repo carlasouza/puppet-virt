@@ -61,12 +61,6 @@ Puppet::Type.type(:virt).provide(:libvirt) do
       end
     end
 
-    # wat? Repeated code!?
-#    resource.properties.each do |prop|
-#      if self.class.supports_parameter? :"#{prop.to_s}" and prop.to_s != 'ensure'
-#        eval "self.#{prop.to_s}=prop.should"
-#      end
-#    end
   end
 
   def clone
@@ -130,43 +124,32 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   end
 
   def diskargs
-    args = []
     parameters = ""
-
-    if resource[:virt_path]
-      parameters = resource[:virt_path]
-    end
-    if resource[:disk_size]
-      parameters.concat("," + resource[:disk_size])
-    end
-    if !parameters.nil?
-      args = ["--disk", parameters]
-    end
-    args
+    parameters = resource[:virt_path] if resource[:virt_path]
+    parameters.concat("," + resource[:disk_size]) if resource[:disk_size]
+    parameters.empty? [] : ["--disk", parameters]
   end
 
   # Additional boot arguments
   def bootargs
     debug "Bootargs"
 
-    bootargs = []
-    bootargs = ["-x", resource[:kickstart]] if resource[:kickstart] #kickstart support
-    bootargs
+    ["-x", resource[:kickstart]] if resource[:kickstart] #kickstart support
   end
 
   # Creates network arguments for virt-install command
   def network
     debug "Network paramenters"
     network = []
+
     iface = resource[:interfaces]
-    if iface.nil?
+    case iface
+    when nil
       network = ["--network", "network=default"]
-    elsif iface == "disabled"
+    when "disabled"
       network = ["--nonetworks"]
     else
-      iface.each do |iface|
-        network << ["--network","bridge="+iface] if interface?(iface)
-      end
+      iface.each { |iface| network << ["--network","bridge="+iface] if interface?(iface) }
     end
 
     macs = resource[:macaddrs]
@@ -250,7 +233,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
       install(false)
     elsif status == :running
       case resource[:virt_type]
-               when :kvm,:qemu then exec { @guest.destroy }
+        when :kvm,:qemu then exec { @guest.destroy }
         else exec { @guest.shutdown }
       end
     end
@@ -293,12 +276,10 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
   # Check if the domain exists.
   def exists?
-    begin
-      exec
-      true
-    rescue Libvirt::RetrieveError => e
-      false # The vm with that name doesnt exist
-    end
+    exec
+    true
+  rescue Libvirt::RetrieveError => e
+    false # The vm with that name doesnt exist
   end
 
   # running | stopped | absent,
@@ -331,16 +312,14 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   # Set true or false to autoboot property
   def autoboot=(value)
     debug "Trying to set autoboot %s at domain %s." % [resource[:autoboot], resource[:name]]
-    begin
-      # FIXME
-      if value.to_s == "false"
-        exec { @guest.autostart=(false) }
-      else
-        exec { @guest.autostart=(true) }
-      end
-    rescue Libvirt::RetrieveError => e
-      debug "Domain %s not defined" % [resource[:name]]
+    # FIXME
+    if value.to_s == "false"
+      exec { @guest.autostart=(false) }
+    else
+      exec { @guest.autostart=(true) }
     end
+  rescue Libvirt::RetrieveError => e
+    debug "Domain %s not defined" % [resource[:name]]
   end
 
   def memory
@@ -357,11 +336,9 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   end
 
   def cpus
-    begin
-      exec { @guest.num_vcpus 0 } #Why 0? See at http://www.libvirt.org/html/libvirt-libvirt.html#virDomainGetVcpusFlags
-    rescue Libvirt::RetrieveError => e
-      debug "Domain is not running, cannot evaluate cpus parameter"
-    end
+    exec { @guest.num_vcpus 0 } #Why 0? See at http://www.libvirt.org/html/libvirt-libvirt.html#virDomainGetVcpusFlags
+  rescue Libvirt::RetrieveError => e
+    debug "Domain is not running, cannot evaluate cpus parameter"
   end
 
   def cpus=(value)
