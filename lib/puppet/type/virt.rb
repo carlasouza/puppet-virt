@@ -195,6 +195,10 @@ Puppet::Type.newtype(:virt) do
       end
     end
 
+    autorequire(:file) do
+      self[:configfile] if self[:configfile]
+    end
+
     newproperty(:ipaddr, :array_matching => :all, :required_features => :ip) do
       desc "IP address(es) of the VE."
 
