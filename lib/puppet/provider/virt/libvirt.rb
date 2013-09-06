@@ -127,14 +127,15 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     parameters = ""
     parameters = resource[:virt_path] if resource[:virt_path]
     parameters.concat("," + resource[:disk_size]) if resource[:disk_size]
-    parameters.empty? [] : ["--disk", parameters]
+    parameters.empty? ? [] : ["--disk", parameters]
   end
 
-  # Additional boot arguments
+  # Additional boot arguments  #FIXME 
   def bootargs
     debug "Bootargs"
 
     ["-x", resource[:kickstart]] if resource[:kickstart] #kickstart support
+    []
   end
 
   # Creates network arguments for virt-install command
