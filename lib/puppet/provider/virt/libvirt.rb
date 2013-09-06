@@ -101,7 +101,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     max_cpus = Facter.value('processorcount')
     arguments << ["--vcpus=#{resource[:cpus]},maxvcpus=#{max_cpus}"]
 
-    arguments << diskargs
+    arguments << diskargs << additional_diskargs
 
     if resource[:boot_location]
       fail "To use 'boot_location', you need to specify the 'virt_path' parameter." if resource[:virt_path].nil?
@@ -128,6 +128,15 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     parameters = resource[:virt_path] if resource[:virt_path]
     parameters.concat("," + resource[:disk_size]) if resource[:disk_size]
     parameters.empty? ? [] : ["--disk", parameters]
+  end
+
+  def additional_diskargs
+    disks = resource[:virt_disks]
+    args = []
+    disks.each do |key,value|
+      args << ["--disk=#{key},size=#{value}"]
+    end
+    args
   end
 
   # Additional boot arguments  #FIXME 

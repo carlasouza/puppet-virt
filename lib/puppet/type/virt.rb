@@ -389,6 +389,9 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
         "size=" + value
       end
     end
+    newparam(:virt_disks) do
+      desc "Additional disks"
+    end
 
     newproperty(:quotatime, :parent => VirtNumericParam, :required_features => :disk_quota) do
       desc "Sets soft overusage time limit for disk quota (also known as grace period)."
