@@ -392,6 +392,9 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
     newparam(:virt_disks) do
       desc "Additional disks"
     end
+    newparam(:virtio_for_disks) do
+      desc "Using virtio for block devices"
+    end
 
     newproperty(:quotatime, :parent => VirtNumericParam, :required_features => :disk_quota) do
       desc "Sets soft overusage time limit for disk quota (also known as grace period)."

@@ -127,15 +127,18 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     parameters = ""
     parameters = resource[:virt_path] if resource[:virt_path]
     parameters.concat("," + resource[:disk_size]) if resource[:disk_size]
+    parameters.concat(",bus=virtio") if resource[:virtio_for_disks] == 'true' 
     parameters.empty? ? [] : ["--disk", parameters]
   end
 
   def additional_diskargs
     disks = resource[:virt_disks]
     args = []
-    disks.each do |key,value|
-      args << ["--disk=#{key},size=#{value}"]
-    end
+    parameters = ""
+    parameters.concat(",bus=virtio") if resource[:virtio_for_disks] == 'true'
+      disks.each do |key,value|
+        args << ["--disk=#{key},size=#{value}"+parameters]
+      end
     args
   end
 
