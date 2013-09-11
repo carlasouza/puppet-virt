@@ -154,15 +154,17 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   def network
     debug "Network paramenters"
     network = []
+    parameters = ""
+    parameters.concat(",model=virtio") if resource[:virtio_for_net] == 'true'
 
     iface = resource[:interfaces]
     case iface
     when nil
-      network = ["--network", "network=default"]
+      network = ["--network", "network=default"+parameters]
     when "disabled"
       network = ["--nonetworks"]
     else
-      iface.each { |iface| network << ["--network","bridge="+iface] if interface?(iface) }
+      iface.each { |iface| network << ["--network","bridge="+iface+parameters] if interface?(iface) }
     end
 
     macs = resource[:macaddrs]

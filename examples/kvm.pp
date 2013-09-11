@@ -8,6 +8,8 @@ class kvm-guests {
     disk_size => '3',
     virt_disks => {"/tmp/disk1.qcow2" => 2, "/tmp/disk2.qcow2" => 3 },
     virtio_for_disks => 'true',
+    virtio_for_net => 'true',
+    #interfaces => ["br1"],
     cpus      => 2,
     ensure    => running,
     virt_type => 'kvm'
