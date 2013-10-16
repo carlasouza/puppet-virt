@@ -688,6 +688,10 @@ To force the start of a disabled guest, use vzctl start with --force option."
       end
     end
 
+    newparam(:boot_order) do
+      desc "Specify the boot order of the machine."
+    end
+
     ###
     # UBC parameters (in form of barrier:limit)
     # Requires one or two arguments. In case of one argument, vzctl sets barrier and limit to the same value. In case of two colon-separated arguments, the first is a barrier, and the second is a limit. Each argument is either a number, a number with a suffix, or the special value 'unlimited'."

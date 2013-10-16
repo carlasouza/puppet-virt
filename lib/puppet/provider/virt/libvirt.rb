@@ -134,8 +134,10 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   def bootargs
     debug "Bootargs"
 
-    # kickstart support
-    resource[:kickstart] ? ["-x", resource[:kickstart]] : []
+    bootargs = []
+    bootargs = ["-x", resource[:kickstart]] if resource[:kickstart] #kickstart support
+    bootargs << ["--boot",resource[:boot_order]] if resource[:boot_order]
+    bootargs
   end
 
   # Creates network arguments for virt-install command
