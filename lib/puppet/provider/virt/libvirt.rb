@@ -165,6 +165,14 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     return network
   end
 
+  def macaddrs
+    resource[:macaddrs]
+  end
+
+  def macaddrs=(value)
+    warnonce "It is not possible to change macaddrs settings for an existing guest."
+  end
+
   # Auxiliary method. Checks if declared interface exists.
   def interface?(ifname)
     ip('link', 'list',  ifname)
