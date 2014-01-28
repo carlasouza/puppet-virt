@@ -102,7 +102,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     arguments << ["--vcpus=#{resource[:cpus]},maxvcpus=#{max_cpus}"]
 
     arguments << diskargs << additional_diskargs
-    arguments << ["--cpuset='#{resource[:cpuset]}'"]
+    arguments << ["--cpuset=#{resource[:cpuset]}"]
 
     if resource[:boot_location]
       fail "To use 'boot_location', you need to specify the 'virt_path' parameter." if resource[:virt_path].nil?
