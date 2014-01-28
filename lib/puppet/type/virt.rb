@@ -247,7 +247,7 @@ Puppet::Type.newtype(:virt) do
       defaultto(1)
     end
 
-    newproperty(:cpuset, :required_features => :cpuset) do
+    newparam(:cpuset, :required_features => :cpuset) do
       desc "Tune CPU affinity at virt-install time."
 
       defaultto("auto")
