@@ -7,6 +7,9 @@ Puppet::Type.newtype(:virt) do
     feature :cpu_fair,
       "These parameters control CPU usage by guest."
 
+    feature :cpuset,
+      "Control libvirt CPU affinities during virt-install."
+
     feature :disk_quota,
       "Specify disk usage quota."
 
@@ -242,6 +245,12 @@ Puppet::Type.newtype(:virt) do
       desc "Number of virtual CPUs active in the guest domain."
 
       defaultto(1)
+    end
+
+    newproperty(:cpuset, :required_features => :cpuset) do
+      desc "Tune CPU affinity at virt-install time."
+
+      defaultto("auto")
     end
 
     newproperty(:cpuunits, :parent => VirtNumericParam, :required_features => :cpu_fair) do
