@@ -394,9 +394,15 @@ Image files must end with `*.img`, `*.qcow` or `*.qcow2`"
     end
     newparam(:virtio_for_disks) do
       desc "Using virtio for block devices"
+      munge do |value|
+        @resource.munge_boolean(value)
+      end
     end
     newparam(:virtio_for_net) do
       desc "Using virtio for network devices"
+      munge do |value|
+        @resource.munge_boolean(value)
+      end
     end
 
     newproperty(:quotatime, :parent => VirtNumericParam, :required_features => :disk_quota) do

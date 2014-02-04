@@ -127,7 +127,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     parameters = ""
     parameters = resource[:virt_path] if resource[:virt_path]
     parameters.concat("," + resource[:disk_size]) if resource[:disk_size]
-    parameters.concat(",bus=virtio") if resource[:virtio_for_disks] == 'true' 
+    parameters.concat(",bus=virtio") if resource[:virtio_for_disks] == :true
     parameters.empty? ? [] : ["--disk", parameters]
   end
 
@@ -135,7 +135,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     disks = resource[:virt_disks]
     args = []
     parameters = ""
-    parameters.concat(",bus=virtio") if resource[:virtio_for_disks] == 'true'
+    parameters.concat(",bus=virtio") if resource[:virtio_for_disks] == :true
       disks.each do |key,value|
         args << ["--disk=#{key},size=#{value}"+parameters]
       end
@@ -153,7 +153,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     debug "Network paramenters"
     network = []
     parameters = ""
-    parameters.concat(",model=virtio") if resource[:virtio_for_net] == 'true'
+    parameters.concat(",model=virtio") if resource[:virtio_for_net] == :true
 
     iface = resource[:interfaces]
     case iface
