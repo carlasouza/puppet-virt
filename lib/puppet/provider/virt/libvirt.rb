@@ -101,7 +101,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     max_cpus = Facter.value('processorcount')
     arguments << ["--vcpus=#{resource[:cpus]},maxvcpus=#{max_cpus}"]
 
-    arguments << diskargs
+    arguments << diskargs << additional_diskargs
 
     if resource[:boot_location]
       fail "To use 'boot_location', you need to specify the 'virt_path' parameter." if resource[:virt_path].nil?
@@ -127,29 +127,42 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     parameters = ""
     parameters = resource[:virt_path] if resource[:virt_path]
     parameters.concat("," + resource[:disk_size]) if resource[:disk_size]
-    parameters.empty? [] : ["--disk", parameters]
+    parameters.concat(",bus=virtio") if resource[:virtio_for_disks] == :true
+    parameters.empty? ? [] : ["--disk", parameters]
   end
 
-  # Additional boot arguments
+  def additional_diskargs
+    disks = resource[:virt_disks]
+    args = []
+    parameters = ""
+    parameters.concat(",bus=virtio") if resource[:virtio_for_disks] == :true
+      disks.each do |key,value|
+        args << ["--disk=#{key},size=#{value}"+parameters]
+      end
+    args
+  end
+
+  # Additional boot arguments  #FIXME 
   def bootargs
     debug "Bootargs"
-
-    ["-x", resource[:kickstart]] if resource[:kickstart] #kickstart support
+    resource[:kickstart] ? ["-x", resource[:kickstart]] : [] #kickstart support
   end
 
   # Creates network arguments for virt-install command
   def network
     debug "Network paramenters"
     network = []
+    parameters = ""
+    parameters.concat(",model=virtio") if resource[:virtio_for_net] == :true
 
     iface = resource[:interfaces]
     case iface
     when nil
-      network = ["--network", "network=default"]
+      network = ["--network", "network=default"+parameters]
     when "disabled"
       network = ["--nonetworks"]
     else
-      iface.each { |iface| network << ["--network","bridge="+iface] if interface?(iface) }
+      iface.each { |iface| network << ["--network","bridge="+iface+parameters] if interface?(iface) }
     end
 
     macs = resource[:macaddrs]

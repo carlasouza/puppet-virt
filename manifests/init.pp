@@ -16,7 +16,7 @@ class virt {
   }
 
   service { $servicename:
-    ensure => 'running',
+    ensure => running,
     enable => 'true',
   }
 
