@@ -49,6 +49,9 @@ Puppet::Type.newtype(:virt) do
     feature :boot_params,
       "Support parameters for the guest boot."
 
+    feature :boot_order,
+      "Support specifying a boot media order."
+
     feature :initial_config,
       "Config file with default values for VE or LXC creation"
 
@@ -249,8 +252,6 @@ Puppet::Type.newtype(:virt) do
 
     newparam(:cpuset, :required_features => :cpuset) do
       desc "Tune CPU affinity at virt-install time."
-
-      defaultto("auto")
     end
 
     newproperty(:cpuunits, :parent => VirtNumericParam, :required_features => :cpu_fair) do
@@ -363,6 +364,10 @@ Puppet::Type.newtype(:virt) do
 
     newparam(:boot_options, :requires_features => :boot_params) do
       desc "Additional kernel command line arguments to pass to the installer when performing a guest install from declared location."
+    end
+
+    newparam(:boot_order, :requires_features => :boot_order) do
+      desc "Specifies the boot order for the guest."
     end
 
     newparam(:virt_path) do

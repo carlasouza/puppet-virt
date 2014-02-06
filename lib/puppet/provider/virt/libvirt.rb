@@ -12,7 +12,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   # The provider is chosen by virt_type
   confine :feature => :libvirt
 
-  has_features :pxe, :manages_behaviour, :graphics, :clocksync, :boot_params, :cloneable, :cpuset
+  has_features :pxe, :manages_behaviour, :graphics, :clocksync, :boot_params, :cloneable, :cpuset, :boot_order
 
   defaultfor :virtual => ["kvm", "physical", "xenu"]
 
@@ -102,7 +102,11 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     arguments << ["--vcpus=#{resource[:cpus]},maxvcpus=#{max_cpus}"]
 
     arguments << diskargs << additional_diskargs
-    arguments << ["--cpuset=#{resource[:cpuset]}"]
+    arguments << bootorderargs
+
+    if resource[:cpuset]
+      arguments << ["--cpuset=#{resource[:cpuset]}"]
+    end
 
     if resource[:boot_location]
       fail "To use 'boot_location', you need to specify the 'virt_path' parameter." if resource[:virt_path].nil?
@@ -147,6 +151,10 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   def bootargs
     debug "Bootargs"
     resource[:kickstart] ? ["-x", resource[:kickstart]] : [] #kickstart support
+  end
+
+  def bootorderargs
+    resource[:boot_order] ? ["--boot", resource[:boot_order]] : []
   end
 
   # Creates network arguments for virt-install command
