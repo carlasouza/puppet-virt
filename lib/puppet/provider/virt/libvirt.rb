@@ -132,7 +132,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   def additional_virt_install_params
     if resource[:virt_install_params]
       resource[:virt_install_params].collect {|k,v|
-        sep = k.end_with?("=") ? "=" : " "
+        sep = k.end_with?("=") ? "" : " "
         "--#{k}#{sep}#{v}"
       }
     else
