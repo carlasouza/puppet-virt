@@ -12,7 +12,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   # The provider is chosen by virt_type
   confine :feature => :libvirt
 
-  has_features :pxe, :manages_behaviour, :graphics, :clocksync, :boot_params, :cloneable, :cpuset, :boot_order
+  has_features :pxe, :manages_behaviour, :graphics, :clocksync, :boot_params, :cloneable, :cpuset, :boot_order, :virt_install_params
 
   defaultfor :virtual => ["kvm", "physical", "xenu"]
 
@@ -103,6 +103,7 @@ Puppet::Type.type(:virt).provide(:libvirt) do
 
     arguments << diskargs << additional_diskargs
     arguments << bootorderargs
+    arguments << additional_virt_install_params
 
     if resource[:cpuset]
       arguments << ["--cpuset=#{resource[:cpuset]}"]
@@ -126,6 +127,14 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     end
 
     arguments
+  end
+
+  def additional_virt_install_params
+    if resource[:virt_install_params]
+      resource[:virt_install_params].collect {|k,v| "--#{k} #{v}"}
+    else
+      []
+    end
   end
 
   def diskargs
