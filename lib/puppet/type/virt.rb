@@ -67,7 +67,7 @@ Puppet::Type.newtype(:virt) do
     feature :ip,
       "Assign an IP for the guest"
 
-    feature :virt_install_params
+    feature :virt_install_params,
       "Additional parameter passthrough for virt_install"
 
     # A base class for numeric Virt parameters validation.
