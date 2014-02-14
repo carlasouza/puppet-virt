@@ -398,6 +398,14 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     end
   end
 
+  def macaddrs=(value)
+    # Not implemented
+  end
+
+  def macaddrs
+    # Not implemented
+  end
+
   #
   def on_poweroff=(value)
     # Not implemented by libvirt yet
