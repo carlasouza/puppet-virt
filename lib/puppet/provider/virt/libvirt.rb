@@ -154,7 +154,8 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     parameters = ""
     parameters.concat(",bus=virtio") if resource[:virtio_for_disks] == 'true'
       disks.each do |key,value|
-        args << ["--disk=#{key},size=#{value}"+parameters]
+        size_str = value == 0 ? "" : "size=#{value}"
+        args << ["--disk=#{key},#{size_str}"+parameters]
       end
     args
   end
