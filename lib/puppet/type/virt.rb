@@ -189,10 +189,14 @@ Puppet::Type.newtype(:virt) do
       desc "If specified, values from example configuration file /etc/vz/conf/ve-<VALUE>.conf-sample are put into the container configuration file. If this container configuration file already exists, it will be removed."
 
       validate do |file|
-        unless File.file? "#{file}"
-          raise ArgumentError, "Config file \"#{file}\" does not exist."
+        unless Pathname.new(file).absolute?
+          raise ArgumentError, "Path to config file \"#{file}\" must be absolute."
         end
       end
+    end
+
+    autorequire(:file) do
+      self[:configfile] if self[:configfile]
     end
 
     newproperty(:ipaddr, :array_matching => :all, :required_features => :ip) do
