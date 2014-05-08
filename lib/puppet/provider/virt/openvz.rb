@@ -172,7 +172,10 @@ Puppet::Type.type(:virt).provide(:openvz) do
     vzctl('set', ctid, '--userpasswd', value)
   end
 
-  SET_PARAMS = ["name", "capability", "applyconfig", "applyconfig_map", "iptables", "features", "searchdomain", "hostname", "disabled", "setmode", "cpuunits", "cpulimit", "quotatime", "quotaugidlimit", "ioprio", "cpus", "diskspace", "diskinodes", "devices", "devnodes"]
+  SET_PARAMS = %w(name capability applyconfig applyconfig_map iptables features
+    searchdomain hostname disabled setmode cpuunits cpulimit quotatime
+    quotaugidlimit ioprio cpus diskspace diskinodes devices devnodes
+  ).freeze
 
   SET_PARAMS.each do |arg|
     define_method(arg.to_s.downcase) do
