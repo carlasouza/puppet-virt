@@ -4,8 +4,10 @@ Puppet Module to manage virtual machines. Provides a the type: `virt`.
 
 ## Requirements
 
-  ruby-libvirt 0.4.0 (gem)
-  virtinst 0.600 (package)
+On agent
+*  ruby-libvirt 0.4.0 (gem)
+*  virtinst 0.600 (package)
+*  `pluginsync=true` in `puppet.conf`
 
 ----------------
 
