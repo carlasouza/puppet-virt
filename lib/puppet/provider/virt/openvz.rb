@@ -137,8 +137,9 @@ Puppet::Type.type(:virt).provide(:openvz) do
   end
 
   def exists?
-    stat = vzctl('status', ctid).split(" ")
-    !(stat.nil? || stat[2] == "deleted")
+    cmdoutput = vzctl('status', ctid)
+    stat = cmdoutput.split(" ")
+    !(stat.nil? || stat[2] == "deleted" || cmdoutput.match(/deleted/))
   end
 
   # OpenVZ guests status: exist, deleted, mouted, umounted, running, down
