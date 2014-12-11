@@ -30,58 +30,65 @@ This module is the result of my work at GSoC 2010. I thank [Reliant Security] [6
 
 OpenVZ Examples:
 
-    virt { guest-openvz1:
-      ensure      => 'running',
-      id          => 101,
-      os_template => 'ubuntu-10.10',
-      virt_type   => 'openvz',
-      autoboot    => 'false'
-    }
+```puppet
+virt { guest-openvz1:
+  ensure      => 'running',
+  id          => 101,
+  os_template => 'ubuntu-10.10',
+  virt_type   => 'openvz',
+  autoboot    => 'false'
+}
+```
 
 Note that some values can be specified as an array of values:
 
-    virt { guest-openvz2:
-      ensure      => 'installed',
-      memory      => 512,
-      os_template => 'ubuntu-10.10-x86_64',
-      virt_type   => 'openvz',
-      autoboot    => true,
-      interfaces  => ["eth0", "eth1"]
-    }
+```puppet
+virt { guest-openvz2:
+  ensure      => 'installed',
+  memory      => 512,
+  os_template => 'ubuntu-10.10-x86_64',
+  virt_type   => 'openvz',
+  autoboot    => true,
+  interfaces  => ["eth0", "eth1"]
+}
+```
 
 KVM examples:
 
-    virt { guest-kvm1:
-      memory    => 512,
-      virt_path => '/home/user/disk0.qcow2',
-      ensure    => installed,
-      virt_type => 'kvm'
-    }
+```puppet
+virt { guest-kvm1:
+  memory    => 512,
+  virt_path => '/home/user/disk0.qcow2',
+  ensure    => installed,
+  virt_type => 'kvm'
+}
 
-    # clone from kvm1
-    virt { guest-kvm2:
-      clone     => 'guest-kvm1',
-      ensure    => running,
-      virt_type => 'kvm'
-    }
+# clone from kvm1
+virt { guest-kvm2:
+  clone     => 'guest-kvm1',
+  ensure    => running,
+  virt_type => 'kvm'
+}
+```
 
 lXC Examples:
 
-    virt { guest-lxc1:
-      ensure      => running,
-      os_template => 'ubuntu',
-      provider    => 'lxc'
-    }
+```puppet
+virt { guest-lxc1:
+  ensure      => running,
+  os_template => 'ubuntu',
+  provider    => 'lxc'
+}
 
-    # clone from lxc1
-    virt { guest-lxc2:
-      ensure   => running,
-      clone    => 'guest-lxc1',
-      snapshot => true,
-      provider => 'lxc',
-      require  => Virt['lxc1']
-    }
-
+# clone from lxc1
+virt { guest-lxc2:
+  ensure   => running,
+  clone    => 'guest-lxc1',
+  snapshot => true,
+  provider => 'lxc',
+  require  => Virt['lxc1']
+}
+```
 
 #### Features
 
