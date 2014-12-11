@@ -1,5 +1,8 @@
 # Puppet Virtualization Management Module
 
+[![Puppet
+Forge](http://img.shields.io/puppetforge/v/carlasouza/virt.svg)](https://forge.puppetlabs.com/carlasouza/virt)
+
 Puppet Module to manage virtual machines. Provides a the type: `virt`.
 
 ## Requirements
