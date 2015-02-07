@@ -10,14 +10,10 @@ class virt {
     subscribe => Package[$virt::params::packages],
   }
 
-  service { $virt::params::service:
+  service { $virt::params::servicename:
     ensure => running,
     enable => true,
-  }
-
-  service { $servicename:
-    ensure => 'running',
-    enable => 'true',
+    subscribe => Package[$virt::params::packages],
   }
 
   case $virtual {
