@@ -7,7 +7,8 @@ class kvm-guests {
     virt_path => '/home/user/disk0.qcow2',
     cpus      => 2,
     ensure    => running,
-    virt_type => 'kvm'
+    virt_type => 'kvm',
+    boot_order  => 'network,menu=on',
   }
 
   # clone from guest-kvm1
