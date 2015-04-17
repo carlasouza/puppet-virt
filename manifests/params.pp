@@ -21,6 +21,7 @@ class virt::params {
         'Debian' => [ 'kvm', 'libvirt0', 'libvirt-bin', 'qemu', 'virtinst', 'libvirt-ruby' ],
         'Ubuntu' => [ 'ubuntu-virt-server', 'python-vm-builder', 'kvm', 'qemu', 'qemu-kvm', 'libvirt-ruby' ],
         'Fedora' => [ 'kvm', 'qemu', 'libvirt', 'python-virtinst', 'ruby-libvirt' ],
+        'CentOS' => [ 'qemu-kvm', 'libvirt', 'python-virtinst', 'ruby-libvirt' ],
       }
     }
     /^xen/: {
