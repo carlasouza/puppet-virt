@@ -13,7 +13,7 @@ Puppet::Type.type(:virt).provide(:openvz) do
   when "Ubuntu", "Debian"
     @@vzcache = "/var/lib/vz/template/cache/"
     @@vzconf = "/etc/vz/conf/"
-  when "CentOS", "Fedora"
+  when "CentOS", "Fedora", "OpenSuSE", "SLES"
     @@vzcache = "/vz/template/cache/"
     @@vzconf = "/etc/vz/conf/"
   else
