@@ -138,7 +138,7 @@ define virt::ve (
     device => "/dev/mapper/${lvm_vg}-$name",
     require => $ensure ? {
       absent => Virt[$name],
-      default => [ Lvm::Volume[$name], File ["${vedir}/$name"] ],
+      default => [ Lvm::Volume[$name], File["${vedir}/${name}"] ],
     },
   }
 
