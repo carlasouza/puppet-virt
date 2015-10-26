@@ -142,37 +142,33 @@ define virt::ve (
     },
   }
 
-  file { "${vedir}/$name":
+  file { "${vedir}/${name}":
     ensure => directory,
-    owner => 'root',
-    group => 'root',
-    mode => 0755,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
   }
 
   lvm::volume { $name:
     ensure => present,
-    vg => $lvm_vg,
-    pv => $lvm_pv,
+    vg     => $lvm_vg,
+    pv     => $lvm_pv,
     fstype => $lvm_fstype,
-    size => $lvm_size,
+    size   => $lvm_size,
   }
 
   if ($puppetize) and ($ensure == 'present') {
-
-    notify { "notify-puppetize-$name":
-			message => "Puppetizing $name",
+    notify { "notify-puppetize-${name}":
+      message => "Puppetizing ${name}",
       require => Virt[$name],
-		}
-
-    exec { "puppetize-$name":
-      command => "vzctl exec2 $name 'puppet agent -t -l /tmp/install.log --pluginsync true'",
-      unless => "vzctl exec2 $name 'crontab -l | grep -q puppet-client'",
-      timeout => 300,
-      returns => [ 0, 2 ],
-      require => Notify["notify-puppetize-$name"],
     }
 
+    exec { "puppetize-${name}":
+      command => "vzctl exec2 ${name} 'puppet agent -t -l /tmp/install.log --pluginsync true'",
+      unless  => "vzctl exec2 ${name} 'crontab -l | grep -q puppet-client'",
+      timeout => 300,
+      returns => [ 0, 2 ],
+      require => Notify["notify-puppetize-${name}"],
+    }
   }
-
 }
-
