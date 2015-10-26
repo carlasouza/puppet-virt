@@ -4,9 +4,9 @@ class virt {
   package { $virt::params::packages: ensure => latest }
 
   File {
-    owner => 'root',
-    group => 'root',
-    mode => 0644,
+    owner     => 'root',
+    group     => 'root',
+    mode      => '0644',
     subscribe => Package[$virt::params::packages],
   }
 
