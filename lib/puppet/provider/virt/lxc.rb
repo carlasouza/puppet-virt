@@ -111,15 +111,17 @@ Puppet::Type.type(:virt).provide :lxc do
     # lxc-info returns stopped if the container
     # doesn't exist
     def status
-      stat = lxcinfo('-n', @resource[:name])
       if !exists?
         :absent
       elsif exists? and resource[:ensure].to_s == 'installed'
         :installed
-      elsif stat.include?("STOPPED")
-        return :stopped
       else
-        stat = stat.split(" ")[1].downcase.to_sym
+          stat = lxcinfo('-n', @resource[:name])
+          if stat.include?("STOPPED")
+            return :stopped
+          else
+            stat = stat.split(" ")[1].downcase.to_sym
+        end
       end
     end
 
