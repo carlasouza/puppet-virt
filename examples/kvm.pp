@@ -12,7 +12,7 @@ class kvm-guests {
 
   # clone from guest-kvm1
   virt { guest-kvm2:
-    clone     => 'guest-kvm1'
+    clone     => 'guest-kvm1',
     ensure    => running,
     virt_type => 'kvm'
   }
