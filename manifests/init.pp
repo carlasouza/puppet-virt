@@ -6,7 +6,7 @@ class virt {
   File {
     owner => 'root',
     group => 'root',
-    mode => 0644,
+    mode => '0644',
     subscribe => Package[$virt::params::packages],
   }
 
