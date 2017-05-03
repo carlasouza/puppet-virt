@@ -134,8 +134,10 @@ Puppet::Type.type(:virt).provide(:libvirt) do
   def bootargs
     debug "Bootargs"
 
-    # kickstart support
-    resource[:kickstart] ? ["-x", resource[:kickstart]] : []
+    bootargs = []
+    bootargs = ["-x", resource[:kickstart]] if resource[:kickstart] #kickstart support
+    bootargs << ["--boot",resource[:boot_order]] if resource[:boot_order]
+    bootargs
   end
 
   # Creates network arguments for virt-install command
@@ -163,6 +165,15 @@ Puppet::Type.type(:virt).provide(:libvirt) do
     end
 
     return network
+  end
+
+  def macaddrs
+    warnonce "It is not possible to change macaddrs settings for an existing guest."
+    resource[:macaddrs]
+  end
+
+  def macaddrs=(value)
+    warnonce "It is not possible to change macaddrs settings for an existing guest."
   end
 
   # Auxiliary method. Checks if declared interface exists.
